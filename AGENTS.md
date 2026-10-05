@@ -4,9 +4,15 @@
 
 ## 1. 接手顺序和当前任务
 
+2026-10-05 最新用户任务为 U08，按 docs/UI_SETUP_AND_LIBRARY.md 和 STATUS 接手：媒体库分页与页头视觉——页头（大标题、右侧图标、40dp 轮廓 TabRow）固定在 HorizontalPager 之外，只有 TabRow 下方内容左右切换；标题与图标透明度跟随 pager 偏移量渐隐渐显并在两页交界换字；滚动时大标题收成栏内小标题；库页自持 scroll behavior。**用户已复核满意，本轮无待改视觉项。** 下述 U07／U06／U05 为已实现基线。
+
+2026-10-05 前轮用户任务为 U07，按 docs/UI_SETUP_AND_LIBRARY.md 和 STATUS 接手：首次引导／顶部轮廓TabRow／仅播放玻璃底栏及Sink与环形进度／封面阴影与Tilt／500ms歌词切换／歌词样式／长按多选。该轮要求覆盖旧底部纯图标导航规则，其他弹窗／生命周期规则保留。
+
+2026-10-05 前轮用户任务：在 dev-api 继续 U06.6–U06.9 下载体验，丰富 JSON 参数与 GD 五档音质、默认 Music／自选 SAF 目录、自动专辑图、文件签名与准确命名。原 U06 两个独立默认关闭的联网开关、在线搜索和歌词候选保留。设计见 docs/ONLINE_API.md 与 ADR0005；U05/U04 规则继续保留，native gate不抢先。按 STATUS 实际证据接手。
+
 1. 阅读 README、docs/STATUS.md、docs/TECHNICAL_DESIGN.md，再读 docs/IMPLEMENTATION_PLAN.md 的当前阶段。
-2. 查看git status、实际目录与上次证据；当前master没有初始提交，模板文件未跟踪，不清理用户文件，不自动提交。
-3. 当前优先任务为U05音乐前端：标签歌曲名/歌手/专辑/独立时长、MainActivity内音乐详情、封面色背景/渐变/分层弹簧、同目录/手动/内嵌歌词与同步控制；规则/证据见docs/UI_MUSIC_EXPERIENCE.md和ADR0004。U04弹窗按压铺满、U02纯图标栏回退规则继续保留，见docs/UI_DIALOG_FEEDBACK.md；U03设置边距与方向字重保留。视频/设置/方向的U02原生Activity基线见docs/UI_COMPONENTS_AND_MOTION.md与ADR0003，音乐例外以ADR0004为准。U01截图仍为参考，不代表用户最终认可。E00真实Media3/SAF链路保留；USB DAC、API26、HiFi/native仍待验，不用假快照或mock代替播放。
+2. 查看git status、实际目录与上次证据；用户已授权将 U05 基线提交到 master（80538db），并创建 dev-api。后续不清理用户文件，不自动提交／推送新改动。
+3. U05音乐前端作为基线保留：标签歌曲名/歌手/专辑/独立时长、MainActivity内音乐详情、封面色背景/渐变/分层弹簧、同目录/手动/内嵌歌词与同步控制；规则/证据见docs/UI_MUSIC_EXPERIENCE.md和ADR0004。U04弹窗按压铺满、U02纯图标栏回退规则继续保留，见docs/UI_DIALOG_FEEDBACK.md；U03设置边距与方向字重保留。视频/设置/方向的U02原生Activity基线见docs/UI_COMPONENTS_AND_MOTION.md与ADR0003，音乐例外以ADR0004为准。U01截图仍为参考，不代表用户最终认可。E00真实Media3/SAF链路保留；USB DAC、API26、HiFi/native仍待验，不用假快照或mock代替播放。
 4. 每轮写清任务ID/子步骤、文件、验收，完成具体可审查结果。被设备/工具阻塞时继续不依赖它的工作，记录未验条件。
 5. 更新STATUS的实际结果和下一具体动作，最后中文说明实现/验证/限制。
 
@@ -89,7 +95,7 @@
 - Miuix依赖包装在designsystem，主题令牌集中；不要把所有页面又换Material3。小米风格不使用受限字体/商标/私有API。
 - U01 视觉以用户 references 为准：滚动大标题、灰白/暗色分组、磨砂悬浮音乐/视频双分页、独立搜索、真实媒体封面，播放/设置是子页；不恢复 E00 的宣传渐变 Hero 与常驻四项底栏。Raidian 只读参考，不修改其文件。
 - U02界面图标必须来自MiuixIcons；窗口用WindowDialog/WindowSpinnerPreference，show=false时保留Composition直到退出动画完成。视频/设置/方向二级页真实Activity入栈，正常路径不自定义覆盖ROM转场；音乐按用户U05授权在主Activity内自行绘制转场，见ADR0004。参考仓库只读。
-- 当前U04卡片外12dp/行内16dp，文字总左边距28dp；HyperDialog WindowDialog水平insideMargin=0，交互行内部24dp，统一使用HyperSettingRow/HyperSpinnerPreference令牌。clickable/indication放在文字padding之前，让反馈铺满弹窗；取消/文件标题单独24dp。不要恢复整个内容区水平24dp导致两条白边。方向三选项17sp/SemiBold保留；用户否定U03相册效果并授权回退，当前为FloatingNavigationBar/FloatingNavigationBarItem纯图标、52dp搜索，不自行恢复图文栏或声称完美相册效果。
+- 当前U04卡片外12dp/行内16dp，文字总左边距28dp；HyperDialog WindowDialog水平insideMargin=0，交互行内部24dp，统一使用HyperSettingRow/HyperSpinnerPreference令牌。clickable/indication放在文字padding之前，让反馈铺满弹窗；取消/文件标题单独24dp。不要恢复整个内容区水平24dp导致两条白边。方向三选项17sp/SemiBold保留；用户否定U03相册效果并授权回退。U07已用顶部TabRow替换旧的FloatingNavigationBar纯图标底栏（U08把页头固定在分页之外），不要恢复图文底栏或常驻四项导航，也不要声称已达完美相册效果。库页当前：轮廓TabRow 40dp、“全部音乐／收藏”卡片横向内边距16dp、竖向13dp。
 - miuix-blur0.9.4 的 minSdk33 冲突按 ADR 0002 处理：普通 UI 不暴露 blur 类型；只在 API33+进入 Api33MiuixBlur，API26–32不透明回退。不得把 manifest override 当兼容已验证，不提高 minSdk，也不能把高版本调用移回通用文件。
 - 明暗/设计/强调色/reduceMotion独立；系统scale0和后台停止持续动画，封面色只按revision更新；日常播放页不堆implementation参数。
 - 48dp触控、中文/200%字体/TalkBack/暗色对比度；手势有按钮替代。亮度仅window，不申请WRITE_SETTINGS。
@@ -105,4 +111,4 @@
 
 每次STATUS至少写：任务/子步骤、文件、运行命令与exit结果、设备/素材/证据、未执行检查、已知问题、下一动作。只有代码+要求证据齐备才Done，硬件不足记Partial/待验；不把Luna不能完成当验收标准变宽。
 
-当前优先复核U05音乐前端与用户反馈，保留U04反馈/导航规则；不能因为旧计划的“下一步S02”跳过新要求。若用户之后继续完整产品核心实现，再进入S02 native依赖和JNI/Surface gate。保留Media3适配器作为对照，先证明原生runtime可构建/装载再替换。API26–32磨砂隔离、物理多指、DAC仍需后续验收；debug qa_portrait仅是截图辅助，正常启动没有该行为。任何已有数据的设备更新用install -r，不清除导入/偏好；默认connectedDebugAndroidTest本轮曾卸载MuMu应用，之后用scripts/Test-MumuUi.ps1的直接instrumentation保留数据。UI取材仅保留必要局部，不保存个人视频帧。
+当前优先验收U08媒体库分页/页头（已获用户确认）并保留U07引导／导航／控件／歌词样式／多选与U05音乐前端，保留U04反馈/导航规则；不能因为旧计划的“下一步S02”跳过新要求。若用户之后继续完整产品核心实现，再进入S02 native依赖和JNI/Surface gate。保留Media3适配器作为对照，先证明原生runtime可构建/装载再替换。U08遗留：实体机上`LibraryTabsUiTest`／`LibraryManagementUiTest`尚未跑通（`am instrument`崩溃或无输出，需换MuMu或先查崩溃）；API26–32磨砂隔离、物理多指、DAC仍需后续验收；debug qa_portrait仅是截图辅助，正常启动没有该行为。任何已有数据的设备更新用install -r，不清除导入/偏好；默认connectedDebugAndroidTest本轮曾卸载MuMu应用，之后用scripts/Test-MumuUi.ps1的直接instrumentation保留数据。UI取材仅保留必要局部，不保存个人视频帧。

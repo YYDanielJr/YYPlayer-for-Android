@@ -5,16 +5,21 @@ import android.content.pm.ActivityInfo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import yy.daniel.yyplayerforandroid.ui.*
 import yy.daniel.yyplayerforandroid.ui.theme.YYPlayerTheme
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
 
 /** Leave normal Activity transitions to the ROM. No custom windowAnimationStyle or slide override. */
 abstract class PlayerHostActivity : ComponentActivity() {
@@ -41,6 +46,14 @@ abstract class PlayerHostActivity : ComponentActivity() {
         } else open(PlayerActivity::class.java)
     }
     internal fun openOrientation() = open(OrientationActivity::class.java)
+    internal fun openLyricStyle() = open(LyricStyleActivity::class.java)
+    internal fun openSetup() {
+        runtime.setup.restart()
+        startActivity(Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP))
+        if (this !is MainActivity) closePage()
+    }
+    internal fun openOnlineSearch() { if (runtime.preferences.value.onlineMusic) open(OnlineSearchActivity::class.java) }
+    internal fun openOnlineLyrics() { if (runtime.preferences.value.onlineLyrics) open(OnlineLyricsActivity::class.java) }
     private fun open(type: Class<out PlayerHostActivity>) {
         val target = Intent(this, type)
         if (debugPortrait) target.putExtra("qa_portrait", true)
@@ -75,11 +88,42 @@ class SettingsActivity : PlayerHostActivity() {
         setContent {
             val preferences by runtime.preferences.collectAsStateWithLifecycle()
             val snapshot by runtime.playback.state.collectAsStateWithLifecycle()
+            val config by runtime.online.config.collectAsStateWithLifecycle()
+            val apiMessage by runtime.online.message.collectAsStateWithLifecycle()
+            val downloadDirectory by runtime.online.downloadDirectory.collectAsStateWithLifecycle()
+            var localMessage by remember { mutableStateOf<String?>(null) }
+            val scope = rememberCoroutineScope()
+            val configPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+                if (uri != null) scope.launch {
+                    try { runtime.online.importConfig(uri); localMessage = null }
+                    catch (e: CancellationException) { throw e }
+                    catch (e: Exception) { localMessage = "导入失败：${e.message ?: "配置不合法"}；保留原配置" }
+                }
+            }
+            val directoryPicker = rememberLauncherForActivityResult(DownloadTreePicker()) { result ->
+                if (result != null) try { result.persist(this); runtime.online.rememberDownloadTree(result.uri); localMessage = "下载目录已设置" }
+                catch (e: Exception) { localMessage = e.message ?: "目录授权失败" }
+            }
             AppTheme {
                 SettingsScreen(preferences.theme, runtime::setTheme, preferences.accent, runtime::setAccent,
                     preferences.reduceMotion, runtime::setReduceMotion, snapshot, runtime.playback::setDecoderMode,
-                    preferences.orientation, ::openOrientation, ::closePage)
+                    preferences.orientation, ::openOrientation, ::closePage,
+                    preferences.onlineMusic, runtime::setOnlineMusic, preferences.onlineLyrics, runtime::setOnlineLyrics,
+                    config?.providers?.joinToString("、") { it.name }.orEmpty(), localMessage ?: apiMessage,
+                    { configPicker.launch(arrayOf("application/json", "text/*", "application/octet-stream")) }, { directoryPicker.launch(Unit) },
+                    downloadDirectory?.let { runCatching { android.provider.DocumentsContract.getTreeDocumentId(it.toUri()).replace(':', '/') }.getOrDefault("已选择文件夹") } ?: "系统 Music（默认）",
+                    { runtime.online.rememberDownloadTree(null); localMessage = "已恢复默认 Music 下载目录" }, ::openLyricStyle, ::openSetup)
             }
+        }
+    }
+}
+
+class LyricStyleActivity : PlayerHostActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            val preferences by runtime.preferences.collectAsStateWithLifecycle()
+            AppTheme { LyricStyleScreen(preferences.lyricStyle, runtime::setLyricStyle, ::closePage) }
         }
     }
 }

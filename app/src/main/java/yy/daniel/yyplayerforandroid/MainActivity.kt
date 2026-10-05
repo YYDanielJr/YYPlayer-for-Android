@@ -17,5 +17,7 @@ class MainActivity : PlayerHostActivity() {
         if (intent.getBooleanExtra("open_music", false)) showMusic()
         setContent { AppTheme { YYPlayerApp(this) } }
     }
-    override fun onNewIntent(intent: Intent) { super.onNewIntent(intent); setIntent(intent); if (intent.getBooleanExtra("open_music", false)) showMusic() }
+    // open_music is a transient command. Preserve the launch intent (and debug portrait aid)
+    // when the existing library Activity is brought forward from an online search.
+    override fun onNewIntent(intent: Intent) { super.onNewIntent(intent); if (intent.getBooleanExtra("open_music", false)) showMusic() }
 }

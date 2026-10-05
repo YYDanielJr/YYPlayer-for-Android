@@ -1,0 +1,16 @@
+{
+  "date": "2026-10-05",
+  "branch": "dev-api",
+  "baseline": "80538db",
+  "normalApkSha256": "20FE67A7F8B0257067BD147768D15B47C62771FAD5FE4948300D9B48281D04DF",
+  "qaApkSha256": "389B5F2923BDC1D1F935FCC2D776A66BCF77D8ACFF2A45689BE107916A0CA995",
+  "normalQaResourceCount": 0,
+  "apiConfigSha256": "4DD185C9E38B9122D55D1454B6625BB19BD38037EC9F7D5C3CCC4BEEC119C3F6",
+  "jvmTests": 10,
+  "androidTests": 18,
+  "deviceSerial": "127.0.0.1:16384",
+  "deviceApi": 35,
+  "deviceModel": "V2364A",
+  "fixture": "Original low-level 12s stereo 44.1kHz 16bit WAV and original UTF-8 LRC served via localhost HTTPS; no mock playback snapshots",
+  "gdStatus": "403 Cloudflare challenge; unverified"
+}

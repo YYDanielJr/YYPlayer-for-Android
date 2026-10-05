@@ -2,9 +2,11 @@
 
 面向本地音视频的 Android HiFi 播放器。产品方向是：尽可能保留音频源信息、可核实的设备输出、接近哔哩哔哩的播放交互，以及使用 Jetpack Compose + Miuix 构建的 HyperOS 风格界面。
 
-**当前状态：U05 音乐前端重构已实现并通过 MuMu 验收。** 音乐库显示歌曲标签与独立时长；音乐详情在 MainActivity 内展开，支持封面取色柔光背景、弹簧横滑、同步歌词与紧凑控件。歌词可读取已授权同目录 LRC、手动关联及常见内嵌标签；说明、截图和动画见 [U05说明](docs/UI_MUSIC_EXPERIENCE.md)，Activity 例外见 [ADR0004](docs/adr/0004-inline-music-player.md)。视频／设置仍用原生 Activity。U04 弹窗按压与纯图标导航、U03 设置缩进／方向字重保留。旧 E00 界面已被用户否定，旧截图只作为历史播放证据；最新实际进展见 [STATUS](docs/STATUS.md)。当前仍以 Media3 播放本地音视频；USB DAC独占／位完美、C++/libmpv/FFmpeg/Oboe、后台 MediaSession 尚未实现，物理设备动效及 API26–32 专项仍待验。
+**当前界面已接入 U07 七项新需求，并按 U08 完成媒体库分页与页头收尾（用户已复核满意）。** 首次安装引导通过 SAF 文件选择、两个独立联网选项、JSON导入和主题设置完成配置；竖屏库的页头（大标题、右侧图标、40dp 轮廓 TabRow）固定在分页之外——切换时只有 TabRow 下方的内容左右滑动，标题与图标按 pager 偏移量跟手渐隐渐显并在两页交界换字，滚动时大标题收成栏内小标题；底部只放玻璃播放胶囊、环形真实进度与Sink反馈。音乐详情保留圆角阴影切歌、Tilt封面点按和约500ms歌词切换；设置支持选中／非选中歌词样式，本地歌曲支持长按批量管理。行为与验证见 [U07/U08说明](docs/UI_SETUP_AND_LIBRARY.md)、[STATUS](docs/STATUS.md)。U05标签、封面取色与同步歌词及U04弹窗缩进规则继续保留；音乐仍在MainActivity内展开，视频／设置使用原生Activity。当前 Media3 是真实播放适配器；USB独占／位准确、C++/libmpv/FFmpeg/Oboe与后台MediaSession尚未实现，物理设备与API26–32专项待验。
 
 ## 文档入口
+
+`master` 已保存 U05 基线（`80538db`）；当前 `dev-api` 增加在线音乐／歌词服务，设计与使用见 [在线 API](docs/ONLINE_API.md)。联网歌曲与联网歌词开关独立、默认关闭；GD 示例按用户提供文档包含五档音质和专辑图；默认 Music、自选目录、实际格式命名与可用音质检查已实现，具体验证结果见 STATUS。
 
 | 文档 | 用途 |
 | --- | --- |
@@ -12,6 +14,7 @@
 | [实施计划](docs/IMPLEMENTATION_PLAN.md) | S00–S14 的具体文件、操作顺序、前置条件和验收方法 |
 | [AGENTS.md](AGENTS.md) | 后续代码代理必须遵循的执行规则与禁区 |
 | [进度记录](docs/STATUS.md) | 实际完成情况、证据和下一任务；接手先读 |
+| [U07 引导／库／控件](docs/UI_SETUP_AND_LIBRARY.md) | 首次设置、顶部标签、播放玻璃胶囊、歌词样式与长按批量管理 |
 | [U05 音乐展示／歌词／动画](docs/UI_MUSIC_EXPERIENCE.md) | 曲目标签、同页详情、歌词规则、取色与 MuMu 实际证据 |
 | [ADR 0004](docs/adr/0004-inline-music-player.md) | 音乐使用主页内动画覆盖层，视频保留 Activity |
 | [U04 按压反馈/导航回退](docs/UI_DIALOG_FEEDBACK.md) | 反馈宽度规则、纯图标回退与真机证据 |

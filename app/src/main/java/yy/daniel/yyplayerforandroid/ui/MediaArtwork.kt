@@ -50,11 +50,16 @@ private object ArtworkCache {
         }
     }
     fun clear() { entries.evictAll(); revision++ }
+    fun peek(media: LocalMedia?) = media?.let { entries.get(it.uri.toString()) }
     private suspend fun readWithSiblingCover(context: Context, media: LocalMedia): MediaDetails {
-        val details = read(context, media)
+        val base = if (media.isOnline) MediaDetails(artist = media.artist, album = media.album, title = media.songTitle, durationMs = media.durationMs, loaded = true) else read(context, media)
+        val details = base.let { it.copy(artist = it.artist ?: media.artist, album = it.album ?: media.album,
+            title = it.title ?: media.songTitle, durationMs = it.durationMs ?: media.durationMs) }
         if (media.kind != MediaKind.AUDIO || details.artwork != null) return details
         val stem = media.title.substringBeforeLast('.', media.title)
-        val uri = MusicDocuments(context).sibling(media, listOf("$stem.jpg", "$stem.png", "cover.jpg", "cover.png", "folder.jpg")) ?: return details
+        val ownCover = media.artworkUri?.takeIf { it.scheme == "file" && it.path?.startsWith(java.io.File(context.filesDir, "online-artwork").absolutePath + "/") == true }
+        val uri = ownCover ?: if (media.isOnline) null else MusicDocuments(context).sibling(media, listOf("$stem.jpg", "$stem.png", "cover.jpg", "cover.png", "folder.jpg"))
+        if (uri == null) return details
         val art = runCatching { context.contentResolver.openInputStream(uri)?.use { input ->
             val bytes = input.readBytesBounded(16 * 1024 * 1024)
             val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }; BitmapFactory.decodeByteArray(bytes, 0, bytes.size, bounds)
@@ -107,7 +112,7 @@ internal fun rememberMediaDetails(media: LocalMedia?): MediaDetails {
     val context = LocalContext.current.applicationContext
     // key resets the previous song immediately; cancellation prevents late cover colours from winning.
     return key(media?.uri, ArtworkCache.revision) {
-        val details by produceState(MediaDetails(artist = media?.artist, album = media?.album, durationMs = media?.durationMs, title = media?.songTitle)) {
+        val details by produceState(ArtworkCache.peek(media) ?: MediaDetails(artist = media?.artist, album = media?.album, durationMs = media?.durationMs, title = media?.songTitle)) {
             value = if (media == null) MediaDetails() else ArtworkCache.load(context, media)
         }
         details

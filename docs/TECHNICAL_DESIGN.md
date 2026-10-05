@@ -2,7 +2,11 @@
 
 版本：规划基线与E00实测补充，2026-10-04；音乐重构及真机反馈2026-10-05补充。**当前音乐标签、主页内详情、封面色背景、歌词和动画以 [UI_MUSIC_EXPERIENCE](UI_MUSIC_EXPERIENCE.md) 与 [ADR0004](adr/0004-inline-music-player.md) 为准。音乐不再新开 Activity，视频／设置保留原生 Activity。弹窗反馈与导航回退以 [UI_DIALOG_FEEDBACK](UI_DIALOG_FEEDBACK.md) 为准；U03设置/字重历史见 [UI_REAL_DEVICE_REFINEMENTS](UI_REAL_DEVICE_REFINEMENTS.md)。U02窗口/图标/Activity及动效见 [UI_COMPONENTS_AND_MOTION](UI_COMPONENTS_AND_MOTION.md) 和 [ADR0003](adr/0003-activity-stack-runtime.md)；U01视觉基线见 [UI_REWRITE](UI_REWRITE.md)。本文早期骨架/接口仍属于规划。** 事实依据见 [调研来源](RESEARCH_SOURCES.md)，执行顺序见 [实施计划](IMPLEMENTATION_PLAN.md)。第三方API必须对照锁定版本源码实现。
 
+2026-10-05 U07 用户新视觉与引导要求见 [UI_SETUP_AND_LIBRARY](UI_SETUP_AND_LIBRARY.md)。首次标记独立于偏好，SAF授权可选；竖屏库切换置顶，底栏仅真实播放；歌词样式与选中集属于UI数据投影。API33磨砂隔离与单一播放引擎保留。同日 U08 细化库页结构（用户已复核满意）：`HyperPage` 用 `headerAlpha: () -> Float` 延迟读取驱动顶栏淡入淡出、用 `tabs` 槽把 TabRow 放进 `TopAppBar.bottomContent`，页头因此留在 pager 之外、只有内容区横向切换；库页自持 `MiuixScrollBehavior`（把 `TopAppBarState` 提到共享会让滚动后栏内小标题不再出现），音乐／视频各持控制器与列表状态。
+
 ## 1. 需求转成可验收目标
+
+2026-10-05 用户将联网音乐／歌词提前到 U06：JSON provider 请求／响应映射、独立在线搜索 Activity、音质可用性检查／默认 MediaStore Music 与自选 SAF 下载／自动专辑图／文件签名命名、两个默认关闭的联网开关和歌词候选。界面／平台服务仍 Kotlin，唯一共享 Media3 后端保持；详细接口与范围见 [ONLINE_API](ONLINE_API.md)、[ADR0005](adr/0005-configurable-online-music.md)。S13 早期网络规划不覆盖或限制这次授权；native／USB路线未改变。
 
 | 用户目标 | 实现定义 | 不接受的替代品 |
 | --- | --- | --- |

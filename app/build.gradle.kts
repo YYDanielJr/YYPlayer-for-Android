@@ -34,6 +34,12 @@ android {
     buildFeatures {
         compose = true
     }
+    // Explicit QA build only: trust a freshly generated localhost certificate for self-owned fixtures.
+    // Normal debug/release builds retain the platform trust store and contain no QA endpoints/certificates.
+    if (providers.gradleProperty("onlineQa").orNull == "true") {
+        sourceSets.getByName("debug").manifest.srcFile("build/online-qa/AndroidManifest.xml")
+        sourceSets.getByName("debug").res.srcDir("build/online-qa/res")
+    }
 }
 
 dependencies {

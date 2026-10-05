@@ -1,0 +1,125 @@
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.MusicExperienceUiTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=6
+INSTRUMENTATION_STATUS: stream=
+yy.daniel.yyplayerforandroid.MusicExperienceUiTest:
+INSTRUMENTATION_STATUS: test=coverKeepsItsShapeDuringNextAndClickOpensLyrics
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.MusicExperienceUiTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=6
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: Held cover must visibly tilt. Actual: Rect.fromLTRB(272.0, 175.0, 689.0, 592.0)
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failEquals(Assert.java:187)
+	at org.junit.Assert.assertNotEquals(Assert.java:163)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest.coverKeepsItsShapeDuringNextAndClickOpensLyrics$lambda$0(MusicExperienceUiTest.kt:92)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest$$ExternalSyntheticLambda9.invoke(D8$$SyntheticClass:0)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest.fixture(MusicExperienceUiTest.kt:47)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest.coverKeepsItsShapeDuringNextAndClickOpensLyrics(MusicExperienceUiTest.kt:72)
+
+INSTRUMENTATION_STATUS: stream=
+Error in coverKeepsItsShapeDuringNextAndClickOpensLyrics(yy.daniel.yyplayerforandroid.MusicExperienceUiTest):
+java.lang.AssertionError: Held cover must visibly tilt. Actual: Rect.fromLTRB(272.0, 175.0, 689.0, 592.0)
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failEquals(Assert.java:187)
+	at org.junit.Assert.assertNotEquals(Assert.java:163)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest.coverKeepsItsShapeDuringNextAndClickOpensLyrics$lambda$0(MusicExperienceUiTest.kt:92)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest$$ExternalSyntheticLambda9.invoke(D8$$SyntheticClass:0)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest.fixture(MusicExperienceUiTest.kt:47)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest.coverKeepsItsShapeDuringNextAndClickOpensLyrics(MusicExperienceUiTest.kt:72)
+
+INSTRUMENTATION_STATUS: test=coverKeepsItsShapeDuringNextAndClickOpensLyrics
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.MusicExperienceUiTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=6
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=ringSeekPauseAndNextControlTheRealSharedPlayer
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.MusicExperienceUiTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=6
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=ringSeekPauseAndNextControlTheRealSharedPlayer
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.OnboardingUiTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=6
+INSTRUMENTATION_STATUS: stream=
+yy.daniel.yyplayerforandroid.OnboardingUiTest:
+INSTRUMENTATION_STATUS: test=optionalPermissionsOnlineChoicesAndCompletionStayInExistingActivity
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.OnboardingUiTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=6
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=optionalPermissionsOnlineChoicesAndCompletionStayInExistingActivity
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.LibraryManagementUiTest
+INSTRUMENTATION_STATUS: current=4
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=6
+INSTRUMENTATION_STATUS: stream=
+yy.daniel.yyplayerforandroid.LibraryManagementUiTest:
+INSTRUMENTATION_STATUS: test=longPressSelectsWithoutPlayingAndBatchUsesBothSelections
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.LibraryManagementUiTest
+INSTRUMENTATION_STATUS: current=4
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=6
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=longPressSelectsWithoutPlayingAndBatchUsesBothSelections
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.LibraryManagementUiTest
+INSTRUMENTATION_STATUS: current=5
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=6
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=accessibleMenuCanStartManagementAndExitKeepsPlaybackUntouched
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.LibraryManagementUiTest
+INSTRUMENTATION_STATUS: current=5
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=6
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=accessibleMenuCanStartManagementAndExitKeepsPlaybackUntouched
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.LibraryManagementUiTest
+INSTRUMENTATION_STATUS: current=6
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=6
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=removeNeedsExplicitConfirmationAndCancelRetainsSelection
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.LibraryManagementUiTest
+INSTRUMENTATION_STATUS: current=6
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=6
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=removeNeedsExplicitConfirmationAndCancelRetainsSelection
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_RESULT: stream=
+
+Time: 6.022
+There was 1 failure:
+1) coverKeepsItsShapeDuringNextAndClickOpensLyrics(yy.daniel.yyplayerforandroid.MusicExperienceUiTest)
+java.lang.AssertionError: Held cover must visibly tilt. Actual: Rect.fromLTRB(272.0, 175.0, 689.0, 592.0)
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failEquals(Assert.java:187)
+	at org.junit.Assert.assertNotEquals(Assert.java:163)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest.coverKeepsItsShapeDuringNextAndClickOpensLyrics$lambda$0(MusicExperienceUiTest.kt:92)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest$$ExternalSyntheticLambda9.invoke(D8$$SyntheticClass:0)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest.fixture(MusicExperienceUiTest.kt:47)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest.coverKeepsItsShapeDuringNextAndClickOpensLyrics(MusicExperienceUiTest.kt:72)
+
+FAILURES!!!
+Tests run: 6,  Failures: 1
+
+
+INSTRUMENTATION_CODE: -1

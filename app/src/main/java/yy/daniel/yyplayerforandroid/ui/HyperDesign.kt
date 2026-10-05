@@ -1,6 +1,8 @@
 package yy.daniel.yyplayerforandroid.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -9,10 +11,17 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
+import androidx.compose.ui.semantics.progressBarRangeInfo
+import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.semantics.setProgress
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
@@ -27,6 +36,8 @@ import top.yukonga.miuix.kmp.window.WindowDialog
 import top.yukonga.miuix.kmp.icon.MiuixIcons
 import top.yukonga.miuix.kmp.icon.extended.*
 import top.yukonga.miuix.kmp.theme.MiuixTheme
+import top.yukonga.miuix.kmp.utils.SinkFeedback
+import top.yukonga.miuix.kmp.utils.pressable
 import top.yukonga.miuix.kmp.preference.WindowSpinnerPreference
 import yy.daniel.yyplayerforandroid.playback.PlaybackBackend
 import yy.daniel.yyplayerforandroid.playback.PlaybackSnapshot
@@ -41,17 +52,30 @@ private val LocalPreferenceInset = compositionLocalOf { PreferenceInset }
 internal val CardShape = RoundedCornerShape(24.dp)
 internal val Muted: Color @Composable get() = MiuixTheme.colorScheme.onSurfaceVariantSummary
 
+/**
+ * Screen frame: one pinned [TopAppBar] (title, actions, optional [tabs] row) above [content].
+ *
+ * [headerAlpha] is a deferred read: when a pager drives it, only the bar itself re-composes per
+ * frame, so the title plus its actions fade with the gesture and the bar never moves sideways.
+ * Pass [tabs] to keep a tab row pinned under the collapsing title.
+ */
 @Composable
-internal fun HyperPage(title: String, onBack: (() -> Unit)? = null,
-    actions: @Composable RowScope.() -> Unit = {}, content: @Composable (PaddingValues) -> Unit) {
+internal fun HyperPage(title: String, onBack: (() -> Unit)? = null, headerAlpha: () -> Float = { 1f },
+    tabs: (@Composable () -> Unit)? = null,
+    actions: @Composable () -> Unit = {}, content: @Composable (PaddingValues) -> Unit) {
     val backdrop = rememberHyperBackdrop(MiuixTheme.colorScheme.background)
     val scroll = MiuixScrollBehavior(rememberTopAppBarState())
     Scaffold(containerColor = MiuixTheme.colorScheme.background, topBar = {
+        val fade = headerAlpha()
+        val titleColor = MiuixTheme.colorScheme.onSurface.copy(alpha = fade)
         TopAppBar(title = title, largeTitle = title, titlePadding = 26.dp,
+            titleColor = titleColor, largeTitleColor = titleColor,
             color = if (backdrop.supported) Color.Transparent else MiuixTheme.colorScheme.background,
-            modifier = Modifier.hyperGlass(backdrop, RectangleShape, .82f),
+            modifier = Modifier.testTag("hyper-top-bar").hyperGlass(backdrop, RectangleShape, .82f),
             navigationIcon = { if (onBack != null) HyperIconButton(PlayerIcons.Back, "返回", onBack) },
-            actions = actions, scrollBehavior = scroll)
+            actions = { Row(Modifier.graphicsLayer { alpha = fade }, verticalAlignment = Alignment.CenterVertically) { actions() } },
+            bottomContent = { if (tabs != null) tabs() },
+            scrollBehavior = scroll)
     }) { padding ->
         Box(Modifier.fillMaxSize().hyperCapture(backdrop).nestedScroll(scroll.nestedScrollConnection)) { content(padding) }
     }
@@ -133,29 +157,6 @@ internal fun HyperDialog(title: String, onDismiss: () -> Unit, show: Boolean = t
 }
 
 @Composable
-internal fun FloatingLibraryNavigation(selected: Int, onSelect: (Int) -> Unit, searching: Boolean, onSearch: () -> Unit, backdrop: HyperBackdrop) {
-    // Restore the official icon-only floating bar after the user's U04 feedback.
-    // The bar owns its bottom safe spacing. The caller must not add the same insets again.
-    Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.Top) {
-        Box(Modifier.width(180.dp)) {
-            FloatingNavigationBar(modifier = Modifier.hyperGlass(backdrop, RoundedCornerShape(FloatingToolbarDefaults.CornerRadius), alpha = .6f, navigationStyle = true),
-                color = if (backdrop.supported) Color.Transparent else MiuixTheme.colorScheme.surfaceContainer,
-                defaultWindowInsetsPadding = false, shadowElevation = 0.dp) {
-                listOf("音乐" to PlayerIcons.Music, "视频" to PlayerIcons.Video).forEachIndexed { index, (label, icon) ->
-                    FloatingNavigationBarItem(selected = selected == index, onClick = { onSelect(index) }, icon = icon, label = label)
-                }
-            }
-        }
-        Surface(onClick = onSearch, modifier = Modifier.size(52.dp).hyperGlass(backdrop, CircleShape, alpha = .6f, navigationStyle = true), shape = CircleShape,
-            color = if (backdrop.supported) Color.Transparent else MiuixTheme.colorScheme.surfaceContainer) {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Icon(if (searching) PlayerIcons.Close else PlayerIcons.Search, if (searching) "关闭搜索" else "搜索媒体", Modifier.size(26.dp))
-            }
-        }
-    }
-}
-
-@Composable
 internal fun LibrarySidebar(selected: Int, onSelect: (Int) -> Unit, onSettings: () -> Unit) {
     HyperCard(Modifier.statusBarsPadding().navigationBarsPadding().padding(12.dp).width(180.dp).fillMaxHeight()) {
         Text("YYPlayer", Modifier.padding(22.dp), fontSize = 23.sp, fontWeight = FontWeight.Medium)
@@ -172,24 +173,39 @@ internal fun LibrarySidebar(selected: Int, onSelect: (Int) -> Unit, onSettings: 
 }
 
 @Composable
-internal fun LibraryMiniPlayer(snapshot: PlaybackSnapshot, backend: PlaybackBackend, backdrop: HyperBackdrop, onOpen: () -> Unit) {
+internal fun LibraryMiniPlayer(snapshot: PlaybackSnapshot, backend: PlaybackBackend, backdrop: HyperBackdrop, onOpen: () -> Unit, modifier: Modifier = Modifier, reduced: Boolean = false) {
     val details = rememberMediaDetails(snapshot.current)
-    Surface(onClick = onOpen, modifier = Modifier.fillMaxWidth().hyperGlass(backdrop, CardShape, .88f), shape = CardShape,
+    val interactions = remember { MutableInteractionSource() }
+    val sink = remember(reduced) { if (reduced) null else SinkFeedback() }
+    val shape = CircleShape
+    Surface(onClick = onOpen, modifier = modifier.fillMaxWidth().testTag("library-mini-player").pressable(interactions, indication = sink, delay = null)
+        .hyperGlass(backdrop, shape, .6f, navigationStyle = true).border(1.dp, MiuixTheme.colorScheme.onSurface.copy(alpha = .06f), shape), shape = shape,
         color = if (backdrop.supported) Color.Transparent else MiuixTheme.colorScheme.surface) {
-        Column {
-            Row(Modifier.padding(start = 10.dp, end = 6.dp, top = 8.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                MediaArtwork(snapshot.current, Modifier.size(46.dp), radius = 15.dp)
+            Row(Modifier.padding(start = 12.dp, end = 8.dp, top = 8.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                MediaArtwork(snapshot.current, Modifier.size(46.dp), radius = 23.dp)
                 Column(Modifier.weight(1f).padding(horizontal = 12.dp)) {
                     Text(snapshot.current?.let { if (snapshot.isVideo) displayTitle(it.title) else details.title ?: it.musicTitle }.orEmpty(), maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 15.sp, fontWeight = FontWeight.Medium)
-                    Text(if (!snapshot.isVideo) listOf(details.artist ?: "未知歌手", details.album ?: "未知专辑").joinToString(" · ") else if (snapshot.isPlaying) "正在播放" else "已暂停", fontSize = 12.sp, color = Muted, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(if (!snapshot.isVideo) listOf(details.artist ?: snapshot.current?.artist ?: "未知歌手", details.album ?: snapshot.current?.album ?: "未知专辑").joinToString(" · ") else if (snapshot.isPlaying) "正在播放" else "已暂停", fontSize = 12.sp, color = Muted, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
-                HyperIconButton(if (snapshot.isPlaying) PlayerIcons.Pause else PlayerIcons.Play, if (snapshot.isPlaying) "暂停" else "播放", backend::togglePlayPause)
+                val track = MiuixTheme.colorScheme.onSurface.copy(alpha = .12f)
+                val accent = MiuixTheme.colorScheme.primary
+                Box(Modifier.size(56.dp), contentAlignment = Alignment.Center) {
+                    Canvas(Modifier.fillMaxSize().semantics {
+                        progressBarRangeInfo = ProgressBarRangeInfo(snapshot.progress, 0f..1f)
+                        stateDescription = "播放进度 ${formatTime(snapshot.positionMs)}，共 ${formatTime(snapshot.durationMs)}"
+                        if (snapshot.durationMs > 0) setProgress { backend.seekTo((it.coerceIn(0f, 1f) * snapshot.durationMs).toLong()); true }
+                    }) {
+                        val width = 2.5.dp.toPx()
+                        val inset = width / 2 + 2.dp.toPx()
+                        val area = androidx.compose.ui.geometry.Size(size.width - inset * 2, size.height - inset * 2)
+                        drawArc(track, -90f, 360f, false, androidx.compose.ui.geometry.Offset(inset, inset), area, style = Stroke(width, cap = StrokeCap.Round))
+                        if (snapshot.progress > 0f) drawArc(accent, -90f, 360f * snapshot.progress, false,
+                            androidx.compose.ui.geometry.Offset(inset, inset), area, style = Stroke(width, cap = StrokeCap.Round))
+                    }
+                    HyperIconButton(if (snapshot.isPlaying) PlayerIcons.Pause else PlayerIcons.Play, if (snapshot.isPlaying) "暂停" else "播放", backend::togglePlayPause)
+                }
                 HyperIconButton(PlayerIcons.Next, "下一首", backend::next)
             }
-            Box(Modifier.fillMaxWidth().height(2.dp).background(MiuixTheme.colorScheme.surfaceContainerHigh)) {
-                Box(Modifier.fillMaxWidth(snapshot.progress).fillMaxHeight().background(MiuixTheme.colorScheme.primary))
-            }
-        }
     }
 }
 
@@ -210,6 +226,8 @@ internal object PlayerIcons {
     val Music = MiuixIcons.Regular.Music
     val Video = MiuixIcons.Regular.Play
     val Search = MiuixIcons.Regular.Search
+    val Online = MiuixIcons.Regular.CloudFill
+    val Download = MiuixIcons.Regular.Download
     val Add = MiuixIcons.Regular.Add
     val Back = MiuixIcons.Regular.ChevronBackward
     val Chevron = MiuixIcons.Regular.ChevronForward

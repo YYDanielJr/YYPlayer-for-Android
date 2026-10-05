@@ -21,29 +21,34 @@ class MediaLibraryRepository(context: Context) {
             for (i in 0 until saved.length()) {
                 val row = saved.optJSONObject(i) ?: continue
                 val uri = runCatching { Uri.parse(row.optString("uri")) }.getOrNull() ?: continue
-                if (resolver.persistedUriPermissions.none { it.uri == uri && it.isReadPermission ||
+                val owned = row.optBoolean("appOwnedDownload") && uri.scheme == "content" && uri.authority == "media" &&
+                    runCatching { resolver.openAssetFileDescriptor(uri, "r")?.use { true } ?: false }.getOrDefault(false)
+                if (!owned && resolver.persistedUriPermissions.none { it.uri == uri && it.isReadPermission ||
                         it.isReadPermission && it.isPersistedTreeCovering(uri) }) continue
                 val kind = runCatching { MediaKind.valueOf(row.optString("kind")) }.getOrNull() ?: continue
                 add(LocalMedia(uri, row.optString("title", "未命名媒体"), kind, row.optString("mime").takeIf(String::isNotBlank),
                     row.optString("songTitle").takeIf(String::isNotBlank), row.optString("artist").takeIf(String::isNotBlank),
-                    row.optString("album").takeIf(String::isNotBlank), row.optLong("durationMs", -1).takeIf { it >= 0 }, row.optBoolean("metadataRead")))
+                    row.optString("album").takeIf(String::isNotBlank), row.optLong("durationMs", -1).takeIf { it >= 0 }, row.optBoolean("metadataRead"),
+                    artworkUri = row.optString("artworkUri").takeIf(String::isNotBlank)?.let(Uri::parse), appOwnedDownload = owned))
             }
         }
     }
 
     /** Keeps only URIs for which Android granted a persistable read permission. */
     suspend fun add(uris: List<Uri>, kind: MediaKind): List<LocalMedia> {
-        val old = load().associateBy { it.uri.toString() }.toMutableMap()
+        val added = mutableListOf<LocalMedia>()
         uris.forEach { uri ->
             currentCoroutineContext().ensureActive()
             val mime = runCatching { resolver.getType(uri) }.getOrNull()
             val title = queryTitle(resolver, uri) ?: uri.lastPathSegment?.substringAfterLast('/') ?: "未命名媒体"
-            old[uri.toString()] = readMusicMetadata(context = appContext, LocalMedia(uri, title, kind, mime))
+            added += readMusicMetadata(context = appContext, LocalMedia(uri, title, kind, mime))
         }
-        val result = old.values.toList()
         currentCoroutineContext().ensureActive()
-        save(result)
-        return result
+        return synchronized(this) {
+            val merged = load().associateBy { it.uri.toString() }.toMutableMap()
+            added.forEach { media -> merged[media.uri.toString()] = media }
+            save(merged.values.toList()); load()
+        }
     }
 
     private val appContext = context.applicationContext
@@ -52,8 +57,20 @@ class MediaLibraryRepository(context: Context) {
     suspend fun refreshMetadata(items: List<LocalMedia>): List<LocalMedia> {
         val result = items.map { currentCoroutineContext().ensureActive(); if (it.metadataRead) it else readMusicMetadata(appContext, it) }
         currentCoroutineContext().ensureActive()
-        save(result)
-        return result
+        return synchronized(this) {
+            val refreshed = result.associateBy { it.uri }
+            val merged = load().map { refreshed[it.uri] ?: it }
+            save(merged); merged
+        }
+    }
+
+    /** A completed download already has provider metadata; do not discard it for an untagged file. */
+    fun addDownloaded(media: LocalMedia): List<LocalMedia> = synchronized(this) {
+        val own = media.appOwnedDownload && media.uri.scheme == "content" && media.uri.authority == "media" &&
+            runCatching { resolver.openAssetFileDescriptor(media.uri, "r")?.use { true } ?: false }.getOrDefault(false)
+        require(!media.isOnline && (own || resolver.persistedUriPermissions.any { it.isReadPermission && (it.uri == media.uri || it.isPersistedTreeCovering(media.uri)) })) { "下载文件缺少持久授权" }
+        val result = load().filterNot { it.uri == media.uri } + media
+        save(result); result
     }
 
     private fun save(result: List<LocalMedia>) {
@@ -65,13 +82,19 @@ class MediaLibraryRepository(context: Context) {
                 put("mime", item.mimeType.orEmpty())
                 put("songTitle", item.songTitle.orEmpty()); put("artist", item.artist.orEmpty()); put("album", item.album.orEmpty())
                 put("durationMs", item.durationMs ?: -1); put("metadataRead", item.metadataRead)
+                put("artworkUri", item.artworkUri?.toString().orEmpty()); put("appOwnedDownload", item.appOwnedDownload)
             }) }
         }
         preferences.edit { putString("items", encoded.toString()) }
     }
 
-    fun remove(media: LocalMedia): List<LocalMedia> {
-        val result = load().filterNot { it.uri == media.uri }
+    @Synchronized fun remove(media: LocalMedia): List<LocalMedia> {
+        return removeAll(setOf(media.uri.toString()))
+    }
+
+    /** One atomic library update; never deletes the document or changes the playback queue. */
+    @Synchronized fun removeAll(identities: Set<String>): List<LocalMedia> {
+        val result = load().filterNot { it.uri.toString() in identities }
         save(result)
         return result
     }
