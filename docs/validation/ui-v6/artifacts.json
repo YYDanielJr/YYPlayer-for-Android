@@ -1,0 +1,47 @@
+[
+  {
+    "file": "app-debug.apk",
+    "bytes": 18980762,
+    "sha256": "86CEEBD608FA65E4256F74A48E45625CDBC917A313BE7D677FAE065907A35C69"
+  },
+  {
+    "file": "app-debug-androidTest.apk",
+    "bytes": 1135058,
+    "sha256": "53A05BEA0A78D048CAF63FA1FFDFF899B03C522690BD2DC0103AB668097993EE"
+  },
+  {
+    "file": "amber.png",
+    "bytes": 39143,
+    "sha256": "0792F17037138196D5AE3F2D1380B7450DB7E9818CF33DC1220548C8A12DA136"
+  },
+  {
+    "file": "manual-lyrics.lrc",
+    "bytes": 154,
+    "sha256": "A05691FBA17D1883E7FCF473761DF455F74EAD7420CCA7621AAB11FDB9F4A378"
+  },
+  {
+    "file": "no-lyrics.wav",
+    "bytes": 15876078,
+    "sha256": "C3338E35963D9995B85FEDC029A2E7F12879F1BCA7E65430CEB6C9B832FAE85A"
+  },
+  {
+    "file": "track-file-01.flac",
+    "bytes": 3986176,
+    "sha256": "331E3B3A0857547896482679AC2B50C2362E0CEE1AB5CE2AA5EA8BDE9C5090F5"
+  },
+  {
+    "file": "track-file-01.lrc",
+    "bytes": 425,
+    "sha256": "C50A5C416DAB4930FD5065D7A036085308487F6BFFF29EBBCD7F1393B920EA6F"
+  },
+  {
+    "file": "track-file-02.flac",
+    "bytes": 4023765,
+    "sha256": "4E2AE2314ED04FA4BED93F04F029CEDAC20331980A174C9E2A3A563348FA3BF6"
+  },
+  {
+    "file": "violet.png",
+    "bytes": 43332,
+    "sha256": "F9AB9CA9A5AF8480FF52FB181B97F4114070ED0AE6B83E8C240CC9FF9B8AC87F"
+  }
+]

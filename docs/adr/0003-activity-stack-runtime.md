@@ -1,0 +1,11 @@
+# ADR0003：二级Activity与单一过渡播放runtime
+
+2026-10-04，本轮采用。用户明确要求真实Activity切换，优先于原单Activity视觉设计。旧MainActivity拥有引擎，直接复制会创建多个player、退出任意页释放仍使用的实例。
+
+决定：Main、Settings、Player、Orientation共享PlayerApplication的PlayerRuntime。所有引擎命令/owner计数在主线程。Activity创建acquire、销毁release；配置重建保留；最后owner退出700ms后释放，新owner取消清理。全栈停止500ms后暂停，任一start取消暂停；仅前台Activity投影进度。偏好StateFlow沿用SharedPreferences键。
+
+PlayerActivity停止时仅移除VideoSurface里的AndroidView，触发长按取消/PlayerView detach；外层变换记忆保留，resume重新测量并挂接当前引擎。正常start/finish不覆盖系统transition，减少动态效果才覆盖0；二级Activity exported=false；截图extra受FLAG_DEBUGGABLE守卫。
+
+这个Application holder仅是当前Media3前台适配器方案，不替代S05。后台播放完成时，把同一controller/session所有权迁到真实播放service并删除全栈停止暂停逻辑，不能同时创建Application和service引擎。进程被杀后不恢复上一播放队列，媒体库和偏好仍持久。
+
+验证：实际PCM WAV跨Activity测试确认单一实例、音乐推进与原库页复用；TextureView测试确认长按取消和surface detach/attach后矩阵保留；MuMu手工视频回到播放器重挂接。后台通知、焦点/锁屏等未纳入本轮。

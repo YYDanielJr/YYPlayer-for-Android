@@ -1,0 +1,61 @@
+  * Task{e7ee20a #71 type=standard A=10057:yy.daniel.yyplayerforandroid U=0 visible=true visibleRequested=true mode=fullscreen translucent=false sz=3}
+    mLastPausedActivity: ActivityRecord{89558019 u0 yy.daniel.yyplayerforandroid/.PlayerActivity t71}
+    topResumedActivity=ActivityRecord{18015860 u0 yy.daniel.yyplayerforandroid/.OrientationActivity t71}
+    * Hist  #2: ActivityRecord{18015860 u0 yy.daniel.yyplayerforandroid/.OrientationActivity t71}
+      packageName=yy.daniel.yyplayerforandroid processName=yy.daniel.yyplayerforandroid
+      launchedFromUid=10057 launchedFromPackage=yy.daniel.yyplayerforandroid launchedFromFeature=null userId=0
+      app=ProcessRecord{73114d6 10529:yy.daniel.yyplayerforandroid/u0a57}
+      Intent { cmp=yy.daniel.yyplayerforandroid/.OrientationActivity (has extras) }
+      rootOfTask=false task=Task{e7ee20a #71 type=standard A=10057:yy.daniel.yyplayerforandroid}
+      taskAffinity=10057:yy.daniel.yyplayerforandroid
+      mActivityComponent=yy.daniel.yyplayerforandroid/.OrientationActivity
+      baseDir=/data/app/~~cb8w25l1dyEVbWgyzyZuRg==/yy.daniel.yyplayerforandroid-KSdjU2_g8sxcDz_V_PM-qw==/base.apk
+      dataDir=/data/user/0/yy.daniel.yyplayerforandroid
+      windows=[Window{7b1f5e0 u0 yy.daniel.yyplayerforandroid/yy.daniel.yyplayerforandroid.OrientationActivity}]
+    * Hist  #1: ActivityRecord{89558019 u0 yy.daniel.yyplayerforandroid/.PlayerActivity t71}
+      packageName=yy.daniel.yyplayerforandroid processName=yy.daniel.yyplayerforandroid
+      launchedFromUid=10057 launchedFromPackage=yy.daniel.yyplayerforandroid launchedFromFeature=null userId=0
+      app=ProcessRecord{73114d6 10529:yy.daniel.yyplayerforandroid/u0a57}
+      Intent { cmp=yy.daniel.yyplayerforandroid/.PlayerActivity (has extras) }
+      rootOfTask=false task=Task{e7ee20a #71 type=standard A=10057:yy.daniel.yyplayerforandroid}
+      taskAffinity=10057:yy.daniel.yyplayerforandroid
+      mActivityComponent=yy.daniel.yyplayerforandroid/.PlayerActivity
+      baseDir=/data/app/~~cb8w25l1dyEVbWgyzyZuRg==/yy.daniel.yyplayerforandroid-KSdjU2_g8sxcDz_V_PM-qw==/base.apk
+      dataDir=/data/user/0/yy.daniel.yyplayerforandroid
+      windows=[Window{2abe55f u0 yy.daniel.yyplayerforandroid/yy.daniel.yyplayerforandroid.PlayerActivity}]
+    * Hist  #0: ActivityRecord{54526581 u0 yy.daniel.yyplayerforandroid/.MainActivity t71}
+      packageName=yy.daniel.yyplayerforandroid processName=yy.daniel.yyplayerforandroid
+      app=ProcessRecord{73114d6 10529:yy.daniel.yyplayerforandroid/u0a57}
+      Intent { flg=0x10000000 cmp=yy.daniel.yyplayerforandroid/.MainActivity (has extras) }
+      rootOfTask=true task=Task{e7ee20a #71 type=standard A=10057:yy.daniel.yyplayerforandroid}
+      taskAffinity=10057:yy.daniel.yyplayerforandroid
+      mActivityComponent=yy.daniel.yyplayerforandroid/.MainActivity
+      baseDir=/data/app/~~cb8w25l1dyEVbWgyzyZuRg==/yy.daniel.yyplayerforandroid-KSdjU2_g8sxcDz_V_PM-qw==/base.apk
+      dataDir=/data/user/0/yy.daniel.yyplayerforandroid
+      windows=[Window{e396b1f u0 yy.daniel.yyplayerforandroid/yy.daniel.yyplayerforandroid.MainActivity}]
+    Resumed: ActivityRecord{18015860 u0 yy.daniel.yyplayerforandroid/.OrientationActivity t71}
+  ResumedActivity: ActivityRecord{18015860 u0 yy.daniel.yyplayerforandroid/.OrientationActivity t71}
+  topDisplayFocusedRootTask=Task{e7ee20a #71 type=standard A=10057:yy.daniel.yyplayerforandroid}
+  deepestLastOrientationSource=ActivityRecord{18015860 u0 yy.daniel.yyplayerforandroid/.OrientationActivity t71}
+  mCurrentFocus=Window{7b1f5e0 u0 yy.daniel.yyplayerforandroid/yy.daniel.yyplayerforandroid.OrientationActivity}
+  mFocusedApp=ActivityRecord{18015860 u0 yy.daniel.yyplayerforandroid/.OrientationActivity t71}
+  mObscuringWindow=Window{7b1f5e0 u0 yy.daniel.yyplayerforandroid/yy.daniel.yyplayerforandroid.OrientationActivity}
+      mPreferredTopFocusableRootTask=Task{e7ee20a #71 type=standard A=10057:yy.daniel.yyplayerforandroid}
+      mLastFocusedRootTask=Task{e7ee20a #71 type=standard A=10057:yy.daniel.yyplayerforandroid}
+      * Task{e7ee20a #71 type=standard A=10057:yy.daniel.yyplayerforandroid U=0 visible=true visibleRequested=true mode=fullscreen translucent=false sz=3}
+        * ActivityRecord{18015860 u0 yy.daniel.yyplayerforandroid/.OrientationActivity t71}
+        * ActivityRecord{89558019 u0 yy.daniel.yyplayerforandroid/.PlayerActivity t71}
+        * ActivityRecord{54526581 u0 yy.daniel.yyplayerforandroid/.MainActivity t71}
+    mFocusedWindow=Window{7b1f5e0 u0 yy.daniel.yyplayerforandroid/yy.daniel.yyplayerforandroid.OrientationActivity}
+    mTopFullscreenOpaqueWindowState=Window{7b1f5e0 u0 yy.daniel.yyplayerforandroid/yy.daniel.yyplayerforandroid.OrientationActivity}
+    mSystemBarColorApps={ActivityRecord{18015860 u0 yy.daniel.yyplayerforandroid/.OrientationActivity t71}}
+      Window{7b1f5e0 u0 yy.daniel.yyplayerforandroid/yy.daniel.yyplayerforandroid.OrientationActivity}
+        source=ActivityRecord{15825293 u0 yy.daniel.yyplayerforandroid/.MainActivity t32} SCREEN_ORIENTATION_PORTRAIT
+        source=ActivityRecord{66620667 u0 yy.daniel.yyplayerforandroid/.MainActivity t49} SCREEN_ORIENTATION_PORTRAIT
+        source=ActivityRecord{227557812 u0 yy.daniel.yyplayerforandroid/.MainActivity t60} SCREEN_ORIENTATION_PORTRAIT
+        source=ActivityRecord{54526581 u0 yy.daniel.yyplayerforandroid/.MainActivity t71} SCREEN_ORIENTATION_PORTRAIT
+      Window{7b1f5e0 u0 yy.daniel.yyplayerforandroid/yy.daniel.yyplayerforandroid.OrientationActivity}:
+        mControlTarget=Window{7b1f5e0 u0 yy.daniel.yyplayerforandroid/yy.daniel.yyplayerforandroid.OrientationActivity}
+        mControlTarget=Window{7b1f5e0 u0 yy.daniel.yyplayerforandroid/yy.daniel.yyplayerforandroid.OrientationActivity}
+        (fullscreen) Task{e7ee20a #71 type=standard A=10057:yy.daniel.yyplayerforandroid}
+  VisibleActivityProcess:[ ProcessRecord{73114d6 10529:yy.daniel.yyplayerforandroid/u0a57}]
