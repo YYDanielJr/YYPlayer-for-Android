@@ -5,6 +5,9 @@
     <!-- Only Api33MiuixBlur may load this dependency. API26–32 use the type-free facade. -->
     <uses-sdk tools:overrideLibrary="top.yukonga.miuix.kmp.blur" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- AudioManager.setPreferredMixerAttributes (API 34+ USB bit-perfect) requires this; the app
+         asks for it but still shows "unavailable" when the platform refuses the request. -->
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
     <application
         android:name=".PlayerApplication"
@@ -21,6 +24,7 @@
         <activity android:name=".LyricStyleActivity" android:exported="false" android:configChanges="orientation|screenSize|smallestScreenSize" />
         <activity android:name=".PlayerActivity" android:exported="false" android:configChanges="orientation|screenSize|smallestScreenSize" />
         <activity android:name=".OrientationActivity" android:exported="false" android:configChanges="orientation|screenSize|smallestScreenSize" />
+        <activity android:name=".AudioOutputActivity" android:exported="false" android:configChanges="orientation|screenSize|smallestScreenSize" />
         <activity android:name=".OnlineSearchActivity" android:exported="false" android:configChanges="orientation|screenSize|smallestScreenSize" android:windowSoftInputMode="adjustResize" />
         <activity android:name=".OnlineLyricsActivity" android:exported="false" android:configChanges="orientation|screenSize|smallestScreenSize" android:windowSoftInputMode="adjustResize" />
         <activity

@@ -47,6 +47,7 @@ abstract class PlayerHostActivity : ComponentActivity() {
     }
     internal fun openOrientation() = open(OrientationActivity::class.java)
     internal fun openLyricStyle() = open(LyricStyleActivity::class.java)
+    internal fun openAudioOutput() = open(AudioOutputActivity::class.java)
     internal fun openSetup() {
         runtime.setup.restart()
         startActivity(Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP))
@@ -91,6 +92,7 @@ class SettingsActivity : PlayerHostActivity() {
             val config by runtime.online.config.collectAsStateWithLifecycle()
             val apiMessage by runtime.online.message.collectAsStateWithLifecycle()
             val downloadDirectory by runtime.online.downloadDirectory.collectAsStateWithLifecycle()
+            val audioOutput by runtime.audioOutput.state.collectAsStateWithLifecycle()
             var localMessage by remember { mutableStateOf<String?>(null) }
             val scope = rememberCoroutineScope()
             val configPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
@@ -112,7 +114,8 @@ class SettingsActivity : PlayerHostActivity() {
                     config?.providers?.joinToString("、") { it.name }.orEmpty(), localMessage ?: apiMessage,
                     { configPicker.launch(arrayOf("application/json", "text/*", "application/octet-stream")) }, { directoryPicker.launch(Unit) },
                     downloadDirectory?.let { runCatching { android.provider.DocumentsContract.getTreeDocumentId(it.toUri()).replace(':', '/') }.getOrDefault("已选择文件夹") } ?: "系统 Music（默认）",
-                    { runtime.online.rememberDownloadTree(null); localMessage = "已恢复默认 Music 下载目录" }, ::openLyricStyle, ::openSetup)
+                    { runtime.online.rememberDownloadTree(null); localMessage = "已恢复默认 Music 下载目录" }, ::openLyricStyle, ::openSetup,
+                    audioOutput, ::openAudioOutput)
             }
         }
     }
@@ -137,6 +140,7 @@ class PlayerActivity : PlayerHostActivity() {
             val snapshot by runtime.playback.state.collectAsStateWithLifecycle()
             val preferences by runtime.preferences.collectAsStateWithLifecycle()
             val lifecycleState by lifecycle.currentStateFlow.collectAsState()
+            val audioOutput by runtime.audioOutput.state.collectAsStateWithLifecycle()
             LaunchedEffect(snapshot.current?.uri, snapshot.isVideo) {
                 if (snapshot.current != null && !snapshot.isVideo) openPlayer()
             }
@@ -157,7 +161,8 @@ class PlayerActivity : PlayerHostActivity() {
                 PlayerScreen(runtime.playback, snapshot, preferences.reduceMotion,
                     onOpenOrientation = ::openOrientation, favorite = snapshot.current?.uri.toString() in preferences.favorites,
                     onFavorite = { snapshot.current?.let { runtime.toggleFavorite(it.uri.toString()) } },
-                    onBack = ::closePage, surfaceActive = lifecycleState.isAtLeast(Lifecycle.State.STARTED))
+                    onBack = ::closePage, surfaceActive = lifecycleState.isAtLeast(Lifecycle.State.STARTED),
+                    audioOutput = audioOutput)
             }
         }
     }
@@ -169,6 +174,31 @@ class OrientationActivity : PlayerHostActivity() {
         setContent {
             val preferences by runtime.preferences.collectAsStateWithLifecycle()
             AppTheme { OrientationPage(preferences.orientation, runtime::setOrientation, ::closePage) }
+        }
+    }
+}
+
+/**
+ * Output strategy and device selection. The screen only shows state that the controller published
+ * from platform evidence, so an unavailable bit-perfect contract stays visible as unavailable.
+ */
+class AudioOutputActivity : PlayerHostActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            val preferences by runtime.preferences.collectAsStateWithLifecycle()
+            val output by runtime.audioOutput.state.collectAsStateWithLifecycle()
+            AppTheme {
+                AudioOutputScreen(
+                    state = output,
+                    sharing = preferences.audioSharing,
+                    transparency = preferences.audioTransparency,
+                    onSharing = runtime::setAudioSharing,
+                    onTransparency = runtime::setAudioTransparency,
+                    onSelectDevice = runtime::selectAudioOutputDevice,
+                    onBack = ::closePage,
+                )
+            }
         }
     }
 }

@@ -95,7 +95,8 @@ internal fun rememberMusicReduceMotion(preference: Boolean): Boolean {
 @Composable
 internal fun MusicPlayerScreen(snapshot: PlaybackSnapshot, backend: PlaybackBackend, repository: MusicLyricsRepository,
     reduceMotion: Boolean, favorite: Boolean, onFavorite: () -> Unit, onBack: () -> Unit, onOnlineLyrics: (() -> Unit)? = null,
-    lyricStyle: LyricStyle = LyricStyle()) {
+    lyricStyle: LyricStyle = LyricStyle(),
+    audioOutput: yy.daniel.yyplayerforandroid.audio.AudioOutputState? = null) {
     val current = snapshot.current ?: return
     val details = rememberMediaDetails(current)
     val context = LocalContext.current
@@ -232,7 +233,7 @@ internal fun MusicPlayerScreen(snapshot: PlaybackSnapshot, backend: PlaybackBack
     SpeedDialog(snapshot.speed, backend::setSpeed, show = menu == "speed") { menu = null }
     SelectionDialog("播放队列 · ${snapshot.queue.size}", menu == "queue", snapshot.queue.map { DropdownItem(it.musicTitle, summary = it.musicSubtitle) },
         snapshot.queueIndex, onSelect = { backend.play(snapshot.queue, it) }, onDismiss = { menu = null })
-    MediaInfoDialog(snapshot, menu == "info") { menu = null }
+    MediaInfoDialog(snapshot, menu == "info", audioOutput) { menu = null }
 }
 
 @Composable

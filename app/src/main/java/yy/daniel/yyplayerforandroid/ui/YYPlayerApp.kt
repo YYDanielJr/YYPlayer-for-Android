@@ -57,6 +57,7 @@ fun YYPlayerApp(activity: MainActivity) {
     val snapshot by playback.state.collectAsStateWithLifecycle()
     val libraryRevision by runtime.libraryRevision.collectAsStateWithLifecycle()
     val onlineConfig by runtime.online.config.collectAsStateWithLifecycle()
+    val audioOutput by runtime.audioOutput.state.collectAsStateWithLifecycle()
     var kind by rememberSaveable { mutableStateOf(MediaKind.AUDIO) }
     var library by remember { mutableStateOf(emptyList<LocalMedia>()) }
     var loading by remember { mutableStateOf(true) }
@@ -206,6 +207,7 @@ fun YYPlayerApp(activity: MainActivity) {
                         snapshot.current?.identity in preferences.favorites,
                         { snapshot.current?.let { runtime.toggleFavorite(it.identity) } }, { musicExpanded = false },
                         lyricStyle = preferences.lyricStyle,
+                        audioOutput = audioOutput,
                         onOnlineLyrics = if (preferences.onlineLyrics && onlineConfig?.providers.orEmpty().any { it.lyric != null && it.lyricSearch != null }) activity::openOnlineLyrics else null)
                 }
             }

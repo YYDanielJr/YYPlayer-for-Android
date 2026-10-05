@@ -1,6 +1,33 @@
 # 进度与交接记录
 
-## 2026-10-05：U08 媒体库分页与页头视觉（当前记录）
+## 2026-10-05：H01 HiFi 输出基础——可移植 C++ 核心 + Android 输出策略与设备选择（当前记录）
+
+状态：**H01 已实现并在真机取得证据；位完美（BIT_PERFECT）与独占的硬件资格未验。** 分支 `dev-hifi`（由 master `836a920` 建立）。用户提供一台小米 17 Pro Max（`ac07514c`、Android 17／SDK 37、HyperOS OS4.0），但**没有连接 USB DAC 或蓝牙音频设备**，因此任何 `system_reported` 级别的位完美都无法取证；本轮把这一点如实记为未验，没有伪造状态。设计决策见 [ADR0006](adr/0006-hifi-output-core-android-split.md)，官方 API 事实见 [USB_DAC_BITPERFECT_API_FACTS](research/USB_DAC_BITPERFECT_API_FACTS.md)。
+
+任务／文件／实际行为：
+
+- H01.1 Git 保存点：dev-api 的 U06/U07/U08 改动提交为 `4fff9f1`，以 `--no-ff` 合并入 master `836a920`，再由 dev-api 建立 `dev-hifi`。
+- H01.2 可移植核心（`native/core`）：C++17 静态库，无 Android/JNI/mpv 类型。`format`（PCM 格式、字节/帧运算与 64 位溢出检查）、`pcm`（只做不丢有效位的原样转换：整数加宽、24-packed 与 24-in-32 互转；丢位或经 float 一律拒绝）、`ring`（无锁单生产/单消费 PCM 环，区分丢弃与欠载计数）、`policy`（sharing 与 transparency 的 AND 判定，拒绝必带原因码）、`json`（控制桥用的点路径 JSON 读写）。
+- H01.3 JNI 桥（`native/jni/yy_jni.cpp`）：控制面 JSON、PCM 走 DirectByteBuffer 与预分配环；句柄经注册表校验，旧句柄返回失败而不是解引用；桥内不抛异常、不做 JNI 回调。
+- H01.4 平台层（`app/.../audio`）：`AudioDeviceProbe` 枚举输出设备并读取 API 34+ 混音器属性（API 34 引用全部隔离在嵌套对象内，API 26–33 不会加载新类）；`AudioOutputController` 按“核心决定 → 平台请求 → 只发布平台回读事实”的顺序工作；`NativeAudioCore` 是唯一 JNI 入口，其请求/响应翻译是纯函数，可在主机单测里锁定线格式。
+- H01.5 输出策略与设备选择 UI：新增 `AudioOutputActivity`／`AudioOutputScreen`，可设置“流独占／样本原样”策略、在软件内选择输出设备（或跟随系统）、查看实际流共享、位准确状态、实际输出格式与路由设备。设置页“播放”分组新增“音频输出”入口，媒体信息弹窗按实际观测显示音频输出路径。
+- H01.6 权限与清单：新增 `MODIFY_AUDIO_SETTINGS`（`AudioManager.setPreferredMixerAttributes` 必需，属普通权限，安装即授予）；注册 `AudioOutputActivity`（未导出，只能从应用内进入）。
+- H01.7 Gradle：接入 `externalNativeBuild`（NDK 28.2.13676358 + CMake 3.22.1），ABI 限 `arm64-v8a` 与 `x86_64`；`app/testOptions.unitTests.isReturnDefaultValues = true` 供主机单测运行含 `android.util.Log` 的代码。
+
+实际命令／设备／证据：
+
+- 主机核心测试：`cmake -S native -B native/build-host -G Ninja ... && cmake --build native/build-host` exit0；`yy_core_tests.exe` 输出 `checks=2345 failures=0`、`RESULT OK`；`ctest` 1/1 Passed。
+- 同一二进制在真机运行：`adb push native/build-android-arm64-v8a/yy_core_tests /data/local/tmp/` → `checks=2345 failures=0`、`RESULT OK`（arm64-v8a 与 x86_64 交叉编译均成功）。
+- App 构建：`:app:assembleDebug :app:assembleDebugAndroidTest` BUILD SUCCESSFUL；APK 内含 `lib/arm64-v8a/libyyplayer_jni.so` 与 `lib/x86_64/libyyplayer_jni.so`（`llvm-nm` 校验导出符号与 Kotlin 声明一致）。
+- 主机单测：`AudioBridgeJsonTest`、`AudioPolicyWireTest` 锁定请求/响应字段名与枚举拼写，`:app:testDebugUnitTest` 24 项 0 失败。
+- 真机 instrumentation：`AudioOutputDeviceTest` **OK (7 tests)**，覆盖原生核心装载与版本（`YYPLAYER_CORE_VERSION=1`）、无契约路由拒绝严格原样、软件音量拒绝严格原样、系统 AudioTrack 路径拒绝严格独占、设备能力记录（非 USB 输出不得报告位完美组合）。
+- 设备能力实测（无 USB DAC）：系统只报告内置输出；`getSupportedMixerAttributes` 无 USB 设备可查，故本机不存在任何 `system_reported` 位完美证据。
+
+未执行／已知边界：**没有 USB DAC 与蓝牙设备，BIT_PERFECT 契约、Oboe 独占、真实独占回读、数字捕获、耳机/USB 插拔策略全部未验**；本轮也**没有**把 Media3/ExoPlayer 的 PCM 换成核心输出通路（S06 的 FFmpeg 解码 + AudioTrack/Oboe sink 仍是后续工作），因此“位完美状态”目前只能显示 `unavailable`／`requested`，播放本身仍走系统共享输出。Android 17 后台音频收紧（后台播放与音量 API 静默失败）尚未专项验证。输出页 UI 只做了编译与控制器级验证，未在锁屏/无人值守条件下完成像素级目检（小米运行申请弹窗曾遮挡设备）。
+
+下一具体动作：H02 接入 S06 的 PCM 输出通路（FFmpeg 解码或先把核心环接到 AudioTrack sink），使策略决定真正作用到播放；随后 H03 在实体 USB DAC 上取证 `getSupportedMixerAttributes`／`setPreferredMixerAttributes`／`getRoutedDevices` 的真实结果，并按 ADR0006 的退出条件推进 S08（Oboe 独占）。不自动提交／推送。
+
+## 2026-10-05：U08 媒体库分页与页头视觉（前轮记录）
 
 状态：**用户已复核通过并明确表示满意（第二轮结果）。** 首个实现把标题/页头/分页整片横移，并按固定时间轴切换文字，用户实测指出“滑动时标题不收起、图标和标题闪一下”；本轮改为：页头（标题＋右侧图标＋TabRow）固定在 pager 之外，只有 TabRow 下方的内容左右切换；标题与图标透明度直接跟随 pager 偏移量，换字发生在两页交界、透明度最低处；滚动重新把大标题收成栏内小标题。用户确认 TabRow／卡片收窄与淡入淡出效果符合预期。仍在 dev-api 工作区，未自动提交／推送；未修改桌面 Rust 工程。交互规格见 [UI_SETUP_AND_LIBRARY](UI_SETUP_AND_LIBRARY.md)。
 

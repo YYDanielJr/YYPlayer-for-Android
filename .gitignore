@@ -16,3 +16,8 @@ local.properties
 
 # Kotlin incremental/compiler caches
 /.kotlin/
+
+# Native build outputs: host CTest trees and NDK cross-compile trees are generated, not source.
+/native/build*/
+# Diagnostic artifacts written while repairing Windows file permissions for this workspace.
+/docs/validation/acl-recovery/

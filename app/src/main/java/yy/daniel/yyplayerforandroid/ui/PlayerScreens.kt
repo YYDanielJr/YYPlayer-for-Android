@@ -40,7 +40,8 @@ private enum class PlayerMenu { SPEED, QUEUE, INFO, VIDEO }
 @androidx.annotation.OptIn(markerClass = [androidx.media3.common.util.UnstableApi::class])
 internal fun PlayerScreen(backend: AndroidMedia3PlaybackBackend, snapshot: PlaybackSnapshot, reduceMotion: Boolean,
     onOpenOrientation: () -> Unit, favorite: Boolean,
-    onFavorite: () -> Unit, onBack: () -> Unit, surfaceActive: Boolean = true) {
+    onFavorite: () -> Unit, onBack: () -> Unit, surfaceActive: Boolean = true,
+    audioOutput: yy.daniel.yyplayerforandroid.audio.AudioOutputState? = null) {
     var menu by remember { mutableStateOf<PlayerMenu?>(null) }
     var resetKey by remember { mutableIntStateOf(0) }
     val current = snapshot.current
@@ -53,7 +54,7 @@ internal fun PlayerScreen(backend: AndroidMedia3PlaybackBackend, snapshot: Playb
     @Composable fun dialogs() {
         // Always mount the native popup nodes. Removing a node at show=false cuts off its exit spring.
         SpeedDialog(snapshot.speed, backend::setSpeed, show = menu == PlayerMenu.SPEED) { menu = null }
-        MediaInfoDialog(snapshot, show = menu == PlayerMenu.INFO) { menu = null }
+        MediaInfoDialog(snapshot, show = menu == PlayerMenu.INFO, audioOutput = audioOutput) { menu = null }
         SelectionDialog("播放队列 · ${snapshot.queue.size}", menu == PlayerMenu.QUEUE,
             snapshot.queue.map { DropdownItem(displayTitle(it.title)) }, snapshot.queueIndex,
             onSelect = { backend.play(snapshot.queue, it) }, onDismiss = { menu = null })
@@ -192,7 +193,12 @@ internal fun SpeedDialog(speed: Float, onSpeed: (Float) -> Unit, show: Boolean =
 }
 
 @Composable
-internal fun MediaInfoDialog(snapshot: PlaybackSnapshot, show: Boolean = true, onDismiss: () -> Unit) {
+internal fun MediaInfoDialog(
+    snapshot: PlaybackSnapshot,
+    show: Boolean = true,
+    audioOutput: yy.daniel.yyplayerforandroid.audio.AudioOutputState? = null,
+    onDismiss: () -> Unit,
+) {
     HyperDialog("媒体信息", onDismiss, show = show, buttonText = "完成") {
         HyperSettingRow("文件", snapshot.current?.title ?: "尚未播放")
         if (snapshot.isVideo) {
@@ -208,6 +214,22 @@ internal fun MediaInfoDialog(snapshot: PlaybackSnapshot, show: Boolean = true, o
         }
         HyperSettingRow("音频输入", listOfNotNull(snapshot.audioSampleRate?.let { "${it / 1000f} kHz" }, snapshot.audioChannels?.let { "$it 声道" }).joinToString(" · ").ifBlank { "未报告" })
         HyperSettingRow("音频解码器", snapshot.audioDecoderName ?: "未报告")
-        HyperSettingRow("音频输出", "Android 系统输出；独占与输出格式尚未验证")
+        // Only what the output controller observed is shown: an unreported value stays "未知"
+        // instead of being filled in with the input format.
+        val output = audioOutput
+        if (output == null) {
+            HyperSettingRow("音频输出", "Android 系统输出；独占与输出格式尚未验证")
+        } else {
+            HyperSettingRow("音频输出路径", output.decision.reasonText)
+            HyperSettingRow("位准确", output.bitPerfect.label)
+            HyperSettingRow(
+                "实际输出格式",
+                listOfNotNull(
+                    output.actualSampleRate?.let { "${it / 1000f} kHz" },
+                    output.actualEncoding.takeIf { it.effectiveBits > 0 }?.let { "${it.effectiveBits} bit" },
+                ).joinToString(" · ").ifBlank { "未知（系统未报告硬件输出格式）" },
+            )
+            HyperSettingRow("独占状态", output.actualSharing.label)
+        }
     }
 }

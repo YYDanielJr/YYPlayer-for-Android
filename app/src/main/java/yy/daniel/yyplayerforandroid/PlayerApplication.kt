@@ -28,6 +28,9 @@ internal data class PlayerPreferences(
     val onlineMusic: Boolean = false,
     val onlineLyrics: Boolean = false,
     val lyricStyle: yy.daniel.yyplayerforandroid.ui.LyricStyle = yy.daniel.yyplayerforandroid.ui.LyricStyle(),
+    val audioSharing: yy.daniel.yyplayerforandroid.audio.SharingRequest = yy.daniel.yyplayerforandroid.audio.SharingRequest.SHARED,
+    val audioTransparency: yy.daniel.yyplayerforandroid.audio.TransparencyRequest =
+        yy.daniel.yyplayerforandroid.audio.TransparencyRequest.PREFER_UNPROCESSED,
 )
 
 @androidx.annotation.OptIn(markerClass = [androidx.media3.common.util.UnstableApi::class])
@@ -49,11 +52,28 @@ internal class PlayerRuntime(context: Context) {
                 storage.edit { putString("lyric_style_bad_backup", storage.all["lyric_style"]?.toString()?.take(4096)); remove("lyric_style") }
                 yy.daniel.yyplayerforandroid.ui.LyricStyle()
             },
+        audioSharing = yy.daniel.yyplayerforandroid.audio.SharingRequest.entries
+            .firstOrNull { it.name == storage.getString("audio_sharing", null) }
+            ?: yy.daniel.yyplayerforandroid.audio.SharingRequest.SHARED,
+        audioTransparency = yy.daniel.yyplayerforandroid.audio.TransparencyRequest.entries
+            .firstOrNull { it.name == storage.getString("audio_transparency", null) }
+            ?: yy.daniel.yyplayerforandroid.audio.TransparencyRequest.PREFER_UNPROCESSED,
     ))
     val preferences = _preferences.asStateFlow()
     val library = MediaLibraryRepository(context.applicationContext)
     val lyrics = MusicLyricsRepository(context.applicationContext)
     val online = OnlineRepository(appContext, { preferences.value.onlineMusic }, { preferences.value.onlineLyrics })
+
+    /**
+     * Owns the audio output policy and the evidence about it. It follows the same owner count as the
+     * engine so the device callback is only registered while a screen is alive.
+     */
+    val audioOutput: yy.daniel.yyplayerforandroid.audio.AudioOutputController by lazy {
+        yy.daniel.yyplayerforandroid.audio.AudioOutputController(appContext).also {
+            val preferences = _preferences.value
+            it.setPolicy(preferences.audioSharing, preferences.audioTransparency)
+        }
+    }
     val libraryRevision = MutableStateFlow(0L)
     init { scope.launch { online.load() } }
     private var engine: AndroidMedia3PlaybackBackend? = null
@@ -69,12 +89,15 @@ internal class PlayerRuntime(context: Context) {
         onlineLyricJob = scope.launch { online.automaticLyrics(song, media, lyrics) }
     }
 
-    fun acquire() { cleanup?.cancel(); owners++ }
+    fun acquire() { cleanup?.cancel(); if (owners == 0) audioOutput.start(); owners++ }
     fun release(retainForConfiguration: Boolean) {
         owners--
         if (owners == 0 && !retainForConfiguration) cleanup = scope.launch {
             delay(700) // Allow a normal Activity hand-off to acquire the same engine.
-            if (owners == 0) { ticker?.cancel(); onlineLyricJob?.cancel(); engine?.close(); engine = null }
+            if (owners == 0) {
+                audioOutput.stop()
+                ticker?.cancel(); onlineLyricJob?.cancel(); engine?.close(); engine = null
+            }
         }
     }
     fun start() {
@@ -106,4 +129,16 @@ internal class PlayerRuntime(context: Context) {
     fun setFavorites(keys: Set<String>, favorite: Boolean) { setFavorites(if (favorite) preferences.value.favorites + keys else preferences.value.favorites - keys) }
     fun removeFavorite(key: String) { setFavorites(_preferences.value.favorites - key) }
     private fun setFavorites(value: Set<String>) { _preferences.value = _preferences.value.copy(favorites = value); storage.edit { putStringSet("favorites", value) } }
+
+    fun setAudioSharing(value: yy.daniel.yyplayerforandroid.audio.SharingRequest) {
+        _preferences.value = _preferences.value.copy(audioSharing = value)
+        storage.edit { putString("audio_sharing", value.name) }
+        audioOutput.setPolicy(value, _preferences.value.audioTransparency)
+    }
+    fun setAudioTransparency(value: yy.daniel.yyplayerforandroid.audio.TransparencyRequest) {
+        _preferences.value = _preferences.value.copy(audioTransparency = value)
+        storage.edit { putString("audio_transparency", value.name) }
+        audioOutput.setPolicy(_preferences.value.audioSharing, value)
+    }
+    fun selectAudioOutputDevice(deviceId: Int?) = audioOutput.selectDevice(deviceId)
 }
