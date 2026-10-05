@@ -1,6 +1,7 @@
 package yy.daniel.yyplayerforandroid.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -24,7 +25,12 @@ import yy.daniel.yyplayerforandroid.playback.PlaybackSnapshot
 internal fun SettingsScreen(theme: ThemeChoice, onTheme: (ThemeChoice) -> Unit,
     accent: AccentChoice, onAccent: (AccentChoice) -> Unit, reduceMotion: Boolean, onReduceMotion: (Boolean) -> Unit,
     snapshot: PlaybackSnapshot, onDecoder: (DecoderMode) -> Unit, orientation: OrientationChoice,
-    onOpenOrientation: () -> Unit, onBack: () -> Unit) {
+    onOpenOrientation: () -> Unit, onBack: () -> Unit,
+    onlineMusic: Boolean = false, onOnlineMusic: (Boolean) -> Unit = {},
+    onlineLyrics: Boolean = false, onOnlineLyrics: (Boolean) -> Unit = {},
+    apiSummary: String = "", apiMessage: String? = null, onImportApi: () -> Unit = {}, onDownloadDirectory: () -> Unit = {},
+    downloadDirectory: String = "系统 Music（默认）", onDefaultDownloadDirectory: () -> Unit = {},
+    onLyricStyle: () -> Unit = {}, onSetup: () -> Unit = {}) {
     var dialog by remember { mutableStateOf<String?>(null) }
     HyperPage("设置", onBack) { padding ->
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
@@ -59,22 +65,35 @@ internal fun SettingsScreen(theme: ThemeChoice, onTheme: (ThemeChoice) -> Unit,
                         selectedIndex = snapshot.decoderMode.ordinal, onSelectedIndexChange = { onDecoder(DecoderMode.entries[it]) })
                     HyperSettingRow("屏幕方向", value = orientation.label, onClick = onOpenOrientation)
                     HyperSettingRow("播放手势", "长按临时 3 倍速，双指缩放、旋转与移动")
+                    HyperSettingRow("歌词显示", "分别设置选中行、非选中行的字号、字重与颜色，以及行间距", onClick = onLyricStyle)
+                } }
+                item { HyperSection("联网服务") }
+                item { HyperCard(Modifier.padding(horizontal = PageGutter).fillMaxWidth()) {
+                    HyperSettingRow("联网搜索歌曲", "开启后显示独立在线搜索，支持串流与下载", trailing = { Switch(checked = onlineMusic, onCheckedChange = onOnlineMusic) })
+                    HyperSettingRow("联网搜索歌词", "按歌名查找候选，并为在线歌曲自动保存歌词", trailing = { Switch(checked = onlineLyrics, onCheckedChange = onOnlineLyrics) })
+                    HyperSettingRow("API 配置", apiMessage ?: apiSummary.ifBlank { "正在读取…" }, value = "导入 JSON", onClick = onImportApi)
+                    if (onlineMusic) HyperSettingRow("歌曲下载目录", downloadDirectory, onClick = { dialog = "download" })
                 } }
                 item { HyperSection("关于") }
                 item { HyperCard(Modifier.padding(horizontal = PageGutter).fillMaxWidth()) {
                     HyperSettingRow("YYPlayer", "本地音乐与视频播放器")
+                    HyperSettingRow("使用引导", "重新设置文件访问、联网服务与外观", onClick = onSetup)
                     HyperSettingRow("当前媒体信息", "查看媒体格式与实际解码路径", onClick = { dialog = "info" })
                 } }
             }
         }
     }
+    HyperDialog("歌曲下载目录", { dialog = null }, show = dialog == "download") {
+        HyperSettingRow("系统 Music（默认）", "歌曲保存到 Music；歌词与专辑图自动保存在应用内", onClick = { onDefaultDownloadDirectory(); dialog = null })
+        HyperSettingRow("选择文件夹", "同时保存歌曲、同名歌词与专辑图", onClick = { dialog = null; onDownloadDirectory() })
+    }
     MediaInfoDialog(snapshot, show = dialog == "info") { dialog = null }
 }
 
 @Composable
-private fun ThemePreview(choice: ThemeChoice, selected: Boolean, onClick: () -> Unit, modifier: Modifier) {
+internal fun ThemePreview(choice: ThemeChoice, selected: Boolean, onClick: () -> Unit, modifier: Modifier) {
     val shape = RoundedCornerShape(16.dp)
-    Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(modifier.clickable(onClick = onClick), horizontalAlignment = Alignment.CenterHorizontally) {
         Surface(onClick = onClick, modifier = Modifier.fillMaxWidth().height(106.dp)
             .border(if (selected) 2.dp else 1.dp, if (selected) MiuixTheme.colorScheme.primary else MiuixTheme.colorScheme.surfaceContainerHigh, shape),
             color = if (choice == ThemeChoice.DARK) Color(0xFF151515) else Color(0xFFF1F1F1), shape = shape) {

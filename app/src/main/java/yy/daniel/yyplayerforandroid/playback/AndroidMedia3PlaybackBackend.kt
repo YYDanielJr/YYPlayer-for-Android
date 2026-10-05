@@ -12,16 +12,20 @@ import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.analytics.AnalyticsListener
 import androidx.media3.exoplayer.mediacodec.MediaCodecSelector
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.datasource.DefaultDataSource
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+import yy.daniel.yyplayerforandroid.online.OnlineAudioDataSource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 /** Real local Media3 playback for the emulator-first vertical slice; no UI-owned player state. */
 @UnstableApi
-class AndroidMedia3PlaybackBackend(context: Context) : PlaybackBackend {
+class AndroidMedia3PlaybackBackend(context: Context, private val networkAllowed: () -> Boolean = { false }) : PlaybackBackend {
     private val appContext = context.applicationContext
     // newPlayer reads speed during property initialization, so initialize it before player.
     private var speed = 1f
+    private val mediaHeaderSnapshot = java.util.concurrent.atomic.AtomicReference<Map<String, Map<String, Map<String, String>>>>(emptyMap())
     private var player: ExoPlayer = newPlayer(DecoderMode.AUTO)
     private var queue: List<LocalMedia> = emptyList()
     private var index: Int = -1
@@ -40,7 +44,9 @@ class AndroidMedia3PlaybackBackend(context: Context) : PlaybackBackend {
 
     override fun play(queue: List<LocalMedia>, startIndex: Int) {
         if (queue.isEmpty() || startIndex !in queue.indices) return
+        if (queue[startIndex].isOnline && !networkAllowed()) { error = "联网音乐已关闭"; publish(); return }
         this.queue = queue.toList()
+        mediaHeaderSnapshot.set(queue.associate { it.uri.toString() to it.mediaHeaders })
         index = startIndex
         error = null
         videoDecoderName = null
@@ -53,7 +59,9 @@ class AndroidMedia3PlaybackBackend(context: Context) : PlaybackBackend {
     }
 
     override fun togglePlayPause() {
+        if (_state.value.current?.isOnline == true && !networkAllowed()) { error = "联网音乐已关闭"; publish(); return }
         error = null
+        if (player.playbackState == Player.STATE_IDLE && queue.isNotEmpty()) player.prepare()
         if (player.playbackState == Player.STATE_ENDED) {
             player.seekTo(0)
             player.play()
@@ -139,10 +147,13 @@ class AndroidMedia3PlaybackBackend(context: Context) : PlaybackBackend {
 
     fun refreshPosition() = publish()
 
+    fun stopOnline() { if (queue.getOrNull(index)?.isOnline == true) { player.stop(); publish() } }
+
     fun exoPlayer(): ExoPlayer = player
 
     override fun close() {
         player.release()
+        mediaHeaderSnapshot.set(emptyMap())
         queue = emptyList()
         index = -1
         _state.value = PlaybackSnapshot()
@@ -161,7 +172,11 @@ class AndroidMedia3PlaybackBackend(context: Context) : PlaybackBackend {
         val renderers = DefaultRenderersFactory(appContext)
             .setMediaCodecSelector(selector)
             .setEnableDecoderFallback(mode != DecoderMode.STRICT_HARDWARE)
-        return ExoPlayer.Builder(appContext, renderers).build().also { it.playbackParameters = PlaybackParameters(speed) }
+        val dataSource = DefaultDataSource.Factory(appContext, OnlineAudioDataSource.Factory(networkAllowed) { url ->
+            mediaHeaderSnapshot.get()[url]?.get(java.net.URI(url).host).orEmpty()
+        })
+        return ExoPlayer.Builder(appContext, renderers).setMediaSourceFactory(DefaultMediaSourceFactory(dataSource))
+            .build().also { it.playbackParameters = PlaybackParameters(speed) }
     }
 
     private fun attachListeners(target: ExoPlayer) {

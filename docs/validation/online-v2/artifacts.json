@@ -1,0 +1,18 @@
+{
+  "qaApkSha256": "cdc4f10eedaf81cb2ffa3da91d625a995ebdced2b4402a0108cac4e139556194",
+  "configSha256": "418fe8d499d04b1cb3e5ff1f5da0630aacae29eb5aee9b2d4829c62fc4cfaf7e",
+  "wavSha256": "0f6be3d71b2ef29d0916f5e8c68f3ffb54e046cb230cbd568f05d416d501dbd9",
+  "flacSha256": "0fcb111c7299dcc44c626d8c33dba58c1edf86fd8f51eb721e361344f74380c7",
+  "jvmTests": 14,
+  "jvmFailures": 0,
+  "instrumentationTests": 21,
+  "device": "MuMu index 0 Android 15/API35 2304FPN6DC",
+  "adb": "127.0.0.1:16384",
+  "normalApkSha256": "8bec1d9a188894bea67a96f18bc1dcde98524c124c46a4c6b3ad7a048359e81b",
+  "normalQaResourceCount": 0,
+  "normalLint": "No issues found.",
+  "preferencesRestored": true,
+  "privateConfigRestored": true,
+  "qaServerStopped": true,
+  "adbReverseRemoved": true
+}

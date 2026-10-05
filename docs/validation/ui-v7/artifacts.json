@@ -1,0 +1,45 @@
+{
+  "branch": "dev-api",
+  "device": "MuMu Android15 API35 2304FPN6DC 127.0.0.1:16384",
+  "jvm": {
+    "tests": 16,
+    "failures": 0,
+    "errors": 0
+  },
+  "qa_device_tests": 33,
+  "normal_device_reported_tests": 33,
+  "normal_network_skipped": 6,
+  "normal_apk_qa_resources": [],
+  "sha256": {
+    "app\\build\\outputs\\apk\\debug\\app-debug.apk": "0a8b44903d887a6bbd8266692393339a63383bbc2883941869dfb1bd370aa9dc",
+    "app\\build\\outputs\\apk\\androidTest\\debug\\app-debug-androidTest.apk": "74e216c4452f779b2a1845f4376a9263f75ef8ab05f13bea9849c8b23cc750e5"
+  },
+  "normal_actual_passed": 27,
+  "cleanup_device_tests": 4,
+  "screenshots": {
+    "batch-real-queue.png": "33f12c71ef5563f54687fcf9746b3fb8f23565b9e4b77f0d9552c9c9642debb3",
+    "cover-before.png": "e01257701112825c04cb245a6acf41a89026499a1f6258e82a721af4f9ea1ae4",
+    "cover-click-lyrics.png": "f10de921d6310dac694b4aef96883a88c02581509b7a7e5af2f994888864cd56",
+    "cover-next-150ms.png": "77e8723b033cafe7305940956e1e571dd65f07cac569f44c3832c31379fde6b5",
+    "cover-next-300ms.png": "ce1d6906069a9f17f5e085862d73f6921067ff03eb6209bfad7f7dd800a7e00a",
+    "cover-next-450ms.png": "5a7fd69e62e83533d163d800d05e63a20d77ee27ca301195c49cd8b3204c2d9f",
+    "cover-next-complete.png": "6d79c5d161a7d1d82a06a48dea67dcda5f83b8cc245c3e94bde878009b81eeac",
+    "cover-tilt-pressed.png": "f831dc4732d774b37894918905ebe3feed5959ace474e0cc6503a764c70362d3",
+    "library-mini-player.png": "0a6cf7d19c64f39e9ee4611c80aad7cd0e2ae6724196bd0885ba16f4251a53d9",
+    "library-tabs-light.png": "38eb4b0213a8480fb2a7c279149dce2e562348a23cdc0ea9e06c948141488321",
+    "library-tabs.png": "4fa48eb777eca15f644b0de311c4cfd85b183c9bd0576be037486ae776b72f56",
+    "lyric-style-custom.png": "a24120cf50ed00c4737e5bfafb2ff702b26c28b8b3efae42306e57dde268ce7d",
+    "lyric-style-default.png": "f742beb2e2d2a3844bd2089cf2406f4cf8f2523155d0a09100ad0e2b583f1005",
+    "lyrics-custom-real.png": "76916a313b42621019a3fcd53f304525879da1a1a22307d3f8980749f58679a0",
+    "mini-player-ring.png": "e0ea3d26a7e4f788926e6e13c54294ec4c635378a40b4ac2c293e9cbc15c29d4",
+    "mini-player-sink-pressed.png": "cbb982124057bb3340ac98c13956db5dd8c4dd79c66d1934839ad90fa778fbc1",
+    "music-batch-selection.png": "d943153cc7d7b73a3c5a9a00938d7ab1a9952411b3dad2af65565db7ba35d5cf",
+    "music-cover-portrait.png": "fa7514f2c8b68ef37c9147d1f7bc213834930531851fd33dcae5cf24ee281817",
+    "setup-api-imported.png": "bb02d13dbda9fe07543132a7bbdde6a70be732b2c1c675e847171a2a8b69ab5d",
+    "setup-complete.png": "7b61294e0dba2765f9010e70912ec5ebca461b70423dd79ff55b2b94082c3f77",
+    "setup-files.png": "22a4f3cb63dfcf9131db878c9d17ef7a56ebb7ff2ae9fefeeee97ff774a502c0",
+    "setup-online.png": "1d121e5082717099f2afa795797c81aeb1d44ddf6d27e5a1217069f5fdf18683",
+    "setup-theme.png": "fe38584f1f25acc1abbdb66498947eb8593b7f82db321966b87b0c4ee41761fd",
+    "setup-welcome.png": "ca61817492bbe10443f107b74063ff7a22f843c9441e0b26ce8bdf2152aa4353"
+  }
+}

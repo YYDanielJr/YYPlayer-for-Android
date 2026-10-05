@@ -18,7 +18,7 @@
 | `ui/YYPlayerApp.kt` | 导航、持久偏好、异步导入与移除、收藏、播放命令、方向与主题 |
 | `ui/HyperDesign.kt` | Miuix 组件适配、页面骨架、安全区域、导航、迷你播放器、统一线条图标 |
 | `ui/HyperBackdrop.kt` / `ui/Api33MiuixBlur.kt` | API26 无 blur 类型 facade、API33+ 磨砂；见 ADR 0002 |
-| `ui/LibraryScreens.kt` | 音乐分组列表、收藏过滤、本地搜索、视频缩略图网格、媒体选项 |
+| `ui/LibraryScreens.kt` | 音乐分组列表、收藏过滤、本地搜索、视频缩略图网格、媒体选项。U08 起拆为 `LibraryTabs`／`LibraryHeaderActions`／`LibraryPageController`／`LibraryContent`，页头与内容可分别放在分页内外 |
 | `ui/MediaArtwork.kt` | 后台封面/视频首帧与元数据读取；URI 绑定、2 个工作槽、24 MiB 缓存、512px 图片上限；API26 视频使用图标回退 |
 | `ui/PlayerScreens.kt` | 音乐播放、沉浸视频、进度与队列、倍速/方向/解码/媒体信息弹层 |
 | `ui/SettingsScreen.kt` | 主题预览、强调色、减少动画、方向偏好与本次播放解码策略 |

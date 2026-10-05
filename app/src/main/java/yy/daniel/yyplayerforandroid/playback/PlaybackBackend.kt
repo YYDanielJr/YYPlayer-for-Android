@@ -15,7 +15,14 @@ data class LocalMedia(
     val album: String? = null,
     val durationMs: Long? = null,
     val metadataRead: Boolean = false,
+    val mediaHeaders: Map<String, Map<String, String>> = emptyMap(),
+    val onlineKey: String? = null,
+    val onlineQuality: String? = null,
+    val artworkUri: Uri? = null,
+    val appOwnedDownload: Boolean = false,
 ) {
+    val isOnline: Boolean get() = uri.scheme == "https" || uri.scheme == "http"
+    val identity: String get() = onlineKey ?: uri.toString()
     val musicTitle: String get() = songTitle?.takeIf(String::isNotBlank) ?: title.substringBeforeLast('.', title)
     val musicSubtitle: String get() = listOf(artist ?: "未知歌手", album ?: "未知专辑").joinToString(" · ")
 }

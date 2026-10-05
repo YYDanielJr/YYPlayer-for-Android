@@ -1,0 +1,505 @@
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.ActivityPlaybackTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=
+yy.daniel.yyplayerforandroid.ActivityPlaybackTest:
+INSTRUMENTATION_STATUS: test=secondaryActivitiesShareEngineAndReturnToExistingLibrary
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.ActivityPlaybackTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=secondaryActivitiesShareEngineAndReturnToExistingLibrary
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.ActivityPlaybackTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=realEofAdvancesProjectedSongAndGeneration
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.ActivityPlaybackTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=realEofAdvancesProjectedSongAndGeneration
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.ExampleInstrumentedTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=
+yy.daniel.yyplayerforandroid.ExampleInstrumentedTest:
+INSTRUMENTATION_STATUS: test=useAppContext
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.ExampleInstrumentedTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=useAppContext
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.LibraryManagementUiTest
+INSTRUMENTATION_STATUS: current=4
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=
+yy.daniel.yyplayerforandroid.LibraryManagementUiTest:
+INSTRUMENTATION_STATUS: test=longPressSelectsWithoutPlayingAndBatchUsesBothSelections
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.LibraryManagementUiTest
+INSTRUMENTATION_STATUS: current=4
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=longPressSelectsWithoutPlayingAndBatchUsesBothSelections
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.LibraryManagementUiTest
+INSTRUMENTATION_STATUS: current=5
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=accessibleMenuCanStartManagementAndExitKeepsPlaybackUntouched
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.LibraryManagementUiTest
+INSTRUMENTATION_STATUS: current=5
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=accessibleMenuCanStartManagementAndExitKeepsPlaybackUntouched
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.LibraryManagementUiTest
+INSTRUMENTATION_STATUS: current=6
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=removeNeedsExplicitConfirmationAndCancelRetainsSelection
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.LibraryManagementUiTest
+INSTRUMENTATION_STATUS: current=6
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=removeNeedsExplicitConfirmationAndCancelRetainsSelection
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.MusicExperienceUiTest
+INSTRUMENTATION_STATUS: current=7
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=
+yy.daniel.yyplayerforandroid.MusicExperienceUiTest:
+INSTRUMENTATION_STATUS: test=coverKeepsItsShapeDuringNextAndClickOpensLyrics
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.MusicExperienceUiTest
+INSTRUMENTATION_STATUS: current=7
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=coverKeepsItsShapeDuringNextAndClickOpensLyrics
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.MusicExperienceUiTest
+INSTRUMENTATION_STATUS: current=8
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=ringSeekPauseAndNextControlTheRealSharedPlayer
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.MusicExperienceUiTest
+INSTRUMENTATION_STATUS: current=8
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=ringSeekPauseAndNextControlTheRealSharedPlayer
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.MusicLyricsRepositoryTest
+INSTRUMENTATION_STATUS: current=9
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=
+yy.daniel.yyplayerforandroid.MusicLyricsRepositoryTest:
+INSTRUMENTATION_STATUS: test=manualLyricsPersistAndFailedReplacementPreservesAssociation
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.MusicLyricsRepositoryTest
+INSTRUMENTATION_STATUS: current=9
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=manualLyricsPersistAndFailedReplacementPreservesAssociation
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.MusicLyricsRepositoryTest
+INSTRUMENTATION_STATUS: current=10
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=embeddedFlacAndMp4LyricsUseBoundedTagReaders
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.MusicLyricsRepositoryTest
+INSTRUMENTATION_STATUS: current=10
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=embeddedFlacAndMp4LyricsUseBoundedTagReaders
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.MusicLyricsRepositoryTest
+INSTRUMENTATION_STATUS: current=11
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=embeddedId3UsltAndLargeLyricsRejectWithoutOverwriting
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.MusicLyricsRepositoryTest
+INSTRUMENTATION_STATUS: current=11
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=embeddedId3UsltAndLargeLyricsRejectWithoutOverwriting
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.OnlineApiTest
+INSTRUMENTATION_STATUS: current=12
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=
+yy.daniel.yyplayerforandroid.OnlineApiTest:
+INSTRUMENTATION_STATUS: test=realHttpsMedia3PlaybackSeekAndDisable
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.OnlineApiTest
+INSTRUMENTATION_STATUS: current=12
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stack=org.junit.AssumptionViolatedException: got: <false>, expected: is <true>
+	at org.junit.Assume.assumeThat(Assume.java:106)
+	at org.junit.Assume.assumeTrue(Assume.java:50)
+	at yy.daniel.yyplayerforandroid.OnlineApiTest.realHttpsMedia3PlaybackSeekAndDisable(OnlineApiTest.kt:148)
+
+INSTRUMENTATION_STATUS: stream=
+yy.daniel.yyplayerforandroid.OnlineApiTest:
+INSTRUMENTATION_STATUS: test=realHttpsMedia3PlaybackSeekAndDisable
+INSTRUMENTATION_STATUS_CODE: -4
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.OnlineApiTest
+INSTRUMENTATION_STATUS: current=13
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=actualProviderFallbackCannotBeSelectedAsHighResolutionQuality
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.OnlineApiTest
+INSTRUMENTATION_STATUS: current=13
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stack=org.junit.AssumptionViolatedException: got: <false>, expected: is <true>
+	at org.junit.Assume.assumeThat(Assume.java:106)
+	at org.junit.Assume.assumeTrue(Assume.java:50)
+	at yy.daniel.yyplayerforandroid.OnlineApiTest$actualProviderFallbackCannotBeSelectedAsHighResolutionQuality$1.invokeSuspend(OnlineApiTest.kt:56)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:101)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:47)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at yy.daniel.yyplayerforandroid.OnlineApiTest.actualProviderFallbackCannotBeSelectedAsHighResolutionQuality(OnlineApiTest.kt:55)
+
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=actualProviderFallbackCannotBeSelectedAsHighResolutionQuality
+INSTRUMENTATION_STATUS_CODE: -4
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.OnlineApiTest
+INSTRUMENTATION_STATUS: current=14
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=defaultMusicDetectsMislabelledFlacSavesCoverAndReloadsOwnedLibrary
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.OnlineApiTest
+INSTRUMENTATION_STATUS: current=14
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stack=org.junit.AssumptionViolatedException: got: <false>, expected: is <true>
+	at org.junit.Assume.assumeThat(Assume.java:106)
+	at org.junit.Assume.assumeTrue(Assume.java:50)
+	at yy.daniel.yyplayerforandroid.OnlineApiTest$defaultMusicDetectsMislabelledFlacSavesCoverAndReloadsOwnedLibrary$1.invokeSuspend(OnlineApiTest.kt:68)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:101)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:47)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at yy.daniel.yyplayerforandroid.OnlineApiTest.defaultMusicDetectsMislabelledFlacSavesCoverAndReloadsOwnedLibrary(OnlineApiTest.kt:67)
+
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=defaultMusicDetectsMislabelledFlacSavesCoverAndReloadsOwnedLibrary
+INSTRUMENTATION_STATUS_CODE: -4
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.OnlineApiTest
+INSTRUMENTATION_STATUS: current=15
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=rejectsUnsupportedVersionHttpAndHeaderInjection
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.OnlineApiTest
+INSTRUMENTATION_STATUS: current=15
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=rejectsUnsupportedVersionHttpAndHeaderInjection
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.OnlineApiTest
+INSTRUMENTATION_STATUS: current=16
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=richConfigurationPreservesTypedBodiesAndTrackVariables
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.OnlineApiTest
+INSTRUMENTATION_STATUS: current=16
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=richConfigurationPreservesTypedBodiesAndTrackVariables
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.OnlineApiTest
+INSTRUMENTATION_STATUS: current=17
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=invalidImportKeepsPreviousConfigurationAndCachedLyricsAreOffline
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.OnlineApiTest
+INSTRUMENTATION_STATUS: current=17
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=invalidImportKeepsPreviousConfigurationAndCachedLyricsAreOffline
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.OnlineApiTest
+INSTRUMENTATION_STATUS: current=18
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=independentGatesRejectBeforeAnyNetwork
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.OnlineApiTest
+INSTRUMENTATION_STATUS: current=18
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=independentGatesRejectBeforeAnyNetwork
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.OnlineApiTest
+INSTRUMENTATION_STATUS: current=19
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=realHttpsSearchResolveLyricsHeadersAndRedirectIsolation
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.OnlineApiTest
+INSTRUMENTATION_STATUS: current=19
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stack=org.junit.AssumptionViolatedException: got: <false>, expected: is <true>
+	at org.junit.Assume.assumeThat(Assume.java:106)
+	at org.junit.Assume.assumeTrue(Assume.java:50)
+	at yy.daniel.yyplayerforandroid.OnlineApiTest$realHttpsSearchResolveLyricsHeadersAndRedirectIsolation$1.invokeSuspend(OnlineApiTest.kt:124)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:101)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:47)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at yy.daniel.yyplayerforandroid.OnlineApiTest.realHttpsSearchResolveLyricsHeadersAndRedirectIsolation(OnlineApiTest.kt:123)
+
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=realHttpsSearchResolveLyricsHeadersAndRedirectIsolation
+INSTRUMENTATION_STATUS_CODE: -4
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.OnlineApiTest
+INSTRUMENTATION_STATUS: current=20
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=realSafDownloadKeepsAudioAndSiblingLyrics
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.OnlineApiTest
+INSTRUMENTATION_STATUS: current=20
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stack=org.junit.AssumptionViolatedException: got: <false>, expected: is <true>
+	at org.junit.Assume.assumeThat(Assume.java:106)
+	at org.junit.Assume.assumeTrue(Assume.java:50)
+	at yy.daniel.yyplayerforandroid.OnlineApiTest$realSafDownloadKeepsAudioAndSiblingLyrics$1.invokeSuspend(OnlineApiTest.kt:170)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:101)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:47)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at yy.daniel.yyplayerforandroid.OnlineApiTest.realSafDownloadKeepsAudioAndSiblingLyrics(OnlineApiTest.kt:169)
+
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=realSafDownloadKeepsAudioAndSiblingLyrics
+INSTRUMENTATION_STATUS_CODE: -4
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.OnlineUiTest
+INSTRUMENTATION_STATUS: current=21
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=
+yy.daniel.yyplayerforandroid.OnlineUiTest:
+INSTRUMENTATION_STATUS: test=realHttpsResultsOfferPlaybackAndDownloadQuality
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.OnlineUiTest
+INSTRUMENTATION_STATUS: current=21
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stack=org.junit.AssumptionViolatedException: got: <false>, expected: is <true>
+	at org.junit.Assume.assumeThat(Assume.java:106)
+	at org.junit.Assume.assumeTrue(Assume.java:50)
+	at yy.daniel.yyplayerforandroid.OnlineUiTest.realHttpsResultsOfferPlaybackAndDownloadQuality(OnlineUiTest.kt:38)
+
+INSTRUMENTATION_STATUS: stream=
+yy.daniel.yyplayerforandroid.OnlineUiTest:
+INSTRUMENTATION_STATUS: test=realHttpsResultsOfferPlaybackAndDownloadQuality
+INSTRUMENTATION_STATUS_CODE: -4
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.OnlineUiTest
+INSTRUMENTATION_STATUS: current=22
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=onlineMusicEntryTracksItsOwnSwitch
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.OnlineUiTest
+INSTRUMENTATION_STATUS: current=22
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=onlineMusicEntryTracksItsOwnSwitch
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.SetupPreferencesTest
+INSTRUMENTATION_STATUS: current=23
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=
+yy.daniel.yyplayerforandroid.SetupPreferencesTest:
+INSTRUMENTATION_STATUS: test=upgradePreservesExistingLibraryAndPreferences
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.SetupPreferencesTest
+INSTRUMENTATION_STATUS: current=23
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=upgradePreservesExistingLibraryAndPreferences
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.SetupPreferencesTest
+INSTRUMENTATION_STATUS: current=24
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=freshSetupRemainsIncompleteAfterChoicesAndRelaunch
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.SetupPreferencesTest
+INSTRUMENTATION_STATUS: current=24
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=freshSetupRemainsIncompleteAfterChoicesAndRelaunch
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.SetupPreferencesTest
+INSTRUMENTATION_STATUS: current=25
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=lyricStyleRoundTripDefaultsAndCorruptValues
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.SetupPreferencesTest
+INSTRUMENTATION_STATUS: current=25
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=lyricStyleRoundTripDefaultsAndCorruptValues
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.SetupPreferencesTest
+INSTRUMENTATION_STATUS: current=26
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=existingOnlineChoicesSkipFirstInstallGuide
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.SetupPreferencesTest
+INSTRUMENTATION_STATUS: current=26
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=existingOnlineChoicesSkipFirstInstallGuide
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.VideoSurfaceGestureTest
+INSTRUMENTATION_STATUS: current=27
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=
+yy.daniel.yyplayerforandroid.VideoSurfaceGestureTest:
+INSTRUMENTATION_STATUS: test=pinchAndRotationReachTextureMatrix
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.VideoSurfaceGestureTest
+INSTRUMENTATION_STATUS: current=27
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=pinchAndRotationReachTextureMatrix
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.VideoSurfaceGestureTest
+INSTRUMENTATION_STATUS: current=28
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=longPressRestoresExistingBaseSpeed
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.VideoSurfaceGestureTest
+INSTRUMENTATION_STATUS: current=28
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=longPressRestoresExistingBaseSpeed
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.VideoSurfaceGestureTest
+INSTRUMENTATION_STATUS: current=29
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=removingSurfaceCancelsTemporarySpeed
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.VideoSurfaceGestureTest
+INSTRUMENTATION_STATUS: current=29
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=removingSurfaceCancelsTemporarySpeed
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.VideoSurfaceGestureTest
+INSTRUMENTATION_STATUS: current=30
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=activityStopAndResumeRetainsTextureTransform
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=yy.daniel.yyplayerforandroid.VideoSurfaceGestureTest
+INSTRUMENTATION_STATUS: current=30
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=30
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=activityStopAndResumeRetainsTextureTransform
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_RESULT: stream=
+
+Time: 11.112
+
+OK (30 tests)
+
+
+INSTRUMENTATION_CODE: -1

@@ -1,6 +1,110 @@
 # 进度与交接记录
 
-## 2026-10-05：U05 音乐标签、同页详情与歌词（当前记录）
+## 2026-10-05：U08 媒体库分页与页头视觉（当前记录）
+
+状态：**用户已复核通过并明确表示满意（第二轮结果）。** 首个实现把标题/页头/分页整片横移，并按固定时间轴切换文字，用户实测指出“滑动时标题不收起、图标和标题闪一下”；本轮改为：页头（标题＋右侧图标＋TabRow）固定在 pager 之外，只有 TabRow 下方的内容左右切换；标题与图标透明度直接跟随 pager 偏移量，换字发生在两页交界、透明度最低处；滚动重新把大标题收成栏内小标题。用户确认 TabRow／卡片收窄与淡入淡出效果符合预期。仍在 dev-api 工作区，未自动提交／推送；未修改桌面 Rust 工程。交互规格见 [UI_SETUP_AND_LIBRARY](UI_SETUP_AND_LIBRARY.md)。
+
+任务／文件／实际行为：
+
+- U08.1 页头提升：[YYPlayerApp](`../app/src/main/java/yy/daniel/yyplayerforandroid/ui/YYPlayerApp.kt`) 把 `HyperPage`（标题、图标、TabRow）提到 `HorizontalPager` 之外，pager 只承载内容；音乐/视频各自持有 `LibraryPageController`、`LazyListState`、`LazyGridState`，切换后回到原滚动位置。宽横屏仍走侧栏、不显示 TabRow。
+- U08.2 跟手换字：[HyperDesign](`../app/src/main/java/yy/daniel/yyplayerforandroid/ui/HyperDesign.kt`) 的 `HyperPage` 新增 `headerAlpha: () -> Float`（延迟读取，只在顶栏子组合里读状态）与 `tabs` 槽（Miuix `TopAppBar.bottomContent`）。标题与图标透明度＝`1 - |currentPageOffsetFraction| * 2`，与手指/弹簧动画同步；减少动画时恒为 1，文字随页翻转即时切换。
+- U08.3 收窄：TabRow 48→40dp（`LibraryTabs` 保留 8dp 垂直外边距），“全部音乐／收藏”卡片竖向内边距 22→13dp、横向 18→16dp。实机像素（density 3.0）TabRow 容器 144→120px、卡片 260→206px。
+- U08.4 收起标题修复：首轮把 `MiuixScrollBehavior`/`TopAppBarState` 提到 `YYPlayerApp` 共享，实机滚动后大标题淡出但栏内小标题不再出现（设置页自持 scroll behavior 正常）。本轮去掉共享，`HyperPage` 自持 scroll behavior，滚动重新把大标题收成栏内小标题。
+- U08.5 拆分：[LibraryScreens](`../app/src/main/java/yy/daniel/yyplayerforandroid/ui/LibraryScreens.kt`) 由单个 `LibraryScreen`（内部自带 `HyperPage`）拆成 `LibraryTabs`／`LibraryHeaderActions`／`LibraryPageController`（多选状态，带 Saver）／`LibraryContent`（仅滚动内容与对话框），使页头与内容可分别放在 pager 内外。
+- U08.6 可见状态：首轮页头 4 个图标曾因 `Box` 堆叠而只显示 1 个，已改为 `Row` 后实机复核 4 个图标正常。
+
+实际命令／设备／证据：
+
+- 普通四任务 `:app:assembleDebug :app:assembleDebugAndroidTest :app:testDebugUnitTest :app:lintDebug --no-daemon --max-workers=4` exit0、BUILD SUCCESSFUL、JVM **16 项 0 失败／0 错误**、lint **No issues found**，见 [checks-normal](validation/ui-v8/checks-normal.txt)；首轮两个失败日志（Receiver 作用域、测试尾随 lambda）保留在 [checks-normal-failed-2](validation/ui-v8/checks-normal-failed-2.txt)，未当通过。
+- 设备：用户实体小米 2509FPN0BC（Android 16／targetSdk37，1200×2608、density 480、竖屏），`adb install -r` 保留 9 首音乐与收藏。改动前后同为该机截图：用户原图 [user-home-reference](validation/ui-v8/user-home-reference.jpg)、[改动后首页](validation/ui-v8/after-home.png)、[滚动收起](validation/ui-v8/after-scroll.png)、[切换中间帧](validation/ui-v8/after-tab-midfade.png)、[视频页](validation/ui-v8/after-tab-video.png)。
+- 像素核对（同机、同密度）：TabRow 外框 463–606px→463–582px（48→40dp）；“全部音乐／收藏”卡片 667–926px→643–848px（86.7→68.7dp，−20.7%）；卡片与 TabRow 间距保持 20dp。
+- 实机目检：滚动后大标题淡出、栏内居中显示“音乐/视频”小标题、TabRow 常驻；点“视频”后标题、图标、TabRow 选中态、内容同时切到视频页，歌单/视频列表各自保留滚动位置。约 0.1s 中间帧确认标题与图标处于半透明过渡态（跟随偏移量而非时间轴闪烁）。
+- 用户复核：2026-10-05 用户在本机确认本轮结果满意，未再提出视觉或交互修改；本轮结论以此为验收，后续改动需重新取证。
+
+未执行／已知问题：**本轮新增的 `LibraryTabsUiTest` 与改写后的 `LibraryManagementUiTest` 只完成编译（`assembleDebugAndroidTest` exit0），未在该实体机上跑通**：`am instrument` 先报 `Process crashed`，单独跑既有 `LibraryManagementUiTest` 亦长时间无输出（同一 APK 此前在 MuMu 上通过），未取得崩溃栈（MIUI `ProcessManager: error write exception log`），因此本轮的界面结论只以实机截图与像素为准，不声称自动化通过。API26–32 玻璃回退、200% 字体／TalkBack、横屏侧栏未专项复验。
+
+下一具体动作：U08 已按用户确认收尾，当前无待改视觉项。可选的后续顺序：(a) 排查实体机 Compose instrumentation 崩溃或改回 MuMu 跑通 `LibraryTabsUiTest`／`LibraryManagementUiTest`，补回自动化证据；(b) 补 API26–32 磨砂回退、200% 字体／TalkBack、横屏侧栏专项；(c) 用户给出新指令后进入 S02 native 依赖与 JNI/Surface gate。不自动提交／发布，不擅自跳 S02。
+
+## 2026-10-05：U07 首次引导、媒体库与音乐控件（前轮记录）
+
+状态：**七项需求已实现并完成 MuMu 功能／UI 验收；普通最终包已 install -r 更新并正常无 extra 启动。** 在 dev-api 工作区继续，未自动提交／推送；master 80538db 基线保持，未修改桌面 Rust 工程。旧底部纯图标导航规则按本轮用户指令替换，其他 U04 弹窗缩进、U05 同页音乐和 U06 API／下载保留。交互规格见 [UI_SETUP_AND_LIBRARY](UI_SETUP_AND_LIBRARY.md)。
+
+任务／文件／实际行为：
+
+- U07.1 SetupRepository／SetupScreen／YYPlayerApp／PlayerHostActivity／SettingsScreen：独立 setup_v1 首次标记，欢迎→SAF歌曲／视频／目录→两个联网选项及JSON导入→主题／强调色／减少动画→完成。授权与联网均可选；新用户默认联网关闭。已有偏好或库迁移为完成，不重置数据；设置“使用引导”可重入。步骤在Android重建保存；完全结束后未完成引导从欢迎页开始，已作选择保留。后台扫描／标签读取与配置导入继续用真实仓库。ThemePreview整块含文字可点，手动发现标签原本不响应后修复并添加明暗切换设备验证。
+- U07.2 LibraryScreens／YYPlayerApp／HyperDesign：竖屏页头 TabRowWithContour 切换音视频，选中与轮廓明确；本地搜索／在线云图标／设置／添加移到页头。宽横屏保留侧栏。移除原 FloatingLibraryNavigation；底部只放当前媒体播放条。
+- U07.3 HyperDesign／既有 API33 blur facade：整条 CircleShape 磨砂／玻璃描边与 SinkFeedback，文字打开当前详情；播放／暂停和下一首直接控制唯一 Media3。进度为播放键外围环，依据真实position／duration并保留无障碍seek；没有底置线性条或假时钟。API26–32不透明回退，普通UI不暴露blur类型。
+- U07.4–5 MusicPlayerScreen／MediaArtwork：单个稳定圆角背景／shadow壳保持，等待新封面解析后只交叉淡入图片；缓存命中首帧不闪占位卡。TiltFeedback真实按压倾斜，松手点按以500ms进入歌词；横屏将歌词展开。减少动画与系统动画关闭时禁用倾斜／下沉并即时切页。
+- U07.6 LyricStyle／LyricStyleScreen／PlayerApplication／PlayerHostActivity／Manifest／MusicPlayerScreen：新增原生“歌词显示”子页；选中和非选中各自字号14–48sp、字重400–900六档、自动色／预设色／6或8位HEX，全部行额外间距0–40dp与实时预览／恢复默认。version1持久化、数值类型和范围／有限数校验，坏值备份回退；LRC和纯文本均应用样式，纯文本拆行在Default后台，不逐行重复解析。补齐Miuix滑杆SetProgress未触发finish时的保存路径。
+- U07.7 LibraryScreens／YYPlayerApp／PlayerApplication／MediaLibraryRepository：长按进入可保存的多选集，勾选／全选当前列表／退出，批量播放所选／收藏／取消收藏／确认后移除；更多菜单提供多选入口。库移除一次写入、取消旧标签任务，不删除原文件，也不更改正在播放的队列。真实批量播放按库顺序只建立所选两首队列。
+- 测试／交接：LyricStyleTest、SetupPreferencesTest、OnboardingUiTest、LyricStyleUiTest、LibraryManagementUiTest、MusicExperienceUiTest；README、技术设计、实施计划、AGENTS和本记录。新增/.kotlin/忽略编译缓存，无清理用户源码。
+
+实际命令／设备／证据：
+
+- QA完整 `.\scripts\Test-MumuUi.ps1 -OnlineQa -DownloadTree 'content://com.android.externalstorage.documents/tree/primary%3ADownload%2FYYPlayerOnlineQA'` exit0，**OK (33 tests)**／13.443s；此前真实 HTTPS、GD五档供应／降档、签名FLAC、Music／SAF、封面歌词与原视频手势均回归，新U07交互一起执行，无网络skip。见 [checks-qa-final](validation/ui-v7/checks-qa-final.txt)。此后只补ThemePreview文字点击和隔离测试清理，应用最终版本继续如下普通检查。
+- 普通最终四任务 `:app:assembleDebug :app:assembleDebugAndroidTest :app:testDebugUnitTest :app:lintDebug --no-daemon --max-workers=4` exit0、BUILD SUCCESSFUL／41s，JVM **16项0失败／0错误**，lint **No issues found**。见 [checks-normal-final](validation/ui-v7/checks-normal-final.txt)。普通主／测试APK均install -r成功，直接instrumentation **OK (33 tests)**／14.981s，其中**27项实际通过、6项仅QA HTTPS网络用例按条件跳过**，未冒充最终普通包网络联调；见 [device-normal-final](validation/ui-v7/device-normal-final.txt)。没有默认connectedDebugAndroidTest卸载。
+- 隔离偏好测试的apply异步写入会在delete之后重建文件，已改commit排空后delete；最后只有测试清理变化，assembleDebugAndroidTest／lint exit0，直接隔离4项 **OK (4 tests)**／0.036s，[test-cleanup-checks](validation/ui-v7/test-cleanup-checks.txt)／[device-cleanup](validation/ui-v7/device-cleanup.txt)，确认u07-test残留0。最终主／测试APK SHA256、截图hash、单测数量与普通包online_qa资源**0**见 [artifacts](validation/ui-v7/artifacts.json)。本轮localhost HTTPS进程已停止、18443 adb reverse已移除。
+- 设备：已有MuMu实例0，Android15/API35、2304FPN6DC、ADB127.0.0.1:16384；竖屏1080×1920、横屏1920×1080。测试为应用私有30秒44.1kHz双声道16bitWAV与原创500×500几何PNG；线上回归是自有12秒HTTPS样例；手动使用已授权原创“落日之后／微光漂浮”FLAC与LRC。没有播放／下载用户“铁花飞”，没有个人视频帧。MuMu UIAutomator曾在退出线程SIGSEGV，应用进程仍正常；只在成功写出新层级后读取，并使用实际截图／Compose instrumentation继续，不把工具崩溃当应用成功证据。
+- 真实按压像素验证 Tilt 与整个Sink；记录切歌150／300／450ms和完成帧，壳尺寸不变且图像中心未变灰占位，圆角／阴影目检正常：[150ms](validation/ui-v7/cover-next-150ms.png)、[300ms](validation/ui-v7/cover-next-300ms.png)、[450ms](validation/ui-v7/cover-next-450ms.png)、[完成](validation/ui-v7/cover-next-complete.png)、[倾斜](validation/ui-v7/cover-tilt-pressed.png)、[环形进度](validation/ui-v7/mini-player-ring.png)、[整体下沉](validation/ui-v7/mini-player-sink-pressed.png)。早期测试误用固定触控外壳bounds推断倾斜，已改渲染像素；颜色测试先前点到横屏弹窗不可见行，已滚动后点选；早期失败日志保留，未当通过。
+- 手动UI：[欢迎](validation/ui-v7/setup-welcome.png)、[可选文件授权](validation/ui-v7/setup-files.png)、[两个联网选项](validation/ui-v7/setup-online.png)、[SAF真实JSON导入成功](validation/ui-v7/setup-api-imported.png)、[主题文字点击切换浅色](validation/ui-v7/setup-theme.png)、[完成](validation/ui-v7/setup-complete.png)；系统目录选择取消不影响继续，JSON使用独立自有u07文件。首次空状态条件用隔离偏好测试，设备UI用真实“使用引导”重入，没有卸载／清数据模拟首次。
+- [浅色顶部TabRow](validation/ui-v7/library-tabs-light.png)、[两首多选](validation/ui-v7/music-batch-selection.png)、[真实仅两首队列](validation/ui-v7/batch-real-queue.png)、[实际播放胶囊](validation/ui-v7/library-mini-player.png)、[竖屏封面](validation/ui-v7/music-cover-portrait.png)、[歌词样式预览](validation/ui-v7/lyric-style-custom.png)、[应用于真实同步歌词](validation/ui-v7/lyrics-custom-real.png)。实际拖动选中37sp／非选中23sp、选择800／400、选中青绿，关闭子页重进仍保留；随后恢复原样式和主题。
+- 收尾：仅恢复手动验收修改的主题／样式与API副本；首次SD卡中转被Android权限拒绝，改为run-as私有文件stdin写入完成。原ui_preferences／local_media／online_api／music_lyrics逐键语义一致，7首音乐／2个视频／1收藏、两个原联网选择及原SAF下载目录保留；原没有私有配置仍无副本。临时u07导入文件删除，完成标记true；见 [数据保留校验](validation/ui-v7/data-preservation.json)。最终无qa_portrait／open_music extra正常启动，没有修改全局方向或动画设置。
+
+未执行／边界：API26–32的真实类加载／玻璃回退、物理小米HyperOS效果、200%字体与完整TalkBack矩阵尚未专项验收；模拟器不等同私有HyperOS玻璃或真机输出资格。首次完整关闭后从欢迎页重入，偏好／授权保留，未承诺跨进程精确恢复向导步。多选移除仅媒体库管理，不支持删除磁盘文件或改标签。原native／USB／后台MediaSession未实现状态不变。
+
+下一具体动作：用户在当前普通包复核首次引导与封面／播放条动效，提供实体设备视觉反馈；随后按实际反馈调整并补API26–32／大字体／TalkBack证据。不自动提交／发布或跳S02。
+
+
+## 2026-10-05：U06.6–U06.9 在线下载体验优化（前轮记录）
+
+状态：**四项体验改动已实现，并通过自有 HTTPS／MuMu 验收；普通最终构建／单测／lint通过，已install -r更新MuMu。** 本轮依据用户提供的 GD API 文档（2026-09-16 更新）实现，用户反馈第三方搜索已可用；没有把前轮403或本轮自有素材结果当成当前 GD 实际供给事实。仍在 dev-api 工作区，未自动提交／推送，master 基线80538db保持。未修改桌面Rust工程或用户已有下载文件。
+
+任务／文件／行为：
+
+- U06.6 ApiConfig／OnlineRepository／OnlineSearchScreen／assets/online-providers.json：GD补齐128、192、320、740（16bit）、999（24bit）五档和netease／joox／bilibili；可配置分档参数、分档变量／来源、曲目额外字段变量、静态变量、嵌套有类型JSON正文、pageSize、额外API主机及模板访问头。保留旧version1配置兼容，不自动覆盖私有导入副本。菜单结合曲目音质映射与来源限制，实际解析每个URL并核对服务返回档位；空地址／错误／已知回退置不可用，无报告则明确未确认。成功地址缓存60秒／128项上限，仍检查联网开关。GD窗口保守40次／5分钟；出处与用途写入示例。
+- U06.7 DownloadTarget／OnlineRepository／PlayerHostActivity／SettingsScreen／MusicDocumentContracts／MediaLibraryRepository／PlaybackBackend：默认API29+写Music/ MediaStore音频集合，IS_PENDING保护未完成文件；设置可恢复默认或选择SAF持久读写目录，并显示当前路径。API26–28首用先授权，选择器初始位置Music，无全盘权限。自有MediaStore下载持久入库，重开不被SAF权限过滤丢弃；取消清理本次音频／已写旁文件，不触及原文件。
+- U06.8 ApiConfig／OnlineRepository／OnlineSearchActivity／MediaArtwork／LocalMedia：可配置artwork操作、picId／直链映射与artworkSize。串流／下载自动获取，输入8MiB／8192边长校验、解码缩采样至1024，保存本地JPEG并显示封面取色背景。下载入库保留封面URI，默认Music封面与歌词保存在应用内关联；SAF另尽力保存同名JPG／LRC，不覆盖原旁文件。图获取失败不阻断歌曲。GD tlyric可按时间合并原文／翻译。
+- U06.9 AudioFileFormat／DownloadTarget／OnlineRepository：前256KiB文件签名识别FLAC、MP3、WAV、M4A、OGG／Opus、AAC、AIFF、APE，读取FLAC STREAMINFO位深；不依赖MIME／URL后缀／大小。未识别格式拒绝保存并清理。命名为“歌曲名 - 歌手.实际格式”，只清理文件名非法字符，无随机尾缀；重名才增加(2)序号。下载提示实际格式／可读取的位深，不把服务br等同源或设备输出资格。
+- 验收／文档：AudioFileFormatTest、OnlineApiTest／OnlineUiTest、Serve-OnlineFixtures.py（真实FFmpeg编码自有FLAC、500×500原创几何封面）、ONLINE_API／ADR0005／README／TECHNICAL_DESIGN／IMPLEMENTATION_PLAN和此记录。
+
+实际命令／证据：
+
+- 首轮普通`:app:assembleDebug :app:assembleDebugAndroidTest :app:testDebugUnitTest :app:lintDebug --no-daemon --max-workers=4` exit0。新库／默认下载／封面实现编译成功。后续lint发现API29常量分支提示，改为显式SDK保护；最后KTX两处等价转换建议已修正，普通最终结果另列。失败或告警没有写成“无问题”。
+- 最后`.\scripts\Test-MumuUi.ps1 -OnlineQa -DownloadTree 'content://com.android.externalstorage.documents/tree/primary%3ADownload%2FYYPlayerOnlineQA'` exit0，**OK (21 tests)**／9.073s；JVM **14 tests，0 failures/errors**，包括新4项签名／命名／翻译测试。见[checks-qa-final](validation/online-v2/checks-qa-final.txt)，早期轮保留[checks-qa](validation/online-v2/checks-qa.txt)。APK与原创素材hash／测试总数见[artifacts](validation/online-v2/artifacts.json)。QA最后设备运行后只有两处Uri.parse等价KTX转换和cleanup格式整理，普通包继续完整编译与lint验证。
+- 最终普通（无-PonlineQa）完整四任务 exit0，**BUILD SUCCESSFUL 1m11s**、JVM14项0失败、lint **No issues found**，见[checks-normal-final](validation/online-v2/checks-normal-final.txt)。主包／测试包均install -r成功，普通APK内online_qa资源数**0**，hash追加artifacts。正常无extra启动，停止本轮自有HTTPS进程并移除adb reverse。用户ui_preferences与online_api逐键语义校验一致，原本未导入私有配置仍无私有副本；没有残留QA配置或强制修改开关／目录。
+- 真实自有HTTPS：保留特殊API／媒体头、跨主机重定向隔离、歌词独立、Media3 WAV播放／seek和原10项回归。新增999实际回退320菜单不可用；真实FLAC故意返回.mp3 URL与audio/mpeg，最终正确保存.flac／audio/flac／显示16bit；文件实际在Music/，IS_PENDING=0，同名第二次(2)且原字节保留。封面本地文件、歌词关联、下载入库及重新load均验证；SAF同名LRC／JPG与取消不残留、默认Music首块取消删除pending行也验证。测试所创建Music和SAF文件清理；没有操作用户《铁花飞》。
+- 设备：已有MuMu索引0，Android15/API35、2304FPN6DC（本轮adb实际型号），ADB127.0.0.1:16384，截图1080×1920。全部install -r，无卸载或清库。自有12秒44.1kHz双声道16bit低电平WAV／FLAC、原创LRC与几何PNG，实际本机HTTPS传输。生成的CA／私钥只在忽略的app/build，普通包须确认不含QA信任资源。
+- 手动UI：正常主页导航检查[目录选项](validation/online-v2/download-directory.png)、[完整五档及状态](validation/online-v2/five-qualities.png)、[真实串流封面与取色背景](validation/online-v2/online-cover.png)。检查临时使用自有配置，随后还原用户原API副本（原来未导入时继续内置）和ui_preferences／online_api原偏好，包括下载目录；不强制修改原开关／目录。已有7首音乐（包含用户铁花飞）和收藏仍在。只保留必要在线页面截图，无个人音视频帧。
+
+未执行／已知边界：本轮未下载GD的授权商业曲目，也未逐个验证其动态来源、五档供应和地区限制；以用户所贴API文档实现，实际API降档／文件格式通过运行时核对。API26–28文件选择器／真机、大字体／TalkBack、后台下载和长时间下载仍待验。文件头识别不等于全文件解码校验或端到端位准确；罕见容器／超大前置ID3超过256KiB会拒绝，不能退回猜测.mp3。专辑图保存与展示，不写嵌入音频标签。默认Music的非媒体歌词在应用内，自选SAF才另写可移植旁文件。原有手工目录保持，旧导入配置需自行更新或重新导入新版示例。native／USB／后台MediaSession资格不变。
+
+下一具体动作：用户在当前可用GD网络使用一首授权曲目复核五档返回、picId／lyricId；收集低版本和实体手机证据，按新的视觉反馈调整。无新指令不自动提交／发布或跳至S02。
+
+## 2026-10-05：U06 dev-api 可配置在线音乐与歌词（前轮历史记录）
+
+状态：**设计、实现及自有 HTTPS／MuMu UI 验收完成；GD 第三方服务联调待验，整体 Partial。** 用户本轮授权优先于旧 U05／S02 顺序。先将原有全部非忽略源码与资料提交到 master：`80538db chore: snapshot Android player U05 baseline`，再创建 `dev-api`；新增功能留在该分支工作区，未自动提交／推送。没有修改桌面 Rust 工程、清除应用数据或修改系统配置。
+
+任务／文件：
+
+- U06.1：`online/ApiConfig.kt`、`OnlineHttp.kt`、`OnlineRepository.kt`、`assets/online-providers.json`：version=1 JSON，多 provider／source、独立搜索／URL解析／下载／歌词操作，GET／POST、query／form／JSON、特殊访问头、JSON字段映射／text 返回、音质／超时／限流。设置用 SAF 导入，校验后原子替换，坏配置保留原配置；headers 配置在 noBackupFilesDir。规格见 [ONLINE_API](ONLINE_API.md)、[ADR0005](adr/0005-configurable-online-music.md)。参考 LX 官方自定义源的动作／音质分离，不执行或兼容其 JS 脚本。
+- U06.2：`OnlineSearchActivity.kt`、`ui/OnlineSearchScreen.kt`、LibraryScreens／YYPlayerApp／HyperDesign：音乐库开启联网时提供独立在线搜索 Activity，初始留白、顶部搜索框／来源，真实结果与分页、Miuix播放／下载图标、WindowDialog 音质选项。`OnlineAudioDataSource.kt` 和现有 AndroidMedia3PlaybackBackend 使用同一引擎渐进式 HTTPS 串流／Range seek，访问头以实际媒体 URI 原子快照绑定，跨主机重定向不传原凭证。
+- U06.3：PlayerApplication／SettingsScreen／PlayerHostActivity／MusicDocumentContracts／Manifest：联网歌曲、联网歌词独立默认关闭；关闭歌曲停止当前串流，两个入口分别隐藏，仓库直接调用也检查开关。下载经专用 SAF 持久读写目录、512MiB上限、临时文件／失败取消清理、完成重命名、不覆盖用户文件，并保存原 provider 元数据入库；目录可在设置重新选择。MediaLibraryRepository 合并后台标签更新，避免下载入库被旧结果覆盖。
+- U06.4：MusicLyricsRepository／MusicPlayerScreen／MediaArtwork／MainActivity：当前歌名自动搜索并优先展示同名候选，也可手动改名查询／选择来源；选中保存并刷新 U05 歌词，换曲 generation 取消候选。在线串流／下载在歌词开关开启时自动取 lyricId；下载保存同名 LRC，应用内关联仍可离线使用。稳定 provider/source/id 身份避免临时 URL 更新丢歌词；自动获取保持手动／同目录优先级。修复 MainActivity 返回时替换启动 Intent 的生命周期问题、Android ICU 模板正则、系统 text/plain 追加 `.txt` 和无内嵌标签下载曲目的元数据回退。
+- U06.5：OnlineApiTest／OnlineUiTest、scripts/Serve-OnlineFixtures.py／Test-MumuUi.ps1、README／TECHNICAL_DESIGN／IMPLEMENTATION_PLAN／AGENTS 与本条证据更新。
+
+实际运行／验收：
+
+- 普通首轮 `:app:assembleDebug :app:assembleDebugAndroidTest :app:testDebugUnitTest :app:lintDebug --no-daemon --max-workers=4` exit0；设备首次运行发现 Android ICU 未转义右大括号导致进程崩溃，修复后验证。显式 QA 的网络XML曾因缺 includeSubdomains lint失败，已修复；UI返回曾因 MainActivity.setIntent 导致 ActivityScenario 清理失败，保留启动 Intent 后通过。失败轮均未当成功证据。
+- 最后 `.\scripts\Test-MumuUi.ps1 -OnlineQa -DownloadTree 'content://com.android.externalstorage.documents/tree/primary%3ADownload%2FYYPlayerOnlineQA'` exit0；BUILD SUCCESSFUL 43s、JVM 10项0失败、直接 instrumentation **OK (18 tests)**／8.608s、lint **No issues found**，见 [checks-qa](validation/online-v1/checks-qa.txt)。包含实际 HTTPS 搜索／特殊API头／同名排序、音质请求参数与三个UI选项、歌词开关独立、跨主机凭证隔离、真实 WAV Media3播放／seek／关联网、真实持久 SAF音频与精确 `.lrc` 下载／字节校验、首块后取消不残留临时文件、坏配置保护、离线歌词、真实前端音质／导航／入口开关及原10项回归。测试只在专用上下文或还原设置后执行，测试下载文件自行清理。
+- 普通无 `-PonlineQa` 完整检查 exit0、BUILD SUCCESSFUL 43s，见 [checks-normal](validation/online-v1/checks-normal.txt)；末尾补充元数据回退后普通 `:app:assembleDebug :app:testDebugUnitTest :app:lintDebug` exit0、BUILD SUCCESSFUL 42s，见 [checks-normal-final](validation/online-v1/checks-normal-final.txt)，并在 MuMu实测离线页面。APK ZIP检查 `online_qa` 资源数0；SHA256与QA包／示例配置hash见 [artifacts](validation/online-v1/artifacts.json)。只为显式QA构建生成三天 localhost证书／私钥，均在 app/build忽略目录；正常包使用平台 TLS信任，未关闭证书验证或修改系统信任。
+- 设备：已有 MuMu索引0，Android15/API35、V2364A、ADB127.0.0.1:16384，截图1080×1920。启动既有模拟器，`install -r` 更新；没有 UTP卸载或清库。素材为原创低电平12秒、双声道44.1kHz/16bit WAV及UTF-8 LRC；通过 localhost HTTPS和adb reverse 实际传输，不是 mock／假快照；测试服务已停止、转发已移除。
+- 实际UI：系统文件选择器导入配置成功；[独立空搜索页](validation/online-v1/search-empty.png)、[真实结果](validation/online-v1/search-results.png)、[音质选择](validation/online-v1/download-quality.png)、[下载完成](validation/online-v1/download-complete.png)、[入库](validation/online-v1/download-library.png)、[当前歌名候选](validation/online-v1/lyrics-candidates.png)、[手动歌名候选](validation/online-v1/lyrics-manual-search.png)；点“获取”提示保存成功，返回显示真实歌词。最终正常包关闭两个开关后，UI层级音乐在线入口0／歌词联网入口0，[开关关闭](validation/online-v1/settings-disabled.png)，下载曲目实际本地播放、[离线同步歌词](validation/online-v1/lyrics-offline-normal.png)。已有4首音频／2个QA视频／1收藏保留，另增加2首本轮自有下载验收曲；早期旧 `.lrc.txt` 自有样例仍在专用QA目录，新版正确生成 `.lrc`。恢复两个开关为关闭，移除本轮临时QA API配置，安装普通Debug包，结束播放并正常无extra启动；未保存个人视频帧。
+
+未执行／限制：GD官方API从当前网络实际返回403 Cloudflare挑战，无法读取其文档或获得成功搜索／URL／歌词响应；GD内置JSON仍为待核实示例，**不宣称已通过GD真实服务联调**。其他provider、POST／text服务的端到端联调、API26–32、200%字体／TalkBack、手机实机网络／OEM动效、长时间下载未专项验收。当前仅渐进式音频，不支持JS签名／OAuth刷新／HLS／DASH／DRM，下载依附当前页，后台MediaSession／service仍未新增。USB/native资格不变。
+
+下一具体动作：在GD服务可达或提供另一份有效API配置时，用真实授权曲目逐项核对search字段、音质供应／返回码率、stream/download与lyricId，再补第三方服务证据；随后按用户视觉反馈完善在线搜索，并做低版本／大字体专项。未经新指令不跳回S02、自动提交或发布。
+
+## 2026-10-05：U05 音乐标签、同页详情与歌词（历史记录）
 
 状态：**本轮实现、构建和 MuMu 功能／UI 验收完成；物理设备动效与低版本专项待验。** 新版已安装在 MuMu；不宣称达到 HyperOS 私有动效或硬件输出资格。
 

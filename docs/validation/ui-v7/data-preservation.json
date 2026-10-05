@@ -1,0 +1,9 @@
+{
+  "ui_preferences_v1": true,
+  "local_media_v1": true,
+  "online_api_v1": true,
+  "music_lyrics_v1": true,
+  "setup_complete": true,
+  "no_u07_isolated_preferences": true,
+  "original_provider_state": true
+}

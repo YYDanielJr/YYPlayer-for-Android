@@ -1,8 +1,16 @@
 # 分阶段实施手册
 
+2026-10-05 最新优先任务为 **U08 媒体库分页与页头视觉**：页头（标题／图标／TabRow）固定在 HorizontalPager 之外，只有 TabRow 下方的内容左右切换；标题与图标透明度跟随 pager 偏移量，滚动时大标题收成栏内小标题；TabRow 40dp、收藏卡片竖向内边距 13dp。**用户已复核满意。** 设计见 [UI_SETUP_AND_LIBRARY](UI_SETUP_AND_LIBRARY.md) 与 STATUS 的 U08 记录，证据在 `docs/validation/ui-v8/`；下面 U07／U06／U05 为已实现基线。
+
+2026-10-05 前一轮优先任务为 **U07 首次安装引导、顶部音视频 TabRow、玻璃播放胶囊／环形进度／Sink、稳定封面阴影／Tilt与500ms歌词跳转、歌词样式设置、本地音乐批量管理**。设计见 [UI_SETUP_AND_LIBRARY](UI_SETUP_AND_LIBRARY.md)，执行与实际证据见 STATUS；U06服务与U05播放保持。
+
+2026-10-05 当前优先变更为 **U06 可配置在线音乐与歌词**，以用户新指令、[ONLINE_API](ONLINE_API.md)、[ADR0005](adr/0005-configurable-online-music.md) 和最新 STATUS 为准。按 U06.0 master 基线／dev-api，U06.1 JSON与HTTPS，U06.2在线搜索／音质／下载，U06.3独立开关，U06.4歌词候选与离线缓存，U06.5 MuMu自有HTTPS及UI验收执行。下面U05及S02–S14作为已有基线与后续计划。
+
 当前用户优先任务为 **U05 音乐标签、主页内详情与歌词**，以 [UI_MUSIC_EXPERIENCE](UI_MUSIC_EXPERIENCE.md)、[ADR0004](adr/0004-inline-music-player.md) 和 [STATUS](STATUS.md) 为准。U04按压铺满/纯图标回退、U03设置/字重继续保留；视频/设置仍用U02原生Activity。不能凭历史依赖顺序跳过用户UI反馈推进S02。新版保留E00真实播放适配器，媒体核心/硬件阶段仍独立验收。设备测试用scripts/Test-MumuUi.ps1保留数据，避免默认UTP收尾卸载。
 
 日期：2026-10-04。此手册先作为规划基线；用户已授权开始实现，并将当前验收指定为 MuMu Android 模拟器上的真实前后端闭环与 UI。native/硬件阶段仍未开始，必须另记设备证据。先读 [技术设计](TECHNICAL_DESIGN.md) 与 [ADR 0001](adr/0001-android-media3-vertical-slice.md)；每项 Done 必须有实际代码和这里要求的证据，模拟器/真机/数字捕获分别记录。
+
+2026-10-05 继续 U06.6–U06.9：扩展 GD 五档及参数配置、Music 默认与自选目录、自动专辑图、文件头格式与确定命名；实际结果以 STATUS 最新记录为准。
 
 ## 当前实现覆盖：E00 模拟器纵切
 
