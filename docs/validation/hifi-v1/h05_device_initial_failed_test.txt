@@ -1,0 +1,23 @@
+
+yy.daniel.yyplayerforandroid.OutputAuditDeviceTest:...
+Error in bothPathsSwitchActualDevicesAndRetainPosition(yy.daniel.yyplayerforandroid.OutputAuditDeviceTest):
+java.lang.AssertionError: 超时：NATIVE_EXACT → USB-Audio - lifeme HiFi Audio Pro
+	at org.junit.Assert.fail(Assert.java:89)
+	at yy.daniel.yyplayerforandroid.OutputAuditDeviceTest.bothPathsSwitchActualDevicesAndRetainPosition$await(OutputAuditDeviceTest.kt:39)
+	at yy.daniel.yyplayerforandroid.OutputAuditDeviceTest.bothPathsSwitchActualDevicesAndRetainPosition(OutputAuditDeviceTest.kt:57)
+.
+yy.daniel.yyplayerforandroid.NativeOutputPlaybackTest:...
+yy.daniel.yyplayerforandroid.PlayerSessionServiceDeviceTest:.
+yy.daniel.yyplayerforandroid.AudioOutputDeviceTest:.......
+yy.daniel.yyplayerforandroid.AudioOutputSinkDeviceTest:...........
+
+Time: 260.646
+There was 1 failure:
+1) bothPathsSwitchActualDevicesAndRetainPosition(yy.daniel.yyplayerforandroid.OutputAuditDeviceTest)
+java.lang.AssertionError: 超时：NATIVE_EXACT → USB-Audio - lifeme HiFi Audio Pro
+	at org.junit.Assert.fail(Assert.java:89)
+	at yy.daniel.yyplayerforandroid.OutputAuditDeviceTest.bothPathsSwitchActualDevicesAndRetainPosition$await(OutputAuditDeviceTest.kt:39)
+	at yy.daniel.yyplayerforandroid.OutputAuditDeviceTest.bothPathsSwitchActualDevicesAndRetainPosition(OutputAuditDeviceTest.kt:57)
+
+FAILURES!!!
+Tests run: 27,  Failures: 1

@@ -5,6 +5,13 @@
 // precision and is therefore allowed and reported; anything that would drop effective bits, go
 // through floating point, or use floating point arithmetic is refused here and must be reported by
 // the caller as "not pristine" instead of being done silently.
+//
+// Widening is level-preserving, not value-preserving. Full scale in integer PCM is 2^(bits-1), so a
+// sample is a position in its container's range rather than an absolute amplitude: the same numeric
+// value in a wider container is a quieter signal. Convert() therefore shifts the sample into the
+// destination's significant bits and leaves exact zero low bits, which keeps the level and drops
+// nothing. Repacking between containers of the same significant width (s24_in32 <-> s24_3) stays a
+// pure move that changes no value.
 #ifndef YY_CORE_PCM_H
 #define YY_CORE_PCM_H
 
@@ -42,7 +49,9 @@ ConvertResult Convert(SampleEncoding from, SampleEncoding to,
                       std::uint64_t* converted_frames) noexcept;
 
 // Integer arithmetic helpers shared with the engine. Explicitly unsigned so shifts and sign
-// extension do not depend on implementation-defined signed overflow behaviour.
+// extension do not depend on implementation-defined signed overflow behaviour. Each one places the
+// sample in the wider container's significant bits, so the level survives the move; `S24` inputs and
+// outputs hold 24 significant bits.
 std::int32_t WidenS16ToS24(std::int16_t sample) noexcept;
 std::int32_t WidenS16ToS32(std::int16_t sample) noexcept;
 std::int32_t WidenS24ToS32(std::int32_t sample24) noexcept;

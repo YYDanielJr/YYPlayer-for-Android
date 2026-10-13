@@ -30,6 +30,14 @@ std::vector<std::uint8_t> Pattern(std::uint64_t frames, std::uint32_t frame_byte
 void yy::test::RunRingTests(Context& context) {
     context.Begin("ring");
 
+    YY_CASE(context, "invalid channel count cannot exceed the ring allocation cap");
+    auto oversizedFormat = Stereo48(SampleEncoding::kS32);
+    oversizedFormat.channel_count = 2147483647;
+    PcmRing invalidRing(oversizedFormat, 1);
+    YY_EXPECT_EQ(context, invalidRing.capacity_frames(), 0ull);
+    YY_EXPECT_EQ(context, invalidRing.ReadableFrames(), 0ull);
+    YY_EXPECT_EQ(context, invalidRing.WritableFrames(), 0ull);
+
     YY_CASE(context, "capacity and empty state");
     PcmRing ring(Stereo48(SampleEncoding::kS16), 64);
     YY_EXPECT_EQ(context, ring.capacity_frames(), 64ull);

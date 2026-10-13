@@ -96,7 +96,10 @@ internal fun rememberMusicReduceMotion(preference: Boolean): Boolean {
 internal fun MusicPlayerScreen(snapshot: PlaybackSnapshot, backend: PlaybackBackend, repository: MusicLyricsRepository,
     reduceMotion: Boolean, favorite: Boolean, onFavorite: () -> Unit, onBack: () -> Unit, onOnlineLyrics: (() -> Unit)? = null,
     lyricStyle: LyricStyle = LyricStyle(),
-    audioOutput: yy.daniel.yyplayerforandroid.audio.AudioOutputState? = null) {
+    audioOutput: yy.daniel.yyplayerforandroid.audio.AudioOutputState? = null,
+    outputPath: yy.daniel.yyplayerforandroid.audio.OutputPath = yy.daniel.yyplayerforandroid.audio.OutputPath.SYSTEM,
+    onOutputPath: (yy.daniel.yyplayerforandroid.audio.OutputPath) -> Unit = {},
+    onSelectOutputDevice: (Int?) -> Unit = {}, onLyricStyle: (() -> Unit)? = null) {
     val current = snapshot.current ?: return
     val details = rememberMediaDetails(current)
     val context = LocalContext.current
@@ -175,6 +178,7 @@ internal fun MusicPlayerScreen(snapshot: PlaybackSnapshot, backend: PlaybackBack
                             }
                         }
                     }
+                    if (audioOutput != null) MusicAction(PlayerIcons.Tune, "音频输出", { menu = "output" }, foreground, reduceMotion)
                     MusicAction(PlayerIcons.More, "歌词与播放选项", { menu = "options" }, foreground, reduceMotion)
                 }
                 if (wide) {
@@ -213,10 +217,14 @@ internal fun MusicPlayerScreen(snapshot: PlaybackSnapshot, backend: PlaybackBack
         }
     }
     HyperDialog("歌词与播放", { menu = null }, show = menu == "options") {
+        if (audioOutput != null) HyperSettingRow("音频输出", outputPath.label,
+            value = audioOutput.selectedChannel?.productName ?: if (audioOutput.selectedDeviceId != null) "设备已断开" else "跟随系统",
+            onClick = { menu = "output" })
         if (current.onlineQuality != null) HyperSettingRow("在线音质", current.onlineQuality)
         if (onOnlineLyrics != null) HyperSettingRow("联网获取歌词", "按当前歌名查找，也可手动搜索", onClick = { menu = null; onOnlineLyrics() })
         HyperSettingRow("添加歌词", if (importing) "正在读取…" else "选择 LRC 或 TXT", onClick = { if (!importing) addLyrics() })
         HyperSettingRow("授权歌曲目录", "自动读取同目录的同名 LRC", onClick = { menu = null; treePicker.launch(Unit) })
+        if (onLyricStyle != null) HyperSettingRow("歌词显示", "字号、字重、颜色与行间距", onClick = { menu = null; onLyricStyle() })
         HyperSpinnerPreference("歌词对齐", listOf(DropdownItem("左对齐"), DropdownItem("居中")), if (centered) 1 else 0,
             { centered = it == 1; repository.setCentered(centered) })
         HyperSettingRow("歌词时间偏移", "正值提前显示，负值延后显示", value = "${offset / 1000f} 秒")
@@ -230,10 +238,54 @@ internal fun MusicPlayerScreen(snapshot: PlaybackSnapshot, backend: PlaybackBack
         HyperSettingRow("播放队列", value = "${snapshot.queue.size} 首", onClick = { menu = "queue" })
         HyperSettingRow("媒体信息", onClick = { menu = "info" })
     }
+    if (audioOutput != null) MusicOutputDialog(audioOutput, outputPath, menu == "output",
+        onOutputPath, onSelectOutputDevice) { menu = null }
     SpeedDialog(snapshot.speed, backend::setSpeed, show = menu == "speed") { menu = null }
     SelectionDialog("播放队列 · ${snapshot.queue.size}", menu == "queue", snapshot.queue.map { DropdownItem(it.musicTitle, summary = it.musicSubtitle) },
         snapshot.queueIndex, onSelect = { backend.play(snapshot.queue, it) }, onDismiss = { menu = null })
     MediaInfoDialog(snapshot, menu == "info", audioOutput) { menu = null }
+}
+
+/** Shared runtime selections stay on the song page and retain WindowDialog exit composition. */
+@Composable
+internal fun MusicOutputDialog(state: yy.daniel.yyplayerforandroid.audio.AudioOutputState,
+    path: yy.daniel.yyplayerforandroid.audio.OutputPath, show: Boolean,
+    onPath: (yy.daniel.yyplayerforandroid.audio.OutputPath) -> Unit,
+    onDevice: (Int?) -> Unit, onDismiss: () -> Unit) {
+    val paths = yy.daniel.yyplayerforandroid.audio.OutputPath.entries
+    // Keep indices stable for the life of this dialog, including a finger-down hot-plug event.
+    // Missing devices remain as refused entries; new ones append instead of shifting an old choice.
+    val deviceIds = remember(show) { androidx.compose.runtime.mutableStateListOf<Int?>().apply {
+        add(null); addAll(state.channels.map { it.id })
+        state.selectedDeviceId?.let { if (it !in this) add(it) }
+    } }
+    LaunchedEffect(show, state.channels) {
+        if (show) state.channels.forEach { if (it.id !in deviceIds) deviceIds.add(it.id) }
+    }
+    val devices = deviceIds.toList()
+    val items = devices.map { id ->
+        val channel = state.channels.firstOrNull { it.id == id }
+        DropdownItem(if (id == null) "跟随系统" else channel?.productName ?: "设备已断开",
+            summary = channel?.typeLabel)
+    }
+    HyperDialog("音频输出", onDismiss, show = show) {
+        if (state.selfTestRunning) HyperSettingRow("正在输出测试", "测试结束后可切换输出")
+        else {
+            HyperSpinnerPreference("输出方式", paths.map { DropdownItem(it.label, summary = it.summary) },
+                path.ordinal, { paths.getOrNull(it)?.let(onPath) })
+            HyperSpinnerPreference("输出设备", items, devices.indexOf(state.selectedDeviceId).coerceAtLeast(0),
+                { index -> if (index in devices.indices) onDevice(devices[index]) })
+        }
+        val negotiated = state.negotiatedOutput
+        HyperSettingRow("当前输出", summary = when {
+            path == yy.daniel.yyplayerforandroid.audio.OutputPath.SYSTEM -> "系统处理音频，设备选择以实际路由为准"
+            negotiated == null -> "开始播放后回读输出"
+            else -> "${negotiated.format.sampleRate} Hz · ${negotiated.format.encoding.effectiveBits} bit · ${negotiated.format.channelCount} 声道"
+        }, value = state.routedChannel?.productName ?: "路由待回读")
+        if (path == yy.daniel.yyplayerforandroid.audio.OutputPath.NATIVE_EXACT)
+            HyperSettingRow("播放速度", "自研通道当前支持 1×；AudioTrack 不提供流独占证明")
+        state.message?.let { HyperSettingRow("输出状态", it) }
+    }
 }
 
 @Composable
@@ -350,13 +402,14 @@ private fun MusicLyricsPane(state: MusicLyrics, snapshot: PlaybackSnapshot, back
                         Text(line.text.ifBlank { "•••" }, Modifier.fillMaxWidth().graphicsLayer {
                             scaleX = scale; scaleY = scale; transformOrigin = TransformOrigin(if (centered) .5f else 0f, .5f)
                         }.semantics { stateDescription = if (selected) "当前歌词，点按跳转" else "点按跳转到 ${formatTime(line.milliseconds)}" }
-                            .clickable(role = Role.Button) { browsing = false; backend.seekTo((line.milliseconds - offset).coerceAtLeast(0)) }
-                            .padding(vertical = 7.dp).heightIn(min = 48.dp),
+                            // clickable expands small touch targets without inflating the lyric layout.
+                            // Keep the inter-item gap equal to the setting and its preview.
+                            .clickable(role = Role.Button) { browsing = false; backend.seekTo((line.milliseconds - offset).coerceAtLeast(0)) },
                             textAlign = if (centered) TextAlign.Center else TextAlign.Start,
                             fontSize = fontSize.sp, lineHeight = (fontSize * 1.35f).sp,
                             fontWeight = FontWeight(if (selected) style.activeWeight else style.inactiveWeight), color = lineColor)
                     } else items(plainLines.size) { index ->
-                        Text(plainLines[index], Modifier.fillMaxWidth().padding(vertical = 7.dp), fontSize = style.inactiveSize.sp,
+                        Text(plainLines[index], Modifier.fillMaxWidth(), fontSize = style.inactiveSize.sp,
                             lineHeight = (style.inactiveSize * 1.35f).sp, fontWeight = FontWeight(style.inactiveWeight),
                             color = style.inactiveColor?.let(::Color) ?: foreground.copy(alpha = .82f), textAlign = if (centered) TextAlign.Center else TextAlign.Start)
                     }

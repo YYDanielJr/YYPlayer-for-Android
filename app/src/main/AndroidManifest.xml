@@ -8,6 +8,13 @@
     <!-- AudioManager.setPreferredMixerAttributes (API 34+ USB bit-perfect) requires this; the app
          asks for it but still shows "unavailable" when the platform refuses the request. -->
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <!-- Playback keeps running while the app is not visible, and the system media controls (control
+         centre / notification / dynamic island) require the session's service to be a foreground
+         service with the mediaPlayback type. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:name=".PlayerApplication"
@@ -40,6 +47,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- The single owner of playback and of the MediaSession. Exported so the system media
+             controls and other controllers can bind to it. -->
+        <service
+            android:name=".playback.PlayerSessionService"
+            android:exported="true"
+            android:foregroundServiceType="mediaPlayback">
+            <intent-filter>
+                <action android:name="androidx.media3.session.MediaSessionService" />
+                <action android:name="android.media.browse.MediaBrowserService" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

@@ -1,0 +1,30 @@
+10-06 13:31:08.813 25309 25468 I YYPlayerAudio: YYPLAYER_MEDIA3_SINK open=s24_3/44100Hz/ch=2 widened=false mixerRequested=false mixerApplied=false source=s24_3
+10-06 13:31:09.826 25309 25468 I YYPlayerAudio: YYPLAYER_MEDIA3_SINK open=s24_3/44100Hz/ch=2 widened=false mixerRequested=false mixerApplied=false source=s24_3
+10-06 13:31:14.402 25309 25309 I YYPlayerAudio: YYTEST_SESSION background=true uiOwnersReleased=true position=4562 state=3
+10-06 13:33:30.934 26731 26776 I YYPlayerAudio: YYTEST_native_TRACK=编织光流 (For Your Name) uri=content://com.android.externalstorage.documents/tree/primary%3AMusic/document/primary%3AMusic%2F%E9%93%81%E7%97%95%E7%94%B5%E5%8F%B0-MSR%2CEdine%20-%20%E7%BC%96%E7%BB%87%E5%85%89%E6%B5%81%20(For%20Your%20Name).flac
+10-06 13:33:30.967 26731 26776 I YYPlayerAudio: YYTEST_native_FILE durationMs=274585 sampleRate=44100 expectedFrames=12109198
+10-06 13:33:30.998 26731 26731 I YYPlayerAudio: YYTEST_native_STATE=2
+10-06 13:33:31.098 26731 26788 I YYPlayerAudio: YYTEST_native_NEGOTIATED format=s24_3/44100Hz widened=false bitPerfectRequested=false reason=ok
+10-06 13:33:31.098 26731 26788 I YYPlayerAudio: YYPLAYER_MEDIA3_SINK open=s24_3/44100Hz/ch=2 widened=false mixerRequested=false mixerApplied=false source=s24_3
+10-06 13:33:31.228 26731 26731 I YYPlayerAudio: YYTEST_native_STATE=3
+10-06 13:33:35.002 26731 26731 I YYPlayerAudio: YYTEST_native_PROGRESS step=0 isPlaying=true state=3 position=3680 duration=274584 buffered=52709 error=null decodedFrames=165888 fileFrames=12109198 counters=submitted=165888 played=162288 buffered=3600 starving=0 partial=0 bufferFrames=7072 opened=s24_3
+10-06 13:33:39.002 26731 26731 I YYPlayerAudio: YYTEST_native_PROGRESS step=1 isPlaying=true state=3 position=7640 duration=274584 buffered=52709 error=null decodedFrames=343996 fileFrames=12109198 counters=submitted=343996 played=338688 buffered=5308 starving=0 partial=0 bufferFrames=7072 opened=s24_3
+10-06 13:33:42.999 26731 26731 I YYPlayerAudio: YYTEST_native_PROGRESS step=2 isPlaying=true state=3 position=11600 duration=274584 buffered=52709 error=null decodedFrames=518632 fileFrames=12109198 counters=submitted=518632 played=515088 buffered=3544 starving=0 partial=0 bufferFrames=7072 opened=s24_3
+10-06 13:33:47.002 26731 26731 I YYPlayerAudio: YYTEST_native_PROGRESS step=3 isPlaying=true state=3 position=15640 duration=274584 buffered=52709 error=null decodedFrames=696796 fileFrames=12109198 counters=submitted=696796 played=691488 buffered=5308 starving=0 partial=0 bufferFrames=7072 opened=s24_3
+10-06 13:33:47.017 26731 26776 I YYPlayerAudio: YYTEST_native_RESULT reached=true error=null negotiated=format=s24_3/44100Hz widened=false bitPerfectRequested=false reason=ok
+10-06 13:33:47.041 26731 26776 I YYPlayerAudio: YYTEST_system_TRACK=编织光流 (For Your Name) uri=content://com.android.externalstorage.documents/tree/primary%3AMusic/document/primary%3AMusic%2F%E9%93%81%E7%97%95%E7%94%B5%E5%8F%B0-MSR%2CEdine%20-%20%E7%BC%96%E7%BB%87%E5%85%89%E6%B5%81%20(For%20Your%20Name).flac
+10-06 13:33:47.060 26731 26776 I YYPlayerAudio: YYTEST_system_FILE durationMs=274585 sampleRate=44100 expectedFrames=12109198
+10-06 13:33:47.069 26731 26731 I YYPlayerAudio: YYTEST_system_STATE=2
+10-06 13:33:47.138 26731 26731 I YYPlayerAudio: YYTEST_system_STATE=3
+10-06 13:33:51.070 26731 26731 I YYPlayerAudio: YYTEST_system_PROGRESS step=0 isPlaying=true state=3 position=3468 duration=274584 buffered=52709 error=null decodedFrames=0 fileFrames=12109198 counters=null opened=null
+10-06 13:33:55.070 26731 26731 I YYPlayerAudio: YYTEST_system_PROGRESS step=1 isPlaying=true state=3 position=7407 duration=274584 buffered=52709 error=null decodedFrames=0 fileFrames=12109198 counters=null opened=null
+10-06 13:33:59.072 26731 26731 I YYPlayerAudio: YYTEST_system_PROGRESS step=2 isPlaying=true state=3 position=11347 duration=274584 buffered=52709 error=null decodedFrames=0 fileFrames=12109198 counters=null opened=null
+10-06 13:34:03.074 26731 26731 I YYPlayerAudio: YYTEST_system_PROGRESS step=3 isPlaying=true state=3 position=15298 duration=274584 buffered=52709 error=null decodedFrames=0 fileFrames=12109198 counters=null opened=null
+10-06 13:34:03.084 26731 26776 I YYPlayerAudio: YYTEST_system_RESULT reached=true error=null negotiated=null
+10-06 13:34:03.087 26731 26776 I YYPlayerAudio: YYTEST_SESSION_STAGE start
+10-06 13:34:03.102 26731 26776 I YYPlayerAudio: YYTEST_SESSION_STAGE library
+10-06 13:34:03.104 26731 26776 I YYPlayerAudio: YYTEST_SESSION_STAGE engine
+10-06 13:34:03.165 26731 27032 I YYPlayerAudio: YYPLAYER_MEDIA3_SINK open=s24_3/44100Hz/ch=2 widened=false mixerRequested=false mixerApplied=false source=s24_3
+10-06 13:34:06.721 26731 27115 I YYPlayerAudio: YYPLAYER_MEDIA3_SINK open=s24_3/44100Hz/ch=2 widened=false mixerRequested=false mixerApplied=false source=s24_3
+10-06 13:34:07.815 26731 27115 I YYPlayerAudio: YYPLAYER_MEDIA3_SINK open=s24_3/44100Hz/ch=2 widened=false mixerRequested=false mixerApplied=false source=s24_3
+10-06 13:34:12.404 26731 26731 I YYPlayerAudio: YYTEST_SESSION background=true uiOwnersReleased=true position=4560 state=3

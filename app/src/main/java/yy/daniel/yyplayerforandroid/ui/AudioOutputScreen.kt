@@ -32,6 +32,7 @@ import yy.daniel.yyplayerforandroid.audio.ActualSharing
 import yy.daniel.yyplayerforandroid.audio.AudioOutputChannel
 import yy.daniel.yyplayerforandroid.audio.AudioOutputState
 import yy.daniel.yyplayerforandroid.audio.BitPerfectStatus
+import yy.daniel.yyplayerforandroid.audio.OutputPath
 import yy.daniel.yyplayerforandroid.audio.SharingRequest
 import yy.daniel.yyplayerforandroid.audio.TransparencyRequest
 import kotlinx.coroutines.delay
@@ -48,20 +49,14 @@ internal fun AudioOutputScreen(
     state: AudioOutputState,
     sharing: SharingRequest,
     transparency: TransparencyRequest,
+    outputPath: OutputPath,
     onSharing: (SharingRequest) -> Unit,
     onTransparency: (TransparencyRequest) -> Unit,
+    onOutputPath: (OutputPath) -> Unit,
     onSelectDevice: (Int?) -> Unit,
+    onRunSelfTest: () -> Unit,
     onBack: () -> Unit,
 ) {
-    // Re-read the device list and re-evaluate periodically: this catches hot-plug and route changes
-    // without pretending to know the hardware state in between.
-    var tick by remember { mutableStateOf(0) }
-    LaunchedEffect(Unit) {
-        while (true) {
-            delay(2000)
-            tick++
-        }
-    }
     HyperPage("音频输出", onBack) { padding ->
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
             LazyColumn(
@@ -71,6 +66,12 @@ internal fun AudioOutputScreen(
                 item { HyperSection("输出策略") }
                 item {
                     HyperCard(Modifier.padding(horizontal = PageGutter).fillMaxWidth()) {
+                        HyperSpinnerPreference(
+                            title = "输出通道",
+                            items = OutputPath.entries.map { DropdownItem(it.label, summary = it.summary) },
+                            selectedIndex = outputPath.ordinal,
+                            onSelectedIndexChange = { onOutputPath(OutputPath.entries[it]) },
+                        )
                         HyperSpinnerPreference(
                             title = "流独占",
                             items = SharingRequest.entries.map { DropdownItem(it.label, summary = sharingSummary(it)) },
@@ -88,6 +89,63 @@ internal fun AudioOutputScreen(
                             summary = state.decision.reasonText,
                             value = state.decision.reasonCode,
                         )
+                    }
+                }
+
+                item { HyperSection("播放输出实测", trailing = if (state.negotiatedOutput != null) "已回读" else null) }
+                item {
+                    HyperCard(Modifier.padding(horizontal = PageGutter).fillMaxWidth()) {
+                        val negotiated = state.negotiatedOutput
+                        if (negotiated == null) {
+                            HyperSettingRow(
+                                "尚未打开输出",
+                                summary = "选择「独占／位完美优先」并开始播放后，这里显示输出通道实际协商到的格式、是否请求了" +
+                                    "位完美契约，以及平台是否回读确认。",
+                            )
+                        } else {
+                            HyperSettingRow(
+                                "输出通道实际格式",
+                                summary = "${negotiated.format.sampleRate / 1000f} kHz · " +
+                                    "${negotiated.format.channelCount} 声道 · " +
+                                    "${negotiated.format.encoding.effectiveBits} bit",
+                                value = negotiated.format.encoding.wire,
+                            )
+                            HyperSettingRow(
+                                "是否有损加宽",
+                                summary = if (negotiated.widened) {
+                                    "源位深低于容器，由原生核心无损加宽（补零，不丢有效位、不经浮点）"
+                                } else {
+                                    "源容器与输出容器一致，未做任何样本转换"
+                                },
+                                value = if (negotiated.widened) "已加宽" else "无转换",
+                            )
+                            HyperSettingRow(
+                                "位完美契约",
+                                summary = when {
+                                    !negotiated.bitPerfectRequested ->
+                                        "该设备组合没有 BIT_PERFECT 契约，未向系统请求；本次按同格式共享输出"
+                                    negotiated.reasonCode == "mixer_contract_refused" ->
+                                        "已向系统请求，系统拒绝（返回 false），未静默改为其它格式"
+                                    negotiated.bitPerfectActive -> "契约、实际 USB 路由与 API 格式一致；尚无数字捕获验证"
+                                    else -> "已请求，实际路由与契约尚未同时确认"
+                                },
+                                value = if (negotiated.bitPerfectActive) {
+                                    BitPerfectStatus.SYSTEM_REPORTED.label
+                                } else {
+                                    BitPerfectStatus.UNAVAILABLE.label
+                                },
+                            )
+                            HyperSettingRow(
+                                "设备指定",
+                                summary = if (state.selectedDeviceId != null) {
+                                    "已请求把输出固定到所选设备；平台是否照做以路由回读为准" +
+                                        (if (negotiated.devicePinAccepted) "" else "（平台未确认该请求，但仍可能已按此路由）")
+                                } else {
+                                    "跟随系统输出"
+                                },
+                                value = if (negotiated.devicePinAccepted) "平台已确认" else "未确认",
+                            )
+                        }
                     }
                 }
 
@@ -117,7 +175,7 @@ internal fun AudioOutputScreen(
                 item {
                     HyperCard(Modifier.padding(horizontal = PageGutter).fillMaxWidth()) {
                         val sharingText = if (state.actualSharing == ActualSharing.UNKNOWN) {
-                            "未知（未打开输出）"
+                            "未知（AudioTrack 不提供独占证据）"
                         } else {
                             state.actualSharing.label
                         }
@@ -152,6 +210,23 @@ internal fun AudioOutputScreen(
                     }
                 }
 
+                item { HyperSection("输出自检") }
+                item {
+                    HyperCard(Modifier.padding(horizontal = PageGutter).fillMaxWidth()) {
+                        HyperSettingRow(
+                            title = "输出参考信号",
+                            summary = buildString {
+                                append("先停止歌曲输出，测试后保留暂停。以立体声 s16 参考信号协商格式：核心提供 PCM 环，应用按能力请求混音器契约，")
+                                append("播放中回读实际路由与格式。信号为 2 秒静音 → 左 440Hz → 右 880Hz → 双声道")
+                                append("（各 1 秒）→ 2 秒静音，用来确认左右声道与设备是否真的出声。")
+                            },
+                            value = if (state.selfTestRunning) "进行中…" else "开始",
+                            onClick = if (state.selfTestRunning) null else onRunSelfTest,
+                        )
+                        state.selfTest?.let { result -> SelfTestRows(result) }
+                    }
+                }
+
                 item { HyperSection("能力说明") }
                 item {
                     HyperCard(Modifier.padding(horizontal = PageGutter).fillMaxWidth()) {
@@ -169,6 +244,70 @@ internal fun AudioOutputScreen(
             }
         }
     }
+}
+
+@Composable
+private fun SelfTestRows(result: yy.daniel.yyplayerforandroid.audio.OutputSelfTestResult) {
+    if (!result.started) {
+        HyperSettingRow("自检未完成", summary = result.reasonText, value = result.reasonCode)
+        return
+    }
+    HyperSettingRow(
+        "位完美契约",
+        summary = if (result.mixerContractAccepted) {
+            "系统接受了混音器请求，回读值为 " + (result.mixerContractReadBack?.let {
+                "${it.sampleRate / 1000f} kHz · ${it.encoding.effectiveBits} bit" + if (it.bitPerfect) " · BIT_PERFECT" else ""
+            } ?: "无（未回读）")
+        } else {
+            "系统未接受位完美混音器请求，本次按共享输出完成，未静默改为其它格式"
+        },
+        value = when {
+            result.systemReportedBitPerfect -> BitPerfectStatus.SYSTEM_REPORTED.label
+            result.mixerContractAccepted -> BitPerfectStatus.REQUESTED.label
+            else -> BitPerfectStatus.UNAVAILABLE.label
+        },
+    )
+    HyperSettingRow(
+        "播放中实际路由",
+        summary = result.route.routedDeviceNames.joinToString("、").ifBlank { "系统未回读路由设备" },
+        value = if (result.route.routedIsUsb) "USB" else null,
+    )
+    HyperSettingRow(
+        "实际输出格式",
+        summary = if (result.route.trackSampleRate > 0) {
+            "${result.route.trackSampleRate / 1000f} kHz · ${result.route.trackEncoding.effectiveBits} bit · 缓冲 ${result.route.bufferSizeFrames} 帧"
+        } else {
+            "系统未回读格式"
+        },
+        value = when {
+            result.formatWasSubstituted -> "平台已替换"
+            result.formatMatchesTrack -> "与决策一致"
+            else -> "与决策不一致"
+        },
+    )
+    if (result.formatWasSubstituted) {
+        HyperSettingRow(
+            "平台实际接受的格式",
+            summary = "应用按决策格式请求，平台给输出流换成了 " +
+                "${result.route.platformFormat?.sampleRate?.div(1000f)} kHz · " +
+                "${result.route.platformFormat?.encoding?.effectiveBits} bit；" +
+                "应用按平台回读记录，不把请求格式当作实际格式。",
+        )
+    }
+    HyperSettingRow(
+        "样本投递",
+        summary = "写入环 ${result.framesFed} 帧 · 丢弃 ${result.framesDropped} 帧 · 输出取走 ${result.framesConsumed} 帧 · " +
+            "信号期间欠载 ${result.starvingDuringSignal} 帧（开流前静音 ${result.starvingFramesAtFeedEnd} 帧计为正常）· " +
+            "平台 xrun ${result.route.underrunCount ?: "未报告"}",
+        value = if (result.deliveryComplete) "完整" else "有缺失",
+    )
+    HyperSettingRow(
+        "参考信号摘要",
+        summary = "SHA-256（进入环的字节，${result.decidedFormat?.encoding?.wire ?: "?"} 小端交织）：" +
+            (result.digestHex ?: "未计算") + "\n" + result.toneDescription,
+        value = "对比值",
+    )
+    result.notes.forEach { HyperSettingRow("说明", summary = it) }
 }
 
 @Composable

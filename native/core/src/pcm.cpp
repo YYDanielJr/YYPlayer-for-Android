@@ -1,4 +1,5 @@
 #include "yy/core/pcm.h"
+#include <limits>
 
 namespace yy::core {
 namespace {
@@ -24,11 +25,15 @@ void StoreLE(std::uint8_t* p, std::uint32_t bytes, std::uint32_t value) noexcept
 }
 
 std::int32_t SignExtend(std::uint32_t value, std::uint32_t bits) noexcept {
-    if (bits == 0 || bits >= 32) return static_cast<std::int32_t>(value);
+    if (bits == 0 || bits >= 32) {
+        return value <= 0x7FFFFFFFu ? static_cast<std::int32_t>(value)
+            : -1 - static_cast<std::int32_t>(0xFFFFFFFFu - value);
+    }
+    value &= (1u << bits) - 1u;
     const std::uint32_t sign_bit = 1u << (bits - 1u);
     if ((value & sign_bit) == 0) return static_cast<std::int32_t>(value);
     const std::uint32_t widened = value | ~((1u << bits) - 1u);
-    return static_cast<std::int32_t>(widened);
+    return -1 - static_cast<std::int32_t>(0xFFFFFFFFu - widened);
 }
 
 // Reads one sample as a signed 32-bit integer in the source's own scale.
@@ -39,6 +44,7 @@ std::int32_t ReadSample(SampleEncoding encoding, const std::uint8_t* p) noexcept
         case SampleEncoding::kS24_3:
             return SignExtend(LoadLE(p, 3), 24);
         case SampleEncoding::kS24In32:
+            return SignExtend(LoadLE(p, 4), 24);
         case SampleEncoding::kS32:
             return SignExtend(LoadLE(p, 4), 32);
         case SampleEncoding::kUnknown:
@@ -140,6 +146,18 @@ ConvertResult Convert(SampleEncoding from, SampleEncoding to,
     if (frames == 0) {
         return src_frames == 0 ? ConvertResult::kInsufficientInput : ConvertResult::kInsufficientOutput;
     }
+    const auto src_size = frames * src_frame_bytes;
+    const auto dst_size = frames * dst_frame_bytes;
+    const auto src_address = reinterpret_cast<std::uintptr_t>(src);
+    const auto dst_address = reinterpret_cast<std::uintptr_t>(dst);
+    const auto address_max = std::numeric_limits<std::uintptr_t>::max();
+    if (src_size > address_max - src_address || dst_size > address_max - dst_address) {
+        return ConvertResult::kBadArgument;
+    }
+    if (src_address < dst_address + dst_size && dst_address < src_address + src_size &&
+        !(src == dst && src_sample_bytes == dst_sample_bytes)) {
+        return ConvertResult::kBadArgument;
+    }
 
     if (from == to) {
         // Same width: still an explicit copy so the caller never aliases the ring buffer.
@@ -149,25 +167,43 @@ ConvertResult Convert(SampleEncoding from, SampleEncoding to,
     }
 
     const std::uint32_t src_bits = EffectiveBits(from);
+    const std::uint32_t dst_bits = EffectiveBits(to);
+    // Same significant width (s24_in32 <-> s24_3) is a pure repack: shift 0, no value touched. The
+    // pristine check above already refused every narrowing pair, so `dst_bits` is never below
+    // `src_bits` here and this scale never truncates.
+    //
+    // Widening is level-preserving rather than value-preserving. Full scale in integer PCM is
+    // 2^(bits-1), so the same numeric value means a different analog level in a wider container: an s16
+    // sample placed unshifted into 24 bits would sit 48 dB below full scale and play back almost
+    // inaudibly. Shifting left by the bit-depth difference keeps the level and still drops nothing -
+    // the added low bits are exact zeros, which is why this stays on the pristine path and never needs
+    // rounding or dither.
+    const std::uint32_t shift = dst_bits > src_bits ? dst_bits - src_bits : 0;
+    if (shift >= 32) return ConvertResult::kUnsupported;
+    const std::int32_t scale = static_cast<std::int32_t>(1u << shift);
     const std::uint64_t samples = frames * static_cast<std::uint64_t>(channels);
     for (std::uint64_t i = 0; i < samples; ++i) {
         const std::int32_t sample = ReadSample(from, src + i * src_sample_bytes);
         // The destination advances by its own sample width, not by the source width.
-        WriteSample(to, dst + i * dst_sample_bytes, sample, src_bits);
+        WriteSample(to, dst + i * dst_sample_bytes, sample * scale, src_bits);
     }
     *converted_frames = frames;
     return ConvertResult::kOk;
 }
+
 std::int32_t WidenS16ToS24(std::int16_t sample) noexcept {
-    return static_cast<std::int32_t>(sample);
+    // Full scale for each depth is 2^(bits-1), so surviving in a 24-bit container means shifting into
+    // the 24 significant bits. Returning the bare value would be a level change, not a widening.
+    return static_cast<std::int32_t>(sample) * 256;
 }
 
 std::int32_t WidenS16ToS32(std::int16_t sample) noexcept {
-    return static_cast<std::int32_t>(sample);
+    return static_cast<std::int32_t>(sample) * 65536;
 }
 
 std::int32_t WidenS24ToS32(std::int32_t sample24) noexcept {
-    return sample24;
+    // The input holds 24 significant bits, so it scales into the 32-bit container by 8 bits.
+    return SignExtend(static_cast<std::uint32_t>(sample24) << 8, 32);
 }
 
 }  // namespace yy::core

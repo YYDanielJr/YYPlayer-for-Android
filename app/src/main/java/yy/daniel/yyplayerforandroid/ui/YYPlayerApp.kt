@@ -208,6 +208,10 @@ fun YYPlayerApp(activity: MainActivity) {
                         { snapshot.current?.let { runtime.toggleFavorite(it.identity) } }, { musicExpanded = false },
                         lyricStyle = preferences.lyricStyle,
                         audioOutput = audioOutput,
+                        outputPath = preferences.audioOutputPath,
+                        onOutputPath = runtime::setAudioOutputPath,
+                        onSelectOutputDevice = runtime::selectAudioOutputDevice,
+                        onLyricStyle = activity::openLyricStyle,
                         onOnlineLyrics = if (preferences.onlineLyrics && onlineConfig?.providers.orEmpty().any { it.lyric != null && it.lyricSearch != null }) activity::openOnlineLyrics else null)
                 }
             }

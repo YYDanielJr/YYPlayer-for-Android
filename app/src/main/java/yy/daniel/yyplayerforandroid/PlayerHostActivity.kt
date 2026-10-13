@@ -193,9 +193,12 @@ class AudioOutputActivity : PlayerHostActivity() {
                     state = output,
                     sharing = preferences.audioSharing,
                     transparency = preferences.audioTransparency,
+                    outputPath = preferences.audioOutputPath,
                     onSharing = runtime::setAudioSharing,
                     onTransparency = runtime::setAudioTransparency,
+                    onOutputPath = runtime::setAudioOutputPath,
                     onSelectDevice = runtime::selectAudioOutputDevice,
+                    onRunSelfTest = { runtime.runAudioOutputSelfTest() },
                     onBack = ::closePage,
                 )
             }

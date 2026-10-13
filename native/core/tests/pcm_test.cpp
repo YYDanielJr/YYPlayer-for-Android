@@ -22,18 +22,26 @@ std::vector<std::uint8_t> BytesOf16(const std::vector<std::int16_t>& samples) {
 
 std::int32_t Read24In32(const std::uint8_t* p) {
     const std::uint32_t raw = static_cast<std::uint32_t>(p[0]) |
-                              (static_cast<std::uint32_t>(p[1]) << 8) |
-                              (static_cast<std::uint32_t>(p[2]) << 16) |
+                              (static_cast<std::uint32_t>(p[1]) * 256) |
+                              (static_cast<std::uint32_t>(p[2]) * 65536) |
                               (static_cast<std::uint32_t>(p[3]) << 24);
     return static_cast<std::int32_t>(raw);
 }
 
 std::int32_t Read24Packed(const std::uint8_t* p) {
     std::uint32_t raw = static_cast<std::uint32_t>(p[0]) |
-                        (static_cast<std::uint32_t>(p[1]) << 8) |
-                        (static_cast<std::uint32_t>(p[2]) << 16);
+                        (static_cast<std::uint32_t>(p[1]) * 256) |
+                        (static_cast<std::uint32_t>(p[2]) * 65536);
     if ((raw & 0x800000u) != 0) raw |= 0xFF000000u;
     return static_cast<std::int32_t>(raw);
+}
+
+// Position of a sample inside its container's range, in millionths of full scale. Two samples with
+// the same fraction represent the same analog level regardless of how many bits carry them, which is
+// the property that makes a widening conversion level-preserving.
+std::int64_t FullScaleFraction(std::int32_t sample, int bits) {
+    const std::int64_t full_scale = static_cast<std::int64_t>(1) << (bits - 1);
+    return static_cast<std::int64_t>(sample) * 1000000 / full_scale;
 }
 
 }  // namespace
@@ -66,6 +74,8 @@ void yy::test::RunPcmTests(Context& context) {
 
     YY_CASE(context, "extreme and alternating samples");
     // Zero, +/-1, min/max and sample-by-sample channel alternation all survive 16 -> 24 containers.
+    // The values are compared against the *scaled* expectation: full scale in integer PCM is
+    // 2^(bits-1), so a 16-bit sample occupies the top 16 bits of the 24-bit container.
     const std::vector<std::int16_t> samples = {
         0, 0,
         1, -1,
@@ -84,13 +94,14 @@ void yy::test::RunPcmTests(Context& context) {
     YY_EXPECT_EQ(context, frames, 6ull);
     for (std::size_t i = 0; i < samples.size(); ++i) {
         const std::int32_t widened = Read24In32(dst24in32.data() + i * 4);
-        YY_EXPECT_EQ(context, widened, static_cast<std::int32_t>(samples[i]));
+        YY_EXPECT_EQ(context, widened, static_cast<std::int32_t>(samples[i]) * 256);
     }
-    // Widening must not change any sample value, only the container width.
-    for (std::size_t i = 0; i < samples.size(); ++i) {
-        YY_EXPECT_EQ(context, static_cast<std::int32_t>(samples[i]),
-                     Read24In32(dst24in32.data() + i * 4));
-    }
+    // Widening changes the container, never the level: the sample must land in the destination's
+    // significant bits, so its fraction of full scale is identical before and after.
+    YY_EXPECT_EQ(context, FullScaleFraction(Read24In32(dst24in32.data() + 6 * 4), 24),
+                 FullScaleFraction(static_cast<std::int32_t>(samples[6]), 16));
+    YY_EXPECT_EQ(context, FullScaleFraction(Read24In32(dst24in32.data() + 7 * 4), 24),
+                 FullScaleFraction(static_cast<std::int32_t>(samples[7]), 16));
 
     YY_CASE(context, "16 -> 24 packed keeps sign");
     std::vector<std::uint8_t> packed(samples.size() * 3);
@@ -100,17 +111,20 @@ void yy::test::RunPcmTests(Context& context) {
     YY_EXPECT_EQ(context, static_cast<int>(result), static_cast<int>(ConvertResult::kOk));
     YY_EXPECT_EQ(context, frames, 6ull);
     for (std::size_t i = 0; i < samples.size(); ++i) {
-        YY_EXPECT_EQ(context, Read24Packed(packed.data() + i * 3), static_cast<std::int32_t>(samples[i]));
+        YY_EXPECT_EQ(context, Read24Packed(packed.data() + i * 3),
+                     static_cast<std::int32_t>(samples[i]) * 256);
     }
 
     YY_CASE(context, "24 packed -> 24 in 32 keeps value");
+    // Same significant width: this is a pure repack, so no scaling happens at all.
     frames = 0;
     std::vector<std::uint8_t> widened(samples.size() * 4);
     result = Convert(SampleEncoding::kS24_3, SampleEncoding::kS24In32,
                      packed.data(), packed.size(), widened.data(), widened.size(), 2, &frames);
     YY_EXPECT_EQ(context, static_cast<int>(result), static_cast<int>(ConvertResult::kOk));
     for (std::size_t i = 0; i < samples.size(); ++i) {
-        YY_EXPECT_EQ(context, Read24In32(widened.data() + i * 4), static_cast<std::int32_t>(samples[i]));
+        YY_EXPECT_EQ(context, Read24In32(widened.data() + i * 4),
+                     static_cast<std::int32_t>(samples[i]) * 256);
     }
 
     YY_CASE(context, "same encoding copies");
@@ -168,7 +182,7 @@ void yy::test::RunPcmTests(Context& context) {
                                                    src16.data(), 3, copy.data(), copy.size(), 2, &frames)),
                  static_cast<int>(ConvertResult::kInsufficientInput));
 
-    YY_CASE(context, "random round trip 16 -> 32 -> 16 is value preserving");
+    YY_CASE(context, "random round trip 16 -> 32 is level preserving and refuses narrowing");
     std::mt19937 rng(20261005u);
     std::uniform_int_distribution<int> distribution(-32768, 32767);
     std::vector<std::int16_t> random_samples(2000);
@@ -185,23 +199,68 @@ void yy::test::RunPcmTests(Context& context) {
                                                    random32.data(), random32.size(), back.data(),
                                                    back.size(), 2, &frames)),
                  static_cast<int>(ConvertResult::kLossy));
-    // The 32-bit container holds exactly the 16-bit value in its low bits, so a manual narrowing
-    // check confirms no sample was scaled.
+    // The 32-bit container holds the 16-bit sample shifted into its top 16 bits, so every sample sits
+    // at exactly the same fraction of full scale it had before. Unshifted storage would pass a
+    // "value preserved" check and still be 96 dB quiet, which is the bug this asserts against.
     for (std::size_t i = 0; i < random_samples.size(); ++i) {
         const std::uint32_t raw = static_cast<std::uint32_t>(random32[i * 4]) |
-                                  (static_cast<std::uint32_t>(random32[i * 4 + 1]) << 8) |
-                                  (static_cast<std::uint32_t>(random32[i * 4 + 2]) << 16) |
+                                  (static_cast<std::uint32_t>(random32[i * 4 + 1]) * 256) |
+                                  (static_cast<std::uint32_t>(random32[i * 4 + 2]) * 65536) |
                                   (static_cast<std::uint32_t>(random32[i * 4 + 3]) << 24);
-        YY_EXPECT_EQ(context, static_cast<std::int32_t>(raw), static_cast<std::int32_t>(random_samples[i]));
+        const std::int32_t wide = static_cast<std::int32_t>(raw);
+        YY_EXPECT_EQ(context, wide, static_cast<std::int32_t>(random_samples[i]) * 65536);
+        YY_EXPECT_EQ(context, FullScaleFraction(wide, 32),
+                     FullScaleFraction(static_cast<std::int32_t>(random_samples[i]), 16));
+    }
+    // A 24-in-32 container widened to s32 must also keep its level, and must not be shifted twice.
+    std::vector<std::uint8_t> from24in32(random_samples.size() * 4);
+    std::vector<std::uint8_t> toS32(from24in32.size());
+    frames = 0;
+    YY_EXPECT_EQ(context, static_cast<int>(Convert(SampleEncoding::kS16, SampleEncoding::kS24In32,
+                                                   random16.data(), random16.size(),
+                                                   from24in32.data(), from24in32.size(), 2, &frames)),
+                 static_cast<int>(ConvertResult::kOk));
+    YY_EXPECT_EQ(context, frames, random_samples.size() / 2);  // 2000 samples = 1000 stereo frames
+    frames = 0;
+    YY_EXPECT_EQ(context, static_cast<int>(Convert(SampleEncoding::kS24In32, SampleEncoding::kS32,
+                                                   from24in32.data(), from24in32.size(), toS32.data(),
+                                                   toS32.size(), 2, &frames)),
+                 static_cast<int>(ConvertResult::kOk));
+    YY_EXPECT_EQ(context, frames, random_samples.size() / 2);  // 2000 samples = 1000 stereo frames
+    for (std::size_t i = 0; i < random_samples.size(); ++i) {
+        const std::uint32_t raw = static_cast<std::uint32_t>(toS32[i * 4]) |
+                                  (static_cast<std::uint32_t>(toS32[i * 4 + 1]) * 256) |
+                                  (static_cast<std::uint32_t>(toS32[i * 4 + 2]) * 65536) |
+                                  (static_cast<std::uint32_t>(toS32[i * 4 + 3]) << 24);
+        YY_EXPECT_EQ(context, static_cast<std::int32_t>(raw),
+                     static_cast<std::int32_t>(random_samples[i]) * 65536);
     }
 
-    YY_CASE(context, "widening helpers are identity, not scaling");
-    YY_EXPECT_EQ(context, WidenS16ToS24(static_cast<std::int16_t>(-32768)), -32768);
-    YY_EXPECT_EQ(context, WidenS16ToS24(static_cast<std::int16_t>(32767)), 32767);
-    YY_EXPECT_EQ(context, WidenS16ToS32(static_cast<std::int16_t>(-1)), -1);
-    YY_EXPECT_EQ(context, WidenS24ToS32(-8388608), -8388608);
+    YY_CASE(context, "widening helpers keep the level");
+    YY_EXPECT_EQ(context, WidenS16ToS24(static_cast<std::int16_t>(-32768)), -8388608);
+    YY_EXPECT_EQ(context, WidenS16ToS24(static_cast<std::int16_t>(32767)), 8388352);
+    YY_EXPECT_EQ(context, WidenS16ToS32(static_cast<std::int16_t>(-1)), -65536);
+    YY_EXPECT_EQ(context, WidenS24ToS32(-8388608), -2147483647 - 1);
 
     YY_CASE(context, "result names are stable for logs");
+    YY_CASE(context, "overlapping ranges are refused before modifying PCM");
+    std::vector<std::uint8_t> overlap(32, 0x55);
+    YY_EXPECT_EQ(context, static_cast<int>(Convert(SampleEncoding::kS16, SampleEncoding::kS32,
+        overlap.data(), 8, overlap.data() + 2, 16, 2, &frames)),
+        static_cast<int>(ConvertResult::kBadArgument));
+    YY_EXPECT_EQ(context, frames, 0ull);
+    for (auto byte : overlap) YY_EXPECT_EQ(context, byte, static_cast<std::uint8_t>(0x55));
+
+    YY_CASE(context, "24-in-32 ignores padding and widens signed extremes without overflow");
+    const std::uint8_t padded24[] = {0, 0, 0x80, 0x55, 0xff, 0xff, 0x7f, 0xaa};
+    std::uint8_t paddedOut[8] = {};
+    YY_EXPECT_EQ(context, static_cast<int>(Convert(SampleEncoding::kS24In32, SampleEncoding::kS32,
+        padded24, sizeof(padded24), paddedOut, sizeof(paddedOut), 2, &frames)),
+        static_cast<int>(ConvertResult::kOk));
+    const std::uint8_t expectedPadded[] = {0, 0, 0, 0x80, 0, 0xff, 0xff, 0x7f};
+    for (std::size_t i = 0; i < sizeof(paddedOut); ++i) YY_EXPECT_EQ(context, paddedOut[i], expectedPadded[i]);
+    YY_EXPECT_EQ(context, WidenS16ToS32(static_cast<std::int16_t>(-32768)), -2147483647 - 1);
+    YY_EXPECT_EQ(context, WidenS24ToS32(8388607), 2147483392);
     YY_EXPECT_EQ(context, std::string(ConvertResultName(ConvertResult::kLossy)), std::string("lossy"));
     YY_EXPECT_EQ(context, std::string(ConvertResultName(ConvertResult::kOk)), std::string("ok"));
 }

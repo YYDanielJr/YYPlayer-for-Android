@@ -1,0 +1,20 @@
+--------- beginning of main
+10-08 11:47:19.572 26812 26894 I YYPlayerAudio: YYPLAYER_MEDIA3_SINK open=s24_3/44100Hz/ch=2 widened=false mixerRequested=false mixerApplied=false source=s24_3
+10-08 11:47:28.811 26812 27405 I YYPlayerAudio: YYPLAYER_MEDIA3_SINK open=s24_3/44100Hz/ch=2 widened=false mixerRequested=false mixerApplied=false source=s24_3
+10-08 11:47:29.260 26812 26812 I YYPlayerAudio: YYTEST_SWITCH path=SYSTEM requested=919 device=USB-Audio - lifeme HiFi Audio Pro position=555 actualConfirmed=true
+10-08 11:47:30.455 26812 26812 I YYPlayerAudio: YYTEST_SWITCH path=SYSTEM requested=903 device=OPPO Enco Free4 position=1252 actualConfirmed=true
+10-08 11:47:30.568 26812 27523 I YYPlayerAudio: YYPLAYER_MEDIA3_SINK open=s24_3/44100Hz/ch=2 widened=false mixerRequested=false mixerApplied=false source=s24_3
+10-08 11:47:30.568 26812 26812 I YYPlayerAudio: YYTEST_ROUTE requested=919 actual=[919] pin=true
+10-08 11:47:34.208 26812 26812 I YYPlayerAudio: YYTEST_SWITCH path=NATIVE_EXACT requested=919 device=USB-Audio - lifeme HiFi Audio Pro position=1854 actualConfirmed=true
+10-08 11:47:35.090 26812 27574 I YYPlayerAudio: YYPLAYER_MEDIA3_SINK open=s24_3/44100Hz/ch=2 widened=false mixerRequested=false mixerApplied=false source=s24_3
+10-08 11:47:35.090 26812 26812 I YYPlayerAudio: YYTEST_ROUTE requested=903 actual=[903] pin=true
+10-08 11:47:36.134 26812 26812 I YYPlayerAudio: YYTEST_SWITCH path=NATIVE_EXACT requested=903 device=OPPO Enco Free4 position=2377 actualConfirmed=true
+10-08 11:47:36.524 26812 27621 I YYPlayerAudio: YYPLAYER_MEDIA3_SINK open=s24_3/44100Hz/ch=2 widened=false mixerRequested=false mixerApplied=false source=s24_3
+10-08 11:47:36.524 26812 26812 I YYPlayerAudio: YYTEST_ROUTE requested=903 actual=[903] pin=true
+10-08 11:47:37.254 26812 26879 I YYPlayerAudio: YYPLAYER_MEDIA3_SINK open=s16/48000Hz/ch=2 widened=false mixerRequested=false mixerApplied=false source=s16
+10-08 11:47:42.333 26812 26879 I YYPlayerAudio: YYTEST_native_TRACK=编织光流 (For Your Name) uri=content://com.android.externalstorage.documents/tree/primary%3AMusic/document/primary%3AMusic%2F%E9%93%81%E7%97%95%E7%94%B5%E5%8F%B0-MSR%2CEdine%20-%20%E7%BC%96%E7%BB%87%E5%85%89%E6%B5%81%20(For%20Your%20Name).flac
+10-08 11:47:42.399 26812 26879 I YYPlayerAudio: YYTEST_native_FILE durationMs=274585 sampleRate=44100 expectedFrames=12109198
+10-08 11:47:42.405 26812 26812 I YYPlayerAudio: YYTEST_native_STATE=2
+10-08 11:47:42.489 26812 27696 I YYPlayerAudio: YYTEST_native_NEGOTIATED format=s24_3/44100Hz widened=false bitPerfectRequested=false reason=ok requested=null routed=[919]
+10-08 11:47:42.489 26812 27696 I YYPlayerAudio: YYPLAYER_MEDIA3_SINK open=s24_3/44100Hz/ch=2 widened=false mixerRequested=false mixerApplied=false source=s24_3
+10-08 11:47:43.068 26812 26812 I YYPlayerAudio: YYTEST_native_STATE=3

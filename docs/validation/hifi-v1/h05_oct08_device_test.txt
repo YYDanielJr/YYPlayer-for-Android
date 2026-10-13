@@ -1,0 +1,27 @@
+
+yy.daniel.yyplayerforandroid.OutputAuditDeviceTest:......
+Error in formatChangeDrainsTheOldPausedTailBeforeOpeningTheNextTrack(yy.daniel.yyplayerforandroid.OutputAuditDeviceTest):
+java.lang.AssertionError: expected:<4096> but was:<0>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at org.junit.Assert.assertEquals(Assert.java:146)
+	at yy.daniel.yyplayerforandroid.OutputAuditDeviceTest.formatChangeDrainsTheOldPausedTailBeforeOpeningTheNextTrack(OutputAuditDeviceTest.kt:41)
+
+yy.daniel.yyplayerforandroid.NativeOutputPlaybackTest:...
+yy.daniel.yyplayerforandroid.PlayerSessionServiceDeviceTest:.
+yy.daniel.yyplayerforandroid.AudioOutputDeviceTest:.......
+yy.daniel.yyplayerforandroid.AudioOutputSinkDeviceTest:...........
+
+Time: 107.777
+There was 1 failure:
+1) formatChangeDrainsTheOldPausedTailBeforeOpeningTheNextTrack(yy.daniel.yyplayerforandroid.OutputAuditDeviceTest)
+java.lang.AssertionError: expected:<4096> but was:<0>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at org.junit.Assert.assertEquals(Assert.java:146)
+	at yy.daniel.yyplayerforandroid.OutputAuditDeviceTest.formatChangeDrainsTheOldPausedTailBeforeOpeningTheNextTrack(OutputAuditDeviceTest.kt:41)
+
+FAILURES!!!
+Tests run: 29,  Failures: 1

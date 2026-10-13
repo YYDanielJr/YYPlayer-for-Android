@@ -7,13 +7,18 @@
 // JNI function names follow the Kotlin declarations exactly. The bridge methods live in the nested
 // `NativeAudioCore.Bridge` object, whose binary name is `...NativeAudioCore$Bridge`, so `$` is
 // escaped as `_00024` and the two control functions are prefixed `native` to match that object.
-//   yy.daniel.yyplayerforandroid.audio.NativeAudioCore       -> control-free ring entry points
+// All native declarations are on NativeAudioCore$Bridge.
 //   yy.daniel.yyplayerforandroid.audio.NativeAudioCore$Bridge -> version and policy evaluation
 #include <jni.h>
 
 #include <cstdint>
 #include <cstring>
 #include <mutex>
+#include <memory>
+#include <vector>
+#include <limits>
+#include <new>
+#include <type_traits>
 #include <string>
 #include <unordered_map>
 
@@ -41,10 +46,25 @@ using yy::core::SinkKind;
 using yy::core::TransparencyRequest;
 namespace json = yy::core::json;
 
+// Every entry point is registered explicitly below, for two reasons.
+//
+// 1. Kotlin compiles the nested `Bridge` object into its own top-level class, and *all ten* native
+//    declarations are members of it - including the ring and PCM functions that the outer
+//    `NativeAudioCore` wraps. Their JNI names therefore all carry the `_00024Bridge_` infix. An
+//    earlier revision exported the ring functions as if they belonged to the outer class, so
+//    `createRing`, `ringWrite`, `ringRead`, `ringClear`, `ringStats`, `releaseRing` and `convertPcm`
+//    resolved to nothing: `System.loadLibrary` still succeeded, and every call threw
+//    UnsatisfiedLinkError, which the Kotlin wrappers reported as "native unavailable". Seven dead
+//    entry points looked exactly like a device that does not support them.
+// 2. Because the table is resolved at load time, a Kotlin signature change now fails the library load
+//    loudly instead of turning one feature into a false "not supported" on a device.
+constexpr const char* kBridgeClass = "yy/daniel/yyplayerforandroid/audio/NativeAudioCore$Bridge";
+
 // A ring handle is a jlong the JVM may hold across calls. The registry keeps the mapping explicit
 // so a stale or wrong-type handle is rejected instead of dereferenced.
 struct RingEntry {
     yy::core::PcmRing ring;
+    std::mutex io_mutex; // JNI callers are ordinary workers; serialize Clear and duplicate producers.
     RingEntry(const PcmFormat& format, std::uint64_t capacity_frames)
         : ring(format, capacity_frames) {}
 };
@@ -54,28 +74,50 @@ std::mutex& RegistryMutex() {
     return mutex;
 }
 
-std::unordered_map<std::int64_t, RingEntry*>& Registry() {
-    static std::unordered_map<std::int64_t, RingEntry*> registry;
+std::unordered_map<std::int64_t, std::shared_ptr<RingEntry>>& Registry() {
+    static std::unordered_map<std::int64_t, std::shared_ptr<RingEntry>> registry;
     return registry;
 }
 
 std::int64_t NextHandle = 1;
 
-RingEntry* LookupRing(jlong handle) {
+std::shared_ptr<RingEntry> LookupRing(jlong handle) {
     if (handle <= 0) return nullptr;
     std::lock_guard<std::mutex> lock(RegistryMutex());
     const auto found = Registry().find(static_cast<std::int64_t>(handle));
     return found == Registry().end() ? nullptr : found->second;
 }
 
+// No allocation/standard-library exception may cross the registered JNI boundary.
+template <auto Function> struct JniBoundary;
+template <typename Result, typename... Args, Result (*Function)(JNIEnv*, Args...)>
+struct JniBoundary<Function> {
+    static Result Call(JNIEnv* env, Args... args) noexcept {
+        try { return Function(env, args...); }
+        catch (const std::bad_alloc&) { Raise(env, "java/lang/OutOfMemoryError", "native allocation failed"); }
+        catch (...) { Raise(env, "java/lang/IllegalStateException", "native bridge failed"); }
+        return Result{};
+    }
+    static void Raise(JNIEnv* env, const char* name, const char* message) noexcept {
+        if (env->ExceptionCheck()) return;
+        jclass type = env->FindClass(name);
+        if (type != nullptr) { env->ThrowNew(type, message); env->DeleteLocalRef(type); }
+    }
+};
+
 // JSON value for a jstring, tolerating a null pointer and an invalid encoding.
 std::string ToString(JNIEnv* env, jstring value) {
     if (value == nullptr) return std::string();
     const char* chars = env->GetStringUTFChars(value, nullptr);
     if (chars == nullptr) return std::string();
-    std::string text(chars);
-    env->ReleaseStringUTFChars(value, chars);
-    return text;
+    try {
+        std::string text(chars);
+        env->ReleaseStringUTFChars(value, chars);
+        return text;
+    } catch (...) {
+        env->ReleaseStringUTFChars(value, chars);
+        throw;
+    }
 }
 
 jstring ToJString(JNIEnv* env, const std::string& value) {
@@ -185,7 +227,8 @@ extern "C" {
 JNIEXPORT jint JNICALL
 Java_yy_daniel_yyplayerforandroid_audio_NativeAudioCore_00024Bridge_nativeBridgeVersion(JNIEnv*,
                                                                                        jclass) {
-    return 1;
+    // 2 adds nativeIsPristineConversion, which the sink path needs before it converts anything.
+    return 2;
 }
 
 // Evaluates one output request. The request and response are flat JSON documents; see
@@ -265,9 +308,10 @@ Java_yy_daniel_yyplayerforandroid_audio_NativeAudioCore_00024Bridge_nativeEvalua
     // Profiles are borrowed for the duration of this call only.
     std::string profiles_body;
     std::int32_t profile_count = 0;
-    MixerProfile profiles[32];
+    std::vector<MixerProfile> profiles;
     if (json::TryGetObjectArray(request, "route.profiles", &profiles_body, &profile_count)) {
-        if (profile_count > 32) profile_count = 32;
+        if (profile_count > 4096) return nullptr;
+        profiles.resize(static_cast<std::size_t>(profile_count));
         // Each element is an object; locate them by re-scanning the array body.
         std::size_t cursor = 0;
         std::int32_t filled = 0;
@@ -329,7 +373,7 @@ Java_yy_daniel_yyplayerforandroid_audio_NativeAudioCore_00024Bridge_nativeEvalua
             if (usable) profiles[filled++] = profile;
             cursor = close + 1;
         }
-        route.profiles = profiles;
+        route.profiles = profiles.data();
         route.profile_count = filled;
     }
 
@@ -389,7 +433,7 @@ Java_yy_daniel_yyplayerforandroid_audio_NativeAudioCore_00024Bridge_nativeEvalua
 
 // Creates a ring for one PCM format. Returns 0 when the format is not usable exactly as described.
 JNIEXPORT jlong JNICALL
-Java_yy_daniel_yyplayerforandroid_audio_NativeAudioCore_createRing(JNIEnv* env, jclass,
+Java_yy_daniel_yyplayerforandroid_audio_NativeAudioCore_00024Bridge_createRing(JNIEnv* env, jclass,
                                                                   jint sample_rate, jint channels,
                                                                   jstring encoding_name,
                                                                   jint channel_mask,
@@ -402,24 +446,24 @@ Java_yy_daniel_yyplayerforandroid_audio_NativeAudioCore_createRing(JNIEnv* env, 
     format.channel_mask = channel_mask > 0 ? static_cast<ChannelMask>(channel_mask) : 0;
     if (!yy::core::IsPlausibleFormat(format)) return 0;
     if (capacity_frames <= 0) return 0;
-    auto* entry = new (std::nothrow) RingEntry(format, static_cast<std::uint64_t>(capacity_frames));
-    if (entry == nullptr) return 0;
+    auto entry = std::make_shared<RingEntry>(format, static_cast<std::uint64_t>(capacity_frames));
     if (entry->ring.capacity_frames() == 0) {
         // The format was rejected while allocating; do not publish a handle that stores nothing.
-        delete entry;
         return 0;
     }
     std::lock_guard<std::mutex> lock(RegistryMutex());
+    if (NextHandle == std::numeric_limits<std::int64_t>::max()) return 0;
     const std::int64_t handle = NextHandle++;
     Registry()[handle] = entry;
     return static_cast<jlong>(handle);
 }
 
 JNIEXPORT jint JNICALL
-Java_yy_daniel_yyplayerforandroid_audio_NativeAudioCore_ringWrite(JNIEnv* env, jclass, jlong handle,
+Java_yy_daniel_yyplayerforandroid_audio_NativeAudioCore_00024Bridge_ringWrite(JNIEnv* env, jclass, jlong handle,
                                                                  jobject buffer, jint frames) {
-    RingEntry* entry = LookupRing(handle);
+    auto entry = LookupRing(handle);
     if (entry == nullptr || buffer == nullptr || frames <= 0) return 0;
+    std::lock_guard<std::mutex> operation(entry->io_mutex);
     auto* bytes = static_cast<std::uint8_t*>(env->GetDirectBufferAddress(buffer));
     const jlong capacity = env->GetDirectBufferCapacity(buffer);
     if (bytes == nullptr || capacity <= 0) return 0;
@@ -435,10 +479,11 @@ Java_yy_daniel_yyplayerforandroid_audio_NativeAudioCore_ringWrite(JNIEnv* env, j
 }
 
 JNIEXPORT jint JNICALL
-Java_yy_daniel_yyplayerforandroid_audio_NativeAudioCore_ringRead(JNIEnv* env, jclass, jlong handle,
+Java_yy_daniel_yyplayerforandroid_audio_NativeAudioCore_00024Bridge_ringRead(JNIEnv* env, jclass, jlong handle,
                                                                 jobject buffer, jint max_frames) {
-    RingEntry* entry = LookupRing(handle);
+    auto entry = LookupRing(handle);
     if (entry == nullptr || buffer == nullptr || max_frames <= 0) return 0;
+    std::lock_guard<std::mutex> operation(entry->io_mutex);
     auto* bytes = static_cast<std::uint8_t*>(env->GetDirectBufferAddress(buffer));
     const jlong capacity = env->GetDirectBufferCapacity(buffer);
     if (bytes == nullptr || capacity <= 0) return 0;
@@ -454,16 +499,19 @@ Java_yy_daniel_yyplayerforandroid_audio_NativeAudioCore_ringRead(JNIEnv* env, jc
 }
 
 JNIEXPORT jboolean JNICALL
-Java_yy_daniel_yyplayerforandroid_audio_NativeAudioCore_ringClear(JNIEnv*, jclass, jlong handle) {
-    RingEntry* entry = LookupRing(handle);
+Java_yy_daniel_yyplayerforandroid_audio_NativeAudioCore_00024Bridge_ringClear(JNIEnv*, jclass, jlong handle) {
+    auto entry = LookupRing(handle);
     if (entry == nullptr) return JNI_FALSE;
+    std::lock_guard<std::mutex> operation(entry->io_mutex);
     entry->ring.Clear();
     return JNI_TRUE;
 }
 
 JNIEXPORT jlongArray JNICALL
-Java_yy_daniel_yyplayerforandroid_audio_NativeAudioCore_ringStats(JNIEnv* env, jclass, jlong handle) {
-    RingEntry* entry = LookupRing(handle);
+Java_yy_daniel_yyplayerforandroid_audio_NativeAudioCore_00024Bridge_ringStats(JNIEnv* env, jclass, jlong handle) {
+    auto entry = LookupRing(handle);
+    if (entry == nullptr) return nullptr;
+    std::lock_guard<std::mutex> operation(entry->io_mutex);
     jlong values[8] = {0, 0, 0, 0, 0, 0, 0, 0};
     if (entry != nullptr) {
         const yy::core::RingStats stats = entry->ring.Stats();
@@ -483,8 +531,8 @@ Java_yy_daniel_yyplayerforandroid_audio_NativeAudioCore_ringStats(JNIEnv* env, j
 }
 
 JNIEXPORT jboolean JNICALL
-Java_yy_daniel_yyplayerforandroid_audio_NativeAudioCore_releaseRing(JNIEnv*, jclass, jlong handle) {
-    RingEntry* entry = nullptr;
+Java_yy_daniel_yyplayerforandroid_audio_NativeAudioCore_00024Bridge_releaseRing(JNIEnv*, jclass, jlong handle) {
+    std::shared_ptr<RingEntry> entry;
     {
         std::lock_guard<std::mutex> lock(RegistryMutex());
         const auto found = Registry().find(static_cast<std::int64_t>(handle));
@@ -492,13 +540,26 @@ Java_yy_daniel_yyplayerforandroid_audio_NativeAudioCore_releaseRing(JNIEnv*, jcl
         entry = found->second;
         Registry().erase(found);
     }
-    delete entry;
+    // In-flight operations keep their lease; destruction happens after the last one completes.
     return JNI_TRUE;
+}
+
+// Reports whether the core can widen `from` into `to` while keeping every significant bit. The sink
+// path asks this before it converts anything, so a conversion that would drop bits is refused by the
+// same rule the host tests lock down instead of being decided again in Kotlin.
+JNIEXPORT jboolean JNICALL
+Java_yy_daniel_yyplayerforandroid_audio_NativeAudioCore_00024Bridge_nativeIsPristineConversion(
+    JNIEnv* env, jclass, jstring from_name, jstring to_name) {
+    SampleEncoding from = SampleEncoding::kUnknown;
+    SampleEncoding to = SampleEncoding::kUnknown;
+    if (!ParseEncoding(ToString(env, from_name), &from)) return JNI_FALSE;
+    if (!ParseEncoding(ToString(env, to_name), &to)) return JNI_FALSE;
+    return yy::core::IsPristineConversion(from, to) ? JNI_TRUE : JNI_FALSE;
 }
 
 // Converts whole interleaved frames between two encodings, keeping every significant bit.
 JNIEXPORT jint JNICALL
-Java_yy_daniel_yyplayerforandroid_audio_NativeAudioCore_convertPcm(JNIEnv* env, jclass,
+Java_yy_daniel_yyplayerforandroid_audio_NativeAudioCore_00024Bridge_convertPcm(JNIEnv* env, jclass,
                                                                   jstring from_name,
                                                                   jstring to_name, jobject src,
                                                                   jint src_bytes, jobject dst,
@@ -523,6 +584,65 @@ Java_yy_daniel_yyplayerforandroid_audio_NativeAudioCore_convertPcm(JNIEnv* env, 
                           static_cast<std::uint64_t>(dst_bytes), channels, &converted);
     if (result != yy::core::ConvertResult::kOk) return -1;
     return static_cast<jint>(converted);
+}
+
+// Explicit registration of every bridge function. A Kotlin signature change that this table does not
+// match makes the library fail to load, which is visible immediately, instead of leaving one function
+// permanently unresolved and reported as "this device does not support it".
+//
+// Every function is declared on the nested `Bridge` object, so the whole table goes on that one class.
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
+    JNIEnv* env = nullptr;
+    if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK || env == nullptr) {
+        return JNI_ERR;
+    }
+
+    static const JNINativeMethod bridge_methods[] = {
+        {const_cast<char*>("nativeBridgeVersion"),
+         const_cast<char*>("()I"),
+         reinterpret_cast<void*>(&JniBoundary<Java_yy_daniel_yyplayerforandroid_audio_NativeAudioCore_00024Bridge_nativeBridgeVersion>::Call)},
+        {const_cast<char*>("nativeEvaluateOutputPolicy"),
+         const_cast<char*>("(Ljava/lang/String;)Ljava/lang/String;"),
+         reinterpret_cast<void*>(&JniBoundary<Java_yy_daniel_yyplayerforandroid_audio_NativeAudioCore_00024Bridge_nativeEvaluateOutputPolicy>::Call)},
+        {const_cast<char*>("nativeIsPristineConversion"),
+         const_cast<char*>("(Ljava/lang/String;Ljava/lang/String;)Z"),
+         reinterpret_cast<void*>(&JniBoundary<Java_yy_daniel_yyplayerforandroid_audio_NativeAudioCore_00024Bridge_nativeIsPristineConversion>::Call)},
+        {const_cast<char*>("createRing"),
+         const_cast<char*>("(IILjava/lang/String;IJ)J"),
+         reinterpret_cast<void*>(&JniBoundary<Java_yy_daniel_yyplayerforandroid_audio_NativeAudioCore_00024Bridge_createRing>::Call)},
+        {const_cast<char*>("ringWrite"),
+         const_cast<char*>("(JLjava/nio/ByteBuffer;I)I"),
+         reinterpret_cast<void*>(&JniBoundary<Java_yy_daniel_yyplayerforandroid_audio_NativeAudioCore_00024Bridge_ringWrite>::Call)},
+        {const_cast<char*>("ringRead"),
+         const_cast<char*>("(JLjava/nio/ByteBuffer;I)I"),
+         reinterpret_cast<void*>(&JniBoundary<Java_yy_daniel_yyplayerforandroid_audio_NativeAudioCore_00024Bridge_ringRead>::Call)},
+        {const_cast<char*>("ringClear"),
+         const_cast<char*>("(J)Z"),
+         reinterpret_cast<void*>(&JniBoundary<Java_yy_daniel_yyplayerforandroid_audio_NativeAudioCore_00024Bridge_ringClear>::Call)},
+        {const_cast<char*>("ringStats"),
+         const_cast<char*>("(J)[J"),
+         reinterpret_cast<void*>(&JniBoundary<Java_yy_daniel_yyplayerforandroid_audio_NativeAudioCore_00024Bridge_ringStats>::Call)},
+        {const_cast<char*>("releaseRing"),
+         const_cast<char*>("(J)Z"),
+         reinterpret_cast<void*>(&JniBoundary<Java_yy_daniel_yyplayerforandroid_audio_NativeAudioCore_00024Bridge_releaseRing>::Call)},
+        {const_cast<char*>("convertPcm"),
+         const_cast<char*>("(Ljava/lang/String;Ljava/lang/String;Ljava/nio/ByteBuffer;ILjava/nio/ByteBuffer;II)I"),
+         reinterpret_cast<void*>(&JniBoundary<Java_yy_daniel_yyplayerforandroid_audio_NativeAudioCore_00024Bridge_convertPcm>::Call)},
+    };
+
+    jclass bridge = env->FindClass(kBridgeClass);
+    if (bridge == nullptr) {
+        env->ExceptionClear();
+        return JNI_ERR;
+    }
+    const jint result = env->RegisterNatives(
+        bridge, bridge_methods, static_cast<jint>(sizeof(bridge_methods) / sizeof(bridge_methods[0])));
+    env->DeleteLocalRef(bridge);
+    if (result != JNI_OK) {
+        env->ExceptionClear();
+        return JNI_ERR;
+    }
+    return JNI_VERSION_1_6;
 }
 
 }  // extern "C"

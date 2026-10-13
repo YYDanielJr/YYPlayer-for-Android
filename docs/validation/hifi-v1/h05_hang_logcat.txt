@@ -1,0 +1,1351 @@
+--------- beginning of main
+10-06 14:09:26.350  9130  9130 I libprocessgroup: Created cgroup /sys/fs/cgroup/apps/uid_10159/pid_9130
+10-06 14:09:26.350  9130  9130 E Zygote  : process_name_ptr:9130 yy.daniel.yyplayerforandroid
+10-06 14:09:26.350  9130  9130 E Zygote  : SetMemoryProtected process_name_ptr:9130 yy.daniel.yyplayerforandroid
+10-06 14:09:26.354  9130  9130 I Zygote  : Process 9130 created for yy.daniel.yyplayerforandroid
+10-06 14:09:26.354  9130  9130 I layerforandroid: Late-enabling -Xcheck:jni
+10-06 14:09:26.362  9130  9130 I layerforandroid: Using generational CollectorTypeCC GC.
+10-06 14:09:26.365  9130  9130 D nativeloader: Load libframework-connectivity-tiramisu-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity-t.jar: ok
+--------- beginning of system
+10-06 14:09:26.367  9130  9130 I ActivityThread: Current dynamic renderEngine type=0
+10-06 14:09:26.372  9130  9169 D MiuiDownscaleImpl: set override inverted scale : 1.0
+10-06 14:09:26.374  9130  9130 I HardwareRenderer: Process RenderPipelineType: 2
+10-06 14:09:26.374  9130  9130 I RENDER_TURBO: onActivityThreadCreate not in white list, pkg=yy.daniel.yyplayerforandroid, renderType=2
+10-06 14:09:26.378  9130  9130 D ActivityThread: setEmbeddedParam packageName=yy.daniel.yyplayerforandroid processName=yy.daniel.yyplayerforandroid isEmbedded=false isIsolated=false
+10-06 14:09:26.378  9130  9130 D CompatChangeReporter: Compat change id reported: 333566037; UID 10159; state: ENABLED
+10-06 14:09:26.379  9130  9130 W ActivityThread: Package uses different ABI(s) than its instrumentation: package[yy.daniel.yyplayerforandroid]: arm64-v8a, null instrumentation[yy.daniel.yyplayerforandroid.test]: null, null
+10-06 14:09:26.379  9130  9130 D ApplicationLoaders: Returning zygote-cached class loader: /system_ext/framework/androidx.window.extensions.jar
+10-06 14:09:26.379  9130  9130 D ApplicationLoaders: Returning zygote-cached class loader: /system_ext/framework/androidx.window.sidecar.jar
+10-06 14:09:26.565  9130  9130 D nativeloader: Configuring clns-10 for other apk /data/app/~~XUlJiy63wionYm0J8Pvidg==/yy.daniel.yyplayerforandroid.test-UF54j36o_wIcJUDZzeFN7g==/base.apk:/data/app/~~0z9gWy_cVabHmPZWTr6baA==/yy.daniel.yyplayerforandroid-KZ_pECB2jAJ1vUthq6ujow==/base.apk. target_sdk_version=37, uses_libraries=, library_path=/data/app/~~XUlJiy63wionYm0J8Pvidg==/yy.daniel.yyplayerforandroid.test-UF54j36o_wIcJUDZzeFN7g==/lib/arm64:/data/app/~~0z9gWy_cVabHmPZWTr6baA==/yy.daniel.yyplayerforandroid-KZ_pECB2jAJ1vUthq6ujow==/lib/arm64:/data/app/~~XUlJiy63wionYm0J8Pvidg==/yy.daniel.yyplayerforandroid.test-UF54j36o_wIcJUDZzeFN7g==/base.apk!/lib/arm64-v8a:/data/app/~~0z9gWy_cVabHmPZWTr6baA==/yy.daniel.yyplayerforandroid-KZ_pECB2jAJ1vUthq6ujow==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/yy.daniel.yyplayerforandroid
+10-06 14:09:26.567  9130  9130 D MiuiMonitorThread: Shared singleton Thread for stability monitor start
+10-06 14:09:26.568  9130  9130 I Perf    : Connecting to perf service.
+10-06 14:09:26.568  9130  9214 D CompatChangeReporter: Compat change id reported: 458413887; UID 10159; state: ENABLED
+10-06 14:09:26.569  9130  9130 D HWUI    : [HWUI] Flag vulkan_enhance_pipeline_cache enabled
+10-06 14:09:26.569  9130  9130 D HWUI    : [HWUI] EnhanceVkPipelineCache is enabled
+10-06 14:09:26.569  9130  9130 D HWUI    : [HWUI] EnhanceVkPipelineCache runtime=true, cacheType=0, saveImmediately=false, useInfoInterval=43200s, dataInterval=43200s, dataSizeThreshold=2048KB
+10-06 14:09:26.569  9130  9130 D HWUI    : [HWUI] Flag ddre disabled
+10-06 14:09:26.569  9130  9130 D HWUI    : ARCHI_PipelineCache, yy.daniel.yyplayerforandroid prewarm pipeline cache sha256 not available, use app cache
+10-06 14:09:26.569  9130  9130 I ActivityThread: TrafficStats init done
+10-06 14:09:27.615  9130  9130 D nativeloader: Load libmirim_jni.so using system ns (caller=/system_ext/framework/miui-framework.jar): ok
+10-06 14:09:27.616  9130  9130 I ComputilityLevel: getComputilityLevel(): 6
+10-06 14:09:27.616  9130  9130 I ActivityThread: Miui Feature Init done
+10-06 14:09:27.617  9130  9130 D CompatChangeReporter: Compat change id reported: 407952621; UID 10159; state: ENABLED
+10-06 14:09:27.617  9130  9130 D CompatChangeReporter: Compat change id reported: 419020719; UID 10159; state: ENABLED
+10-06 14:09:27.617  9130  9130 I AndroidJUnitRunner: newApplication yy.daniel.yyplayerforandroid.PlayerApplication
+10-06 14:09:27.618  9130  9130 D ResMonitorStub: The current process type is: third_party_app, process name is: yy.daniel.yyplayerforandroid
+10-06 14:09:27.618  9130  9130 D MIUIAutoUIManagerImpl: AutoUI app init: pkg = yy.daniel.yyplayerforandroid is disabled by system
+10-06 14:09:27.626  9130  9130 I AndroidJUnitRunner: onCreate Bundle[mParcelledData.dataSize=572]
+10-06 14:09:27.626  9130  9130 D AndroidJUnitRunner: Use the raw file system for managing file I/O.
+10-06 14:09:27.632  9130  9218 D AndroidJUnitRunner: onStart is called.
+10-06 14:09:27.632  9130  9130 I ComputilityLevel: getComputilityLevelV2(): 4
+10-06 14:09:27.635  9130  9218 I InstrConnection: Could not send broadcast or register receiver (isolatedProcess?)
+10-06 14:09:27.642  9130  9130 W libc    : Access denied finding property "vendor.boostfwk.frameprefetcher"
+10-06 14:09:27.642  9130  9130 D UnionPowerNotifier: check_union_power_ioctl -1
+10-06 14:09:27.643  9130  9130 D FramePredict: FramePredict init: false
+10-06 14:09:27.647  9130  9218 I TestRunner: run started: 27 tests
+10-06 14:09:27.647  9130  9218 I TestRunner: started: requestAcceptanceAloneNeverProvesBitPerfect(yy.daniel.yyplayerforandroid.OutputAuditDeviceTest)
+10-06 14:09:27.650  9130  9218 I TestRunner: finished: requestAcceptanceAloneNeverProvesBitPerfect(yy.daniel.yyplayerforandroid.OutputAuditDeviceTest)
+10-06 14:09:27.650  9130  9218 I TestRunner: started: concurrentReleaseClearAndIoDoNotUseFreedMemory(yy.daniel.yyplayerforandroid.OutputAuditDeviceTest)
+10-06 14:09:27.652  9130  9218 D nativeloader: Load /data/app/~~0z9gWy_cVabHmPZWTr6baA==/yy.daniel.yyplayerforandroid-KZ_pECB2jAJ1vUthq6ujow==/base.apk!/lib/arm64-v8a/libyyplayer_jni.so using class loader ns clns-10 (caller=/data/app/~~0z9gWy_cVabHmPZWTr6baA==/yy.daniel.yyplayerforandroid-KZ_pECB2jAJ1vUthq6ujow==/base.apk!classes8.dex): ok
+10-06 14:09:27.652  9130  9218 D CompatChangeReporter: Compat change id reported: 418924588; UID 10159; state: ENABLED
+10-06 14:09:27.699  9130  9218 I TestRunner: finished: concurrentReleaseClearAndIoDoNotUseFreedMemory(yy.daniel.yyplayerforandroid.OutputAuditDeviceTest)
+10-06 14:09:27.699  9130  9218 I TestRunner: started: directBuffersHonorPositionLimitAndReadOnlyDestination(yy.daniel.yyplayerforandroid.OutputAuditDeviceTest)
+10-06 14:09:27.700  9130  9218 I TestRunner: finished: directBuffersHonorPositionLimitAndReadOnlyDestination(yy.daniel.yyplayerforandroid.OutputAuditDeviceTest)
+10-06 14:09:27.700  9130  9218 I TestRunner: started: bothPathsSwitchActualDevicesAndRetainPosition(yy.daniel.yyplayerforandroid.OutputAuditDeviceTest)
+10-06 14:09:27.702  9130  9218 D AudioSystem: onNewService: media.audio_policy service obtained 0xb4000075ba4973a0
+10-06 14:09:27.702  9130  9218 D AudioSystem: getService: IAudioPolicyService retrieved: 0xb4000075ba4973a0  cached: 0xb4000075ba4973a0
+10-06 14:09:27.769  9130  9130 I ExoPlayerImpl: Init 8c527ec [AndroidXMedia3/1.11.1] [popsicle, 2509FPN0BC, Xiaomi, 37]
+10-06 14:09:27.782  9130  9257 D AudioSystem: onNewServiceWithAdapter: media.audio_flinger service obtained 0xb40000745a47fd00
+10-06 14:09:27.783  9130  9257 D AudioSystem: getService: IAudioFlingerService retrieved: 0xb4000075ba495320  IAudioFlinger cached: 0xb40000745a47fd00
+10-06 14:09:27.785  9130  9130 I ExoPlayerImpl: Init d32c0ee [AndroidXMedia3/1.11.1] [popsicle, 2509FPN0BC, Xiaomi, 37]
+10-06 14:09:27.786  9130  9130 I ExoPlayerImpl: Release 8c527ec [AndroidXMedia3/1.11.1] [popsicle, 2509FPN0BC, Xiaomi, 37] [media3.common, media3.exoplayer, media3.decoder]
+10-06 14:09:27.829  9130  9266 W AudioCapabilities: Unsupported mediaType audio/aihc
+10-06 14:09:27.829  9130  9266 W AudioCapabilities: Unsupported mediaType audio/aihc
+10-06 14:09:27.829  9130  9266 W AudioCapabilities: Unsupported mediaType audio/aivc
+10-06 14:09:27.829  9130  9266 W AudioCapabilities: Unsupported mediaType audio/aivc
+10-06 14:09:27.829  9130  9266 W AudioCapabilities: Unsupported mediaType audio/mihc
+10-06 14:09:27.829  9130  9266 W AudioCapabilities: Unsupported mediaType audio/mihc
+10-06 14:09:27.831  9130  9266 W AudioCapabilities: could not parse integer range: 1-3536000000
+10-06 14:09:27.831  9130  9266 W VideoCapabilities: Unsupported mime video/x-mvhevc
+10-06 14:09:27.831  9130  9266 W VideoCapabilities: Unsupported mime video/x-mvhevc
+10-06 14:09:27.832  9130  9266 W AudioCapabilities: could not parse integer range: 1-3536000000
+10-06 14:09:27.832  9130  9266 W VideoCapabilities: Unsupported mime video/x-mvhevc
+10-06 14:09:27.832  9130  9266 W VideoCapabilities: Unsupported mime video/x-mvhevc
+10-06 14:09:27.833  9130  9266 W VideoCapabilities: Unrecognized profile 32 for video/hevc
+10-06 14:09:27.833  9130  9266 W VideoCapabilities: Unrecognized profile 32 for video/hevc
+10-06 14:09:27.834  9130  9266 W VideoCapabilities: Unrecognized profile 32 for video/hevc
+10-06 14:09:27.836  9130  9266 W VideoCapabilities: Unrecognized profile 32 for video/hevc
+10-06 14:09:27.838  9130  9266 W VideoCapabilities: Unrecognized profile 32 for video/hevc
+10-06 14:09:27.838  9130  9266 W VideoCapabilities: Unrecognized profile 32 for video/hevc
+10-06 14:09:27.839  9130  9266 W VideoCapabilities: Unsupported mime image/vnd.android.heic
+10-06 14:09:27.839  9130  9266 W VideoCapabilities: Unsupported mime video/dolby-vision
+10-06 14:09:27.839  9130  9266 W VideoCapabilities: Unsupported mime video/dolby-vision
+10-06 14:09:27.839  9130  9266 W VideoCapabilities: Unsupported mime video/dolby-vision
+10-06 14:09:27.839  9130  9266 W VideoCapabilities: Unrecognized profile 4 for video/av01
+10-06 14:09:27.839  9130  9266 W VideoCapabilities: Unrecognized profile 8 for video/av01
+10-06 14:09:27.841  9130  9266 W VideoCapabilities: Unrecognized profile 4 for video/av01
+10-06 14:09:27.841  9130  9266 W VideoCapabilities: Unrecognized profile 8 for video/av01
+10-06 14:09:27.842  9130  9266 W AudioCapabilities: Unsupported mime audio/aihc
+10-06 14:09:27.842  9130  9266 W AudioCapabilities: Unsupported mime audio/aihc
+10-06 14:09:27.842  9130  9266 W AudioCapabilities: Unsupported mime audio/aihc
+10-06 14:09:27.842  9130  9266 W AudioCapabilities: Unsupported mime audio/aihc
+10-06 14:09:27.842  9130  9266 W AudioCapabilities: Unsupported mime audio/aivc
+10-06 14:09:27.842  9130  9266 W AudioCapabilities: Unsupported mime audio/aivc
+10-06 14:09:27.842  9130  9266 W AudioCapabilities: Unsupported mime audio/aivc
+10-06 14:09:27.842  9130  9266 W AudioCapabilities: Unsupported mime audio/aivc
+10-06 14:09:27.843  9130  9266 W AudioCapabilities: Unsupported mime audio/mihc
+10-06 14:09:27.843  9130  9266 W AudioCapabilities: Unsupported mime audio/mihc
+10-06 14:09:27.843  9130  9266 W AudioCapabilities: Unsupported mime audio/mihc
+10-06 14:09:27.843  9130  9266 W AudioCapabilities: Unsupported mime audio/mihc
+10-06 14:09:27.846  9130  9266 W Utils   : could not parse integer range '1-3536000000'
+10-06 14:09:27.846  9130  9266 W Utils   : could not parse integer range '1-3536000000'
+10-06 14:09:27.846  9130  9266 W VideoCapabilities: Unsupported mime video/x-mvhevc
+10-06 14:09:27.846  9130  9266 W VideoCapabilities: Unsupported mime video/x-mvhevc
+10-06 14:09:27.847  9130  9266 W Utils   : could not parse integer range '1-3536000000'
+10-06 14:09:27.847  9130  9266 W Utils   : could not parse integer range '1-3536000000'
+10-06 14:09:27.847  9130  9266 W VideoCapabilities: Unsupported mime video/x-mvhevc
+10-06 14:09:27.847  9130  9266 W VideoCapabilities: Unsupported mime video/x-mvhevc
+10-06 14:09:27.847  9130  9266 W VideoCapabilities: Unsupported mime video/x-mvhevc
+10-06 14:09:27.848  9130  9266 W VideoCapabilities: Unsupported mime video/x-mvhevc
+10-06 14:09:27.849  9130  9266 W VideoCapabilities: Unrecognized profile 32 for video/hevc
+10-06 14:09:27.849  9130  9266 W VideoCapabilities: Unrecognized profile 32 for video/hevc
+10-06 14:09:27.850  9130  9266 W VideoCapabilities: Unrecognized profile 32 for video/hevc
+10-06 14:09:27.850  9130  9266 W VideoCapabilities: Unrecognized profile 32 for video/hevc
+10-06 14:09:27.850  9130  9266 W VideoCapabilities: Unrecognized profile 32 for video/hevc
+10-06 14:09:27.850  9130  9266 W VideoCapabilities: Unrecognized profile 32 for video/hevc
+10-06 14:09:27.852  9130  9266 W VideoCapabilities: Unrecognized profile 32 for video/hevc
+10-06 14:09:27.853  9130  9266 W VideoCapabilities: Unrecognized profile 32 for video/hevc
+10-06 14:09:27.853  9130  9266 W VideoCapabilities: Unrecognized profile 32 for video/hevc
+10-06 14:09:27.853  9130  9266 W VideoCapabilities: Unrecognized profile 32 for video/hevc
+10-06 14:09:27.853  9130  9266 W VideoCapabilities: Unrecognized profile 32 for video/hevc
+10-06 14:09:27.853  9130  9266 W VideoCapabilities: Unsupported mime image/vnd.android.heic
+10-06 14:09:27.853  9130  9266 W VideoCapabilities: Unsupported mime image/vnd.android.heic
+10-06 14:09:27.854  9130  9266 W VideoCapabilities: Unsupported mime video/dolby-vision
+10-06 14:09:27.854  9130  9266 W VideoCapabilities: Unsupported mime video/dolby-vision
+10-06 14:09:27.854  9130  9266 W VideoCapabilities: Unsupported mime video/dolby-vision
+10-06 14:09:27.854  9130  9266 W VideoCapabilities: Unrecognized profile 4 for video/av01
+10-06 14:09:27.854  9130  9266 W VideoCapabilities: Unrecognized profile 8 for video/av01
+10-06 14:09:27.857  9130  9266 W VideoCapabilities: Unrecognized profile 4 for video/av01
+10-06 14:09:27.857  9130  9266 W VideoCapabilities: Unrecognized profile 8 for video/av01
+10-06 14:09:27.867  9130  9266 I DMCodecAdapterFactory: Creating an asynchronous MediaCodec adapter for track type audio
+10-06 14:09:27.868  9130  9266 I MediaCodec: The process name is yy.daniel.yyplayerforandroid
+10-06 14:09:27.868  9130  9266 I MediaCodec: Retry enabled for HDCP failure
+10-06 14:09:27.868  9130  9266 D MediaCodec: MediaCodec overwrite invalid pid -1->9130
+10-06 14:09:27.868  9130  9266 D MediaCodec: MediaCodec u-p-n client:10159-9130-yy.daniel.yyplayerforandroid process:10159-9130-yy.daniel.yyplayerforandroid
+10-06 14:09:27.868  9130  9266 D MediaCodec: mWeChatVideoUploadOptimizationFlag 1
+10-06 14:09:27.868  9130  9266 I MediaCodec: MediaCodec::MediaCodec()
+10-06 14:09:27.869  9130  9266 I ApexCodecsLazy: ApexCodecs loading skipped on non-CN device (region=cn)
+10-06 14:09:27.869  9130  9266 I Codec2Client: Available Codec2 services: "default" "vendor0_software" "software"
+10-06 14:09:27.870  9130  9266 W libc    : Access denied finding property "vendor.debug.stagefright.BufferCount"
+10-06 14:09:27.870  9130  9268 I MediaCodec: [mId: 0] [audio-debug-dec] setState: INITIALIZING
+10-06 14:09:27.870  9130  9268 D CCodec  : allocate(c2.android.flac.decoder)
+10-06 14:09:27.870  9130  9268 I CCodec  : setting up 'default' as default (vendor) store
+10-06 14:09:27.874  9130  9268 I CCodec  : Created component [c2.android.flac.decoder] for [c2.android.flac.decoder]
+10-06 14:09:27.874  9130  9268 D CCodecConfig: read media type: audio/flac
+10-06 14:09:27.875  9130  9268 D ReflectedParamUpdater: extent() != 1 for single value type: algo.buffers.max-count.values
+10-06 14:09:27.875  9130  9268 D ReflectedParamUpdater: extent() != 1 for single value type: output.subscribed-indices.values
+10-06 14:09:27.875  9130  9268 D ReflectedParamUpdater: extent() != 1 for single value type: input.buffers.allocator-ids.values
+10-06 14:09:27.875  9130  9268 D ReflectedParamUpdater: extent() != 1 for single value type: output.buffers.allocator-ids.values
+10-06 14:09:27.875  9130  9268 D ReflectedParamUpdater: extent() != 1 for single value type: algo.buffers.allocator-ids.values
+10-06 14:09:27.875  9130  9268 D ReflectedParamUpdater: extent() != 1 for single value type: output.buffers.pool-ids.values
+10-06 14:09:27.875  9130  9268 D ReflectedParamUpdater: extent() != 1 for single value type: algo.buffers.pool-ids.values
+10-06 14:09:27.876  9130  9268 I CCodecConfig: query failed after returning 9 values (BAD_INDEX)
+10-06 14:09:27.876  9130  9268 D CCodecConfig: c2 config diff is Dict {
+10-06 14:09:27.876  9130  9268 D CCodecConfig:   c2::u32 coded.bitrate.value = 768000
+10-06 14:09:27.876  9130  9268 D CCodecConfig:   c2::u32 input.buffers.max-size.value = 32768
+10-06 14:09:27.876  9130  9268 D CCodecConfig:   c2::u32 input.delay.value = 0
+10-06 14:09:27.876  9130  9268 D CCodecConfig:   string input.media-type.value = "audio/flac"
+10-06 14:09:27.876  9130  9268 D CCodecConfig:   c2::u32 output.large-frame.max-size = 0
+10-06 14:09:27.876  9130  9268 D CCodecConfig:   c2::u32 output.large-frame.threshold-size = 0
+10-06 14:09:27.876  9130  9268 D CCodecConfig:   string output.media-type.value = "audio/raw"
+10-06 14:09:27.876  9130  9268 D CCodecConfig:   c2::u32 raw.channel-count.value = 1
+10-06 14:09:27.876  9130  9268 D CCodecConfig:   c2::u32 raw.pcm-encoding.value = 0
+10-06 14:09:27.876  9130  9268 D CCodecConfig:   c2::u32 raw.sample-rate.value = 44100
+10-06 14:09:27.876  9130  9268 D CCodecConfig: }
+10-06 14:09:27.876  9130  9268 I MediaCodec: [mId: 0] [audio-debug-dec] setState: INITIALIZED
+10-06 14:09:27.877  9130  9268 I MediaCodec: MediaCodec will operate in async mode
+10-06 14:09:27.877  9130  9266 I MediaCodec: [mId: 0] [audio-debug-dec] configure: ClientName: yy.daniel.yyplayerforandroid ComponentName: c2.android.flac.decoder
+10-06 14:09:27.877  9130  9266 I MediaCodec: [mId: 0] [audio-debug-dec] configure: ClientFormat: AMessage(what = 0x00000000) = {
+10-06 14:09:27.877  9130  9266 I MediaCodec:   float operating-rate = 44100.000000
+10-06 14:09:27.877  9130  9266 I MediaCodec:   string log-session-id = "KaHScMyp9rJRqs26"
+10-06 14:09:27.877  9130  9266 I MediaCodec:   int32_t sample-rate = 44100
+10-06 14:09:27.877  9130  9266 I MediaCodec:   int32_t importance = 1000
+10-06 14:09:27.877  9130  9266 I MediaCodec:   string mime = "audio/flac"
+10-06 14:09:27.877  9130  9266 I MediaCodec:   int32_t channel-count = 2
+10-06 14:09:27.877  9130  9266 I MediaCodec:   int32_t priority = 0
+10-06 14:09:27.877  9130  9266 I MediaCodec:   int32_t max-output-channel-count = 99
+10-06 14:09:27.877  9130  9266 I MediaCodec:   int32_t max-input-size = 5576
+10-06 14:09:27.877  9130  9266 I MediaCodec:   Buffer csd-0 = {
+10-06 14:09:27.877  9130  9266 I MediaCodec:     00000000:  66 4c 61 43 80 00 00 22  04 00 04 00 00 04 f3 00  fLaC..."........
+10-06 14:09:27.877  9130  9266 I MediaCodec:     00000010:  15 c8 0a c4 43 70 00 b8  c5 89 2e 9c 2c 2d 6d a1  ....Cp......,-m.
+10-06 14:09:27.877  9130  9266 I MediaCodec:     00000020:  71 ac fb d7 9a 49 25 87  03 48                    q....I%..H
+10-06 14:09:27.877  9130  9266 I MediaCodec:   }
+10-06 14:09:27.877  9130  9266 I MediaCodec: }
+10-06 14:09:27.877  9130  9268 I MediaCodec: [mId: 0] [audio-debug-dec] setState: CONFIGURING
+10-06 14:09:27.877  9130  9268 D CCodec  : [c2.android.flac.decoder] buffers are bound to CCodec for this session
+10-06 14:09:27.877  9130  9268 D CCodecConfig: no c2 equivalents for log-session-id
+10-06 14:09:27.877  9130  9268 D CCodecConfig: no c2 equivalents for importance
+10-06 14:09:27.877  9130  9268 D CCodecConfig: no c2 equivalents for flags
+10-06 14:09:27.877  9130  9268 D CCodecConfig: config failed => CORRUPTED
+10-06 14:09:27.877  9130  9268 D CCodecConfig: c2 config diff is   c2::u32 raw.channel-count.value = 2
+10-06 14:09:27.877  9130  9268 D CCodec  : client requested max input size 5576, which is smaller than what component recommended (32768); overriding with component recommendation.
+10-06 14:09:27.877  9130  9268 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-06 14:09:27.877  9130  9268 D CCodec  : encoding statistics level = 0
+10-06 14:09:27.877  9130  9268 D CCodec  : setup formats input: AMessage(what = 0x00000000) = {
+10-06 14:09:27.877  9130  9268 D CCodec  :   int32_t android._codec-pcm-encoding = 2
+10-06 14:09:27.877  9130  9268 D CCodec  :   int32_t bitrate = 768000
+10-06 14:09:27.877  9130  9268 D CCodec  :   int32_t channel-count = 2
+10-06 14:09:27.877  9130  9268 D CCodec  :   int32_t max-input-size = 32768
+10-06 14:09:27.877  9130  9268 D CCodec  :   string mime = "audio/flac"
+10-06 14:09:27.877  9130  9268 D CCodec  :   int32_t pcm-encoding = 2
+10-06 14:09:27.877  9130  9268 D CCodec  :   int32_t sample-rate = 44100
+10-06 14:09:27.877  9130  9268 D CCodec  : }
+10-06 14:09:27.877  9130  9268 D CCodec  : setup formats output: AMessage(what = 0x00000000) = {
+10-06 14:09:27.877  9130  9268 D CCodec  :   int32_t android._codec-pcm-encoding = 2
+10-06 14:09:27.877  9130  9268 D CCodec  :   int32_t buffer-batch-max-output-size = 0
+10-06 14:09:27.877  9130  9268 D CCodec  :   int32_t buffer-batch-threshold-output-size = 0
+10-06 14:09:27.877  9130  9268 D CCodec  :   int32_t channel-count = 2
+10-06 14:09:27.877  9130  9268 D CCodec  :   string mime = "audio/raw"
+10-06 14:09:27.877  9130  9268 D CCodec  :   int32_t pcm-encoding = 2
+10-06 14:09:27.877  9130  9268 D CCodec  :   int32_t sample-rate = 44100
+10-06 14:09:27.877  9130  9268 D CCodec  :   int32_t android._config-pcm-encoding = 2
+10-06 14:09:27.877  9130  9268 D CCodec  : }
+10-06 14:09:27.877  9130  9268 I CCodecConfig: query failed after returning 9 values (BAD_INDEX)
+10-06 14:09:27.877  9130  9268 E layerforandroid: Failed to query component interface for required system resources: 6
+10-06 14:09:27.877  9130  9268 I MediaCodec: [mId: 0] [audio-debug-dec] setState: CONFIGURED
+10-06 14:09:27.878  9130  9266 D MediaCodec: keep callback message for reclaim
+10-06 14:09:27.878  9130  9268 I MediaCodec: [mId: 0] [audio-debug-dec] setState: STARTING
+10-06 14:09:27.878  9130  9268 D C2Store : debug.c2.use_dmabufheaps set, forcing DMABUF Heaps
+10-06 14:09:27.878  9130  9268 D C2Store : Using DMABUF Heaps
+10-06 14:09:27.878  9130  9268 D CCodecBufferChannel: [c2.android.flac.decoder#821] Created input block pool with allocatorID 16 => poolID 17 - OK (0)
+10-06 14:09:27.878  9130  9268 I CCodecBufferChannel: [mId: 0] [audio-debug-dec] start: inputFormat: AMessage(what = 0x00000000) = {
+10-06 14:09:27.878  9130  9268 I CCodecBufferChannel:   int32_t android._codec-pcm-encoding = 2
+10-06 14:09:27.878  9130  9268 I CCodecBufferChannel:   int32_t bitrate = 768000
+10-06 14:09:27.878  9130  9268 I CCodecBufferChannel:   int32_t channel-count = 2
+10-06 14:09:27.878  9130  9268 I CCodecBufferChannel:   int32_t max-input-size = 32768
+10-06 14:09:27.878  9130  9268 I CCodecBufferChannel:   string mime = "audio/flac"
+10-06 14:09:27.878  9130  9268 I CCodecBufferChannel:   int32_t pcm-encoding = 2
+10-06 14:09:27.878  9130  9268 I CCodecBufferChannel:   int32_t sample-rate = 44100
+10-06 14:09:27.878  9130  9268 I CCodecBufferChannel: }
+10-06 14:09:27.879  9130  9268 I CCodecBufferChannel: [c2.android.flac.decoder#821] Created output block pool with allocatorID 16 => poolID 2486 - OK
+10-06 14:09:27.879  9130  9268 D CCodecBufferChannel: [c2.android.flac.decoder#821] Configured output block pool ids 2486 => OK
+10-06 14:09:27.879  9130  9268 I CCodecBufferChannel: [mId: 0] [audio-debug-dec] start: outputFormat: AMessage(what = 0x00000000) = {
+10-06 14:09:27.879  9130  9268 I CCodecBufferChannel:   int32_t android._codec-pcm-encoding = 2
+10-06 14:09:27.879  9130  9268 I CCodecBufferChannel:   int32_t buffer-batch-max-output-size = 0
+10-06 14:09:27.879  9130  9268 I CCodecBufferChannel:   int32_t buffer-batch-threshold-output-size = 0
+10-06 14:09:27.879  9130  9268 I CCodecBufferChannel:   int32_t channel-count = 2
+10-06 14:09:27.879  9130  9268 I CCodecBufferChannel:   string mime = "audio/raw"
+10-06 14:09:27.879  9130  9268 I CCodecBufferChannel:   int32_t pcm-encoding = 2
+10-06 14:09:27.879  9130  9268 I CCodecBufferChannel:   int32_t sample-rate = 44100
+10-06 14:09:27.879  9130  9268 I CCodecBufferChannel:   int32_t android._config-pcm-encoding = 2
+10-06 14:09:27.879  9130  9268 I CCodecBufferChannel: }
+10-06 14:09:27.879  9130  9268 D CCodecBuffers: [c2.android.flac.decoder#821:1D-Output.Impl[N]] converted 0 buffers to array mode of 4
+10-06 14:09:27.879  9130  9268 D CCodecBufferChannel: [c2.android.flac.decoder#821] start: updating output delay 0
+10-06 14:09:27.879  9130  9268 I MediaCodec: [mId: 0] [audio-debug-dec] setState: STARTED
+10-06 14:09:27.880  9130  9268 W layerforandroid: AIBinder_linkToDeath is being called with a non-null cookie and no onUnlink callback set. Use AIBinder_DeathRecipient_setOnUnlinked to manage the lifetime of the cookie. This will become an abort.
+10-06 14:09:27.880  9130  9266 W LoudnessCodecController: MediaCodec mime type not supported for loudness annotation
+10-06 14:09:27.880  9130  9266 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 1 pts: 1000000000000 timediff: 0
+10-06 14:09:27.880  9130  9266 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 2 pts: 1000000023219 timediff: 0
+10-06 14:09:27.881  9130  9266 I MediaCodec: [mId: 0] [audio-debug-dec] queueInputBuffer: index: 3 pts: 1000000046439 timediff: 0
+10-06 14:09:27.881  9130  9168 W layerforandroid: AIBinder_linkToDeath is being called with a non-null cookie and no onUnlink callback set. Use AIBinder_DeathRecipient_setOnUnlinked to manage the lifetime of the cookie. This will become an abort.
+10-06 14:09:27.881  9130  9268 D PipelineWatcher: [0xb40000759a414a70] pipelineFull: too many frames in pipeline (4)
+10-06 14:09:27.882  9130  9266 D AudioTrack: getMinFrameCount(): getMinFrameCount = 3536: afFrameCount = 1920, afSampleRate = 48000, afLatency = 109
+10-06 14:09:27.883  9130  9266 I AudioTrack: Parsed 50 packages from XML
+10-06 14:09:27.883  9130  9266 D AudioRepeatStartCheck: TracedMutex ctor this=0x73a0bfc140 inner_mutex=0x73a0bfc140
+10-06 14:09:27.884  9130  9266 I AudioTrackImpl: initAudioTrackImpl()
+10-06 14:09:27.884  9130  9266 D AudioTrack: set(): (sessionId=81001), mcallback is 1, streamType -1, sampleRate 44100, format 0x1, channelMask 0x3, frameCount 22050, flags 0, notificationFrames 0,transferType 3, mClientAttributionSource AttributionSourceState{pid: 9130, uid: 10159, deviceId: 0, packageName: yy.daniel.yyplayerforandroid, attributionTag: (null), token: binder:0xb40000756a42ba10, renouncedPermissions: [], next: []}
+10-06 14:09:27.886  9130  9266 D AudioTrack: audio_time_msg enable=1 mStreamType=3 usage=1 content_type=0
+10-06 14:09:27.887  9130  9266 I layerforandroid: hiddenapi: Accessing hidden method Landroid/media/AudioTrack;->getLatency()I (runtime_flags=0, domain=platform, api=unsupported) from Landroidx/media3/exoplayer/audio/AudioTrackPositionTracker; (domain=app, TargetSdkVersion=37) using reflection: allowed
+10-06 14:09:27.888  9130  9266 D android.media.AudioTrack: setStereoVolume setParameters is 0.0, rightVolume is 0.0, isMuted is true, mIsLastMute is false, mNeedNotifyedNative is true
+10-06 14:09:27.888  9130  9266 D AudioTrackImpl: setMediaSetMute(8178): Parameter media_set_track_muted is 1 return
+10-06 14:09:27.888  9130  9266 I AudioTrackImpl: before scaleVolumeForVideo L:0.000000 R:0.000000 and the pakage is yy.daniel.yyplayerforandroid
+10-06 14:09:27.889  9130  9266 I AudioAppRegistry: loadXmlOnce: loaded from /system_ext/etc/audio_app_registry.xml
+10-06 14:09:27.889  9130  9266 D AudioTrack: AudioTrack::setVolume L:0.000000 R:0.000000 sessionid=81001
+10-06 14:09:27.889  9130  9266 D BatteryNotifier: Batteryhandler init with status: 0
+10-06 14:09:27.889  9130  9266 D BatteryNotifier: batteryHandler::send audio track volume update msg! 10159, 9130, 81001
+10-06 14:09:27.889  9130  9266 D AudioTrack: AudioTrack::noteTrackVolumeChange L:0.000000 R:0.000000 old L:1.000000 R:1.000000 sessionid=81001
+10-06 14:09:27.889  9130  9266 W AudioTrack: restoreTrack_l(8178): dead IAudioTrack, 0xb40000759a416540, PCM, creating a new one from setOutputDevice()
+10-06 14:09:27.889  9130  9288 D BatteryNotifier: BatteryNotifier::update TrackVolume to power insight! 10159, 9130, 81001, volume 0.000000 0.000000
+10-06 14:09:27.955  9130  9266 I AudioTrack: start(8179): prior state:STATE_STOPPED packageName: yy.daniel.yyplayerforandroid
+10-06 14:09:27.955  9130  9266 W libc    : Access denied finding property "ro.vendor.qos.v1.enable"
+10-06 14:09:28.030  9130  9266 D AudioRepeatStartCheck: [AudioRepeatStartStopCheck], enter: uid = 10159, session = 81001, uidnowTime = 0
+10-06 14:09:28.030  9130  9266 D AudioRepeatStartCheck: [AudioRepeatStartStopCheck] isAnomaly = 0
+10-06 14:09:28.031  9130  9266 W EpFrameworkFactory: activated: false jar exist: false
+10-06 14:09:28.031  9130  9169 I AudioTrackImpl: before scaleVolumeForVideo L:0.000000 R:0.000000 and the pakage is yy.daniel.yyplayerforandroid
+10-06 14:09:28.031  9130  9169 D AudioTrack: AudioTrack::setVolume L:0.000000 R:0.000000 sessionid=81001
+10-06 14:09:28.034  9130  9169 D AudioTrack: onAudioDeviceUpdate AudioPortDebug[ID:00001EF7] deviceType:AUDIO_DEVICE_OUT_USB_HEADSET(04000000)
+10-06 14:09:28.034  9130  9169 D BatteryNotifier: batteryHandler::send audio device update msg! 10159, 9130, 81001, 67108864
+10-06 14:09:28.034  9130  9288 D BatteryNotifier: BatteryNotifier::update device to power insight! 10159, 9130, 81001, 67108864
+10-06 14:09:28.035  9130  9264 I AudioTrackImpl: before scaleVolumeForVideo L:0.000000 R:0.000000 and the pakage is yy.daniel.yyplayerforandroid
+10-06 14:09:28.035  9130  9264 D AudioTrack: AudioTrack::setVolume L:0.000000 R:0.000000 sessionid=81001
+10-06 14:09:28.037  9130  9264 D AudioTrack: onAudioDeviceUpdate AudioPortDebug[ID:00001EF7] deviceType:AUDIO_DEVICE_OUT_USB_HEADSET(04000000)
+10-06 14:09:28.037  9130  9264 D BatteryNotifier: batteryHandler::send audio device update msg! 10159, 9130, 81001, 67108864
+10-06 14:09:28.037  9130  9288 D BatteryNotifier: BatteryNotifier::update device to power insight! 10159, 9130, 81001, 67108864
+10-06 14:09:28.835  9130  9130 I YYPlayerAudio: YYTEST_SWITCH path=SYSTEM requested=7927 device=USB-Audio - lifeme HiFi Audio Pro position=619 actualConfirmed=true
+10-06 14:09:28.836  9130  9266 I AudioTrack: pause(sessionID=81001) pause(8179): prior state:STATE_ACTIVE packageName: yy.daniel.yyplayerforandroid
+10-06 14:09:28.837  9130  9266 D AudioTrack: reportAudioTimeMsg(8179) yy.daniel.yyplayerforandroid create:1 start:74 write:9 frames:22050 ret:0 (worst sum=83, samples=1)
+10-06 14:09:28.837  9130  9130 I ExoPlayerImpl: Init cd34f0b [AndroidXMedia3/1.11.1] [popsicle, 2509FPN0BC, Xiaomi, 37]
+10-06 14:09:28.841  9130  9130 I ExoPlayerImpl: Release d32c0ee [AndroidXMedia3/1.11.1] [popsicle, 2509FPN0BC, Xiaomi, 37] [media3.common, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor]
+10-06 14:09:28.842  9130  9268 I MediaCodec: [mId: 0] [audio-debug-dec] setState: FLUSHING
+10-06 14:09:28.842  9130  9268 I CCodecBufferChannel: [mId: 0] [audio-debug-dec] flush: flushing 0 works
+10-06 14:09:28.842  9130  9268 I MediaCodec: [mId: 0] [audio-debug-dec] setState: FLUSHED
+10-06 14:09:28.842  9130  9266 D MediaCodec: keep callback message for reclaim
+10-06 14:09:28.842  9130  9268 I MediaCodec: [mId: 0] [audio-debug-dec] setState: STARTED
+10-06 14:09:28.842  9130  9268 I CCodecConfig: query failed after returning 9 values (BAD_INDEX)
+10-06 14:09:28.843  9130  9268 I MediaCodec: [mId: 0] [audio-debug-dec] setState: RELEASING
+10-06 14:09:28.843  9130  9268 D CCodecBufferChannel: [c2.android.flac.decoder#821] MediaCodec discarded an unknown buffer
+10-06 14:09:28.843  9130  9268 D CCodecBufferChannel: [c2.android.flac.decoder#821] MediaCodec discarded an unknown buffer
+10-06 14:09:28.843  9130  9316 D CCodec  : hold CodecLooper(1) until release
+10-06 14:09:28.843  9130  9268 D CCodecBufferChannel: [c2.android.flac.decoder#821] MediaCodec discarded an unknown buffer
+10-06 14:09:28.843  9130  9268 D CCodecBufferChannel: [c2.android.flac.decoder#821] MediaCodec discarded an unknown buffer
+10-06 14:09:28.844  9130  9268 I MediaCodec: [mId: 0] [audio-debug-dec] setState: UNINITIALIZED
+10-06 14:09:28.845  9130  9268 I MediaCodec: MediaCodec::~MediaCodec()
+10-06 14:09:28.862  9130  9300 D AudioTrack: flush(8179): prior state:STATE_PAUSED
+10-06 14:09:28.862  9130  9300 I AudioTrack: stop(sessionID=81001), packageName: yy.daniel.yyplayerforandroid
+10-06 14:09:28.862  9130  9300 D AudioTrack: stop(8179): prior state:STATE_FLUSHED
+10-06 14:09:28.862  9130  9300 D AudioTrack: ~AudioTrack(sessionID=81001)
+10-06 14:09:28.862  9130  9300 I AudioTrack: stop(sessionID=81001), packageName: yy.daniel.yyplayerforandroid
+10-06 14:09:28.862  9130  9300 D AudioTrack: stop(8179): prior state:STATE_FLUSHED
+10-06 14:09:28.874  9130  9299 I DMCodecAdapterFactory: Creating an asynchronous MediaCodec adapter for track type audio
+10-06 14:09:28.874  9130  9299 I MediaCodec: The process name is yy.daniel.yyplayerforandroid
+10-06 14:09:28.875  9130  9299 I MediaCodec: Retry enabled for HDCP failure
+10-06 14:09:28.875  9130  9299 D MediaCodec: MediaCodec overwrite invalid pid -1->9130
+10-06 14:09:28.875  9130  9299 D MediaCodec: MediaCodec u-p-n client:10159-9130-yy.daniel.yyplayerforandroid process:10159-9130-yy.daniel.yyplayerforandroid
+10-06 14:09:28.875  9130  9299 D MediaCodec: mWeChatVideoUploadOptimizationFlag 1
+10-06 14:09:28.875  9130  9299 I MediaCodec: MediaCodec::MediaCodec()
+10-06 14:09:28.876  9130  9299 W libc    : Access denied finding property "vendor.debug.stagefright.BufferCount"
+10-06 14:09:28.876  9130  9319 I MediaCodec: [mId: 1] [audio-debug-dec] setState: INITIALIZING
+10-06 14:09:28.876  9130  9319 D CCodec  : allocate(c2.android.flac.decoder)
+10-06 14:09:28.876  9130  9319 I CCodec  : setting up 'default' as default (vendor) store
+10-06 14:09:28.878  9130  9319 W layerforandroid: AIBinder_linkToDeath is being called with a non-null cookie and no onUnlink callback set. Use AIBinder_DeathRecipient_setOnUnlinked to manage the lifetime of the cookie. This will become an abort.
+10-06 14:09:28.878  9130  9319 I CCodec  : Created component [c2.android.flac.decoder] for [c2.android.flac.decoder]
+10-06 14:09:28.878  9130  9319 D CCodecConfig: read media type: audio/flac
+10-06 14:09:28.879  9130  9319 D ReflectedParamUpdater: extent() != 1 for single value type: algo.buffers.max-count.values
+10-06 14:09:28.879  9130  9319 D ReflectedParamUpdater: extent() != 1 for single value type: output.subscribed-indices.values
+10-06 14:09:28.879  9130  9319 D ReflectedParamUpdater: extent() != 1 for single value type: input.buffers.allocator-ids.values
+10-06 14:09:28.879  9130  9319 D ReflectedParamUpdater: extent() != 1 for single value type: output.buffers.allocator-ids.values
+10-06 14:09:28.879  9130  9319 D ReflectedParamUpdater: extent() != 1 for single value type: algo.buffers.allocator-ids.values
+10-06 14:09:28.879  9130  9319 D ReflectedParamUpdater: extent() != 1 for single value type: output.buffers.pool-ids.values
+10-06 14:09:28.880  9130  9319 D ReflectedParamUpdater: extent() != 1 for single value type: algo.buffers.pool-ids.values
+10-06 14:09:28.880  9130  9319 I CCodecConfig: query failed after returning 9 values (BAD_INDEX)
+10-06 14:09:28.880  9130  9319 D CCodecConfig: c2 config diff is Dict {
+10-06 14:09:28.880  9130  9319 D CCodecConfig:   c2::u32 coded.bitrate.value = 768000
+10-06 14:09:28.880  9130  9319 D CCodecConfig:   c2::u32 input.buffers.max-size.value = 32768
+10-06 14:09:28.880  9130  9319 D CCodecConfig:   c2::u32 input.delay.value = 0
+10-06 14:09:28.880  9130  9319 D CCodecConfig:   string input.media-type.value = "audio/flac"
+10-06 14:09:28.880  9130  9319 D CCodecConfig:   c2::u32 output.large-frame.max-size = 0
+10-06 14:09:28.880  9130  9319 D CCodecConfig:   c2::u32 output.large-frame.threshold-size = 0
+10-06 14:09:28.880  9130  9319 D CCodecConfig:   string output.media-type.value = "audio/raw"
+10-06 14:09:28.880  9130  9319 D CCodecConfig:   c2::u32 raw.channel-count.value = 1
+10-06 14:09:28.880  9130  9319 D CCodecConfig:   c2::u32 raw.pcm-encoding.value = 0
+10-06 14:09:28.880  9130  9319 D CCodecConfig:   c2::u32 raw.sample-rate.value = 44100
+10-06 14:09:28.880  9130  9319 D CCodecConfig: }
+10-06 14:09:28.880  9130  9319 I MediaCodec: [mId: 1] [audio-debug-dec] setState: INITIALIZED
+10-06 14:09:28.881  9130  9319 I MediaCodec: MediaCodec will operate in async mode
+10-06 14:09:28.881  9130  9299 I MediaCodec: [mId: 1] [audio-debug-dec] configure: ClientName: yy.daniel.yyplayerforandroid ComponentName: c2.android.flac.decoder
+10-06 14:09:28.881  9130  9299 I MediaCodec: [mId: 1] [audio-debug-dec] configure: ClientFormat: AMessage(what = 0x00000000) = {
+10-06 14:09:28.881  9130  9299 I MediaCodec:   float operating-rate = 44100.000000
+10-06 14:09:28.881  9130  9299 I MediaCodec:   string log-session-id = "r3NPVwYITqXzJy7Z"
+10-06 14:09:28.881  9130  9299 I MediaCodec:   int32_t sample-rate = 44100
+10-06 14:09:28.881  9130  9299 I MediaCodec:   int32_t importance = 1000
+10-06 14:09:28.881  9130  9299 I MediaCodec:   string mime = "audio/flac"
+10-06 14:09:28.881  9130  9299 I MediaCodec:   int32_t channel-count = 2
+10-06 14:09:28.881  9130  9299 I MediaCodec:   int32_t priority = 0
+10-06 14:09:28.881  9130  9299 I MediaCodec:   int32_t max-output-channel-count = 99
+10-06 14:09:28.881  9130  9299 I MediaCodec:   int32_t max-input-size = 5576
+10-06 14:09:28.881  9130  9299 I MediaCodec:   Buffer csd-0 = {
+10-06 14:09:28.881  9130  9299 I MediaCodec:     00000000:  66 4c 61 43 80 00 00 22  04 00 04 00 00 04 f3 00  fLaC..."........
+10-06 14:09:28.881  9130  9299 I MediaCodec:     00000010:  15 c8 0a c4 43 70 00 b8  c5 89 2e 9c 2c 2d 6d a1  ....Cp......,-m.
+10-06 14:09:28.881  9130  9299 I MediaCodec:     00000020:  71 ac fb d7 9a 49 25 87  03 48                    q....I%..H
+10-06 14:09:28.881  9130  9299 I MediaCodec:   }
+10-06 14:09:28.881  9130  9299 I MediaCodec: }
+10-06 14:09:28.882  9130  9319 I MediaCodec: [mId: 1] [audio-debug-dec] setState: CONFIGURING
+10-06 14:09:28.882  9130  9319 D CCodec  : [c2.android.flac.decoder] buffers are bound to CCodec for this session
+10-06 14:09:28.882  9130  9319 D CCodecConfig: no c2 equivalents for log-session-id
+10-06 14:09:28.882  9130  9319 D CCodecConfig: no c2 equivalents for importance
+10-06 14:09:28.882  9130  9319 D CCodecConfig: no c2 equivalents for flags
+10-06 14:09:28.882  9130  9319 D CCodecConfig: config failed => CORRUPTED
+10-06 14:09:28.882  9130  9319 D CCodecConfig: c2 config diff is   c2::u32 raw.channel-count.value = 2
+10-06 14:09:28.882  9130  9319 D CCodec  : client requested max input size 5576, which is smaller than what component recommended (32768); overriding with component recommendation.
+10-06 14:09:28.882  9130  9319 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-06 14:09:28.882  9130  9319 D CCodec  : encoding statistics level = 0
+10-06 14:09:28.882  9130  9319 D CCodec  : setup formats input: AMessage(what = 0x00000000) = {
+10-06 14:09:28.882  9130  9319 D CCodec  :   int32_t android._codec-pcm-encoding = 2
+10-06 14:09:28.882  9130  9319 D CCodec  :   int32_t bitrate = 768000
+10-06 14:09:28.882  9130  9319 D CCodec  :   int32_t channel-count = 2
+10-06 14:09:28.882  9130  9319 D CCodec  :   int32_t max-input-size = 32768
+10-06 14:09:28.882  9130  9319 D CCodec  :   string mime = "audio/flac"
+10-06 14:09:28.882  9130  9319 D CCodec  :   int32_t pcm-encoding = 2
+10-06 14:09:28.882  9130  9319 D CCodec  :   int32_t sample-rate = 44100
+10-06 14:09:28.882  9130  9319 D CCodec  : }
+10-06 14:09:28.882  9130  9319 D CCodec  : setup formats output: AMessage(what = 0x00000000) = {
+10-06 14:09:28.882  9130  9319 D CCodec  :   int32_t android._codec-pcm-encoding = 2
+10-06 14:09:28.882  9130  9319 D CCodec  :   int32_t buffer-batch-max-output-size = 0
+10-06 14:09:28.882  9130  9319 D CCodec  :   int32_t buffer-batch-threshold-output-size = 0
+10-06 14:09:28.882  9130  9319 D CCodec  :   int32_t channel-count = 2
+10-06 14:09:28.882  9130  9319 D CCodec  :   string mime = "audio/raw"
+10-06 14:09:28.882  9130  9319 D CCodec  :   int32_t pcm-encoding = 2
+10-06 14:09:28.882  9130  9319 D CCodec  :   int32_t sample-rate = 44100
+10-06 14:09:28.882  9130  9319 D CCodec  :   int32_t android._config-pcm-encoding = 2
+10-06 14:09:28.882  9130  9319 D CCodec  : }
+10-06 14:09:28.882  9130  9319 I CCodecConfig: query failed after returning 9 values (BAD_INDEX)
+10-06 14:09:28.882  9130  9319 E layerforandroid: Failed to query component interface for required system resources: 6
+10-06 14:09:28.882  9130  9319 I MediaCodec: [mId: 1] [audio-debug-dec] setState: CONFIGURED
+10-06 14:09:28.882  9130  9299 D MediaCodec: keep callback message for reclaim
+10-06 14:09:28.882  9130  9319 I MediaCodec: [mId: 1] [audio-debug-dec] setState: STARTING
+10-06 14:09:28.883  9130  9319 D CCodecBufferChannel: [c2.android.flac.decoder#853] Created input block pool with allocatorID 16 => poolID 18 - OK (0)
+10-06 14:09:28.883  9130  9319 I CCodecBufferChannel: [mId: 1] [audio-debug-dec] start: inputFormat: AMessage(what = 0x00000000) = {
+10-06 14:09:28.883  9130  9319 I CCodecBufferChannel:   int32_t android._codec-pcm-encoding = 2
+10-06 14:09:28.883  9130  9319 I CCodecBufferChannel:   int32_t bitrate = 768000
+10-06 14:09:28.883  9130  9319 I CCodecBufferChannel:   int32_t channel-count = 2
+10-06 14:09:28.883  9130  9319 I CCodecBufferChannel:   int32_t max-input-size = 32768
+10-06 14:09:28.883  9130  9319 I CCodecBufferChannel:   string mime = "audio/flac"
+10-06 14:09:28.883  9130  9319 I CCodecBufferChannel:   int32_t pcm-encoding = 2
+10-06 14:09:28.883  9130  9319 I CCodecBufferChannel:   int32_t sample-rate = 44100
+10-06 14:09:28.883  9130  9319 I CCodecBufferChannel: }
+10-06 14:09:28.884  9130  9319 I CCodecBufferChannel: [c2.android.flac.decoder#853] Created output block pool with allocatorID 16 => poolID 2488 - OK
+10-06 14:09:28.884  9130  9319 D CCodecBufferChannel: [c2.android.flac.decoder#853] Configured output block pool ids 2488 => OK
+10-06 14:09:28.884  9130  9319 I CCodecBufferChannel: [mId: 1] [audio-debug-dec] start: outputFormat: AMessage(what = 0x00000000) = {
+10-06 14:09:28.884  9130  9319 I CCodecBufferChannel:   int32_t android._codec-pcm-encoding = 2
+10-06 14:09:28.884  9130  9319 I CCodecBufferChannel:   int32_t buffer-batch-max-output-size = 0
+10-06 14:09:28.884  9130  9319 I CCodecBufferChannel:   int32_t buffer-batch-threshold-output-size = 0
+10-06 14:09:28.884  9130  9319 I CCodecBufferChannel:   int32_t channel-count = 2
+10-06 14:09:28.884  9130  9319 I CCodecBufferChannel:   string mime = "audio/raw"
+10-06 14:09:28.884  9130  9319 I CCodecBufferChannel:   int32_t pcm-encoding = 2
+10-06 14:09:28.884  9130  9319 I CCodecBufferChannel:   int32_t sample-rate = 44100
+10-06 14:09:28.884  9130  9319 I CCodecBufferChannel:   int32_t android._config-pcm-encoding = 2
+10-06 14:09:28.884  9130  9319 I CCodecBufferChannel: }
+10-06 14:09:28.884  9130  9319 D CCodecBuffers: [c2.android.flac.decoder#853:1D-Output.Impl[N]] converted 0 buffers to array mode of 4
+10-06 14:09:28.884  9130  9319 D CCodecBufferChannel: [c2.android.flac.decoder#853] start: updating output delay 0
+10-06 14:09:28.884  9130  9319 I MediaCodec: [mId: 1] [audio-debug-dec] setState: STARTED
+10-06 14:09:28.885  9130  9319 W layerforandroid: AIBinder_linkToDeath is being called with a non-null cookie and no onUnlink callback set. Use AIBinder_DeathRecipient_setOnUnlinked to manage the lifetime of the cookie. This will become an abort.
+10-06 14:09:28.885  9130  9299 W LoudnessCodecController: MediaCodec mime type not supported for loudness annotation
+10-06 14:09:28.885  9130  9299 I MediaCodec: [mId: 1] [audio-debug-dec] queueInputBuffer: index: 1 pts: 1000000626938 timediff: 0
+10-06 14:09:28.885  9130  9299 I MediaCodec: [mId: 1] [audio-debug-dec] queueInputBuffer: index: 2 pts: 1000000650158 timediff: 0
+10-06 14:09:28.886  9130  9299 I MediaCodec: [mId: 1] [audio-debug-dec] queueInputBuffer: index: 3 pts: 1000000673378 timediff: 0
+10-06 14:09:28.886  9130  9169 W layerforandroid: AIBinder_linkToDeath is being called with a non-null cookie and no onUnlink callback set. Use AIBinder_DeathRecipient_setOnUnlinked to manage the lifetime of the cookie. This will become an abort.
+10-06 14:09:28.886  9130  9319 D PipelineWatcher: [0xb40000759a41a490] pipelineFull: too many frames in pipeline (4)
+10-06 14:09:28.887  9130  9299 D AudioTrack: getMinFrameCount(): getMinFrameCount = 3536: afFrameCount = 1920, afSampleRate = 48000, afLatency = 109
+10-06 14:09:28.888  9130  9299 I AudioTrackImpl: initAudioTrackImpl()
+10-06 14:09:28.888  9130  9299 D AudioTrack: set(): (sessionId=81009), mcallback is 1, streamType -1, sampleRate 44100, format 0x1, channelMask 0x3, frameCount 22050, flags 0, notificationFrames 0,transferType 3, mClientAttributionSource AttributionSourceState{pid: 9130, uid: 10159, deviceId: 0, packageName: yy.daniel.yyplayerforandroid, attributionTag: (null), token: binder:0xb40000756a42ba10, renouncedPermissions: [], next: []}
+10-06 14:09:28.892  9130  9299 D AudioTrack: audio_time_msg enable=1 mStreamType=3 usage=1 content_type=0
+10-06 14:09:28.893  9130  9299 D android.media.AudioTrack: setStereoVolume setParameters is 0.0, rightVolume is 0.0, isMuted is true, mIsLastMute is false, mNeedNotifyedNative is true
+10-06 14:09:28.893  9130  9299 D AudioTrackImpl: setMediaSetMute(8180): Parameter media_set_track_muted is 1 return
+10-06 14:09:28.893  9130  9299 I AudioTrackImpl: before scaleVolumeForVideo L:0.000000 R:0.000000 and the pakage is yy.daniel.yyplayerforandroid
+10-06 14:09:28.893  9130  9299 D AudioTrack: AudioTrack::setVolume L:0.000000 R:0.000000 sessionid=81009
+10-06 14:09:28.893  9130  9299 D BatteryNotifier: batteryHandler::send audio track volume update msg! 10159, 9130, 81009
+10-06 14:09:28.893  9130  9288 D BatteryNotifier: BatteryNotifier::update TrackVolume to power insight! 10159, 9130, 81009, volume 0.000000 0.000000
+10-06 14:09:28.893  9130  9299 D AudioTrack: AudioTrack::noteTrackVolumeChange L:0.000000 R:0.000000 old L:1.000000 R:1.000000 sessionid=81009
+10-06 14:09:28.893  9130  9299 W AudioTrack: restoreTrack_l(8180): dead IAudioTrack, 0xb40000759a41df90, PCM, creating a new one from setOutputDevice()
+10-06 14:09:28.897  9130  9299 I AudioTrack: start(8181): prior state:STATE_STOPPED packageName: yy.daniel.yyplayerforandroid
+10-06 14:09:28.984  9130  9299 D AudioRepeatStartCheck: [AudioRepeatStartStopCheck], enter: uid = 10159, session = 81009, uidnowTime = 1791266968
+10-06 14:09:28.984  9130  9299 D AudioRepeatStartCheck: [AudioRepeatStartStopCheck] uid = 10159, uidbeforeTimeGap = 0, uidnowTimeGap = 0, consecutiveStartCnt = 2
+10-06 14:09:28.984  9130  9299 D AudioRepeatStartCheck: [AudioRepeatStartStopCheck] isAnomaly = 0
+10-06 14:09:28.987  9130  9319 D PipelineWatcher: [0xb40000759a41a490] pipelineFull: too many frames in pipeline (4)
+10-06 14:09:29.012  9130  9264 I AudioTrackImpl: before scaleVolumeForVideo L:0.000000 R:0.000000 and the pakage is yy.daniel.yyplayerforandroid
+10-06 14:09:29.012  9130  9264 D AudioTrack: AudioTrack::setVolume L:0.000000 R:0.000000 sessionid=81009
+10-06 14:09:29.024  9130  9299 D AudioTrack: getTimestamp_l(8181): device stall time corrected using current time 529367588165508
+10-06 14:09:29.307  9130  9264 W libbinder.BpBinder: PerfMonitor binderTransact: time=292ms interface=android.media.IAudioPolicyService code=56
+10-06 14:09:29.311  9130  9264 D AudioTrack: onAudioDeviceUpdate AudioPortDebug[ID:00001EF7] deviceType:AUDIO_DEVICE_OUT_USB_HEADSET(04000000)
+10-06 14:09:29.311  9130  9264 D BatteryNotifier: batteryHandler::send audio device update msg! 10159, 9130, 81009, 67108864
+10-06 14:09:29.311  9130  9264 W libbinder.Binder: Binder transaction to android.media.IAudioFlingerClient, function: ioConfigChanged, code: 1, took 299ms. Data bytes: 560 Reply bytes: 0 Flags: 17
+10-06 14:09:29.311  9130  9288 D BatteryNotifier: BatteryNotifier::update device to power insight! 10159, 9130, 81009, 67108864
+10-06 14:09:29.312  9130  9264 I AudioTrackImpl: before scaleVolumeForVideo L:0.000000 R:0.000000 and the pakage is yy.daniel.yyplayerforandroid
+10-06 14:09:29.312  9130  9264 D AudioTrack: AudioTrack::setVolume L:0.000000 R:0.000000 sessionid=81009
+10-06 14:09:29.317  9130  9264 D AudioTrack: onAudioDeviceUpdate AudioPortDebug[ID:00001F09] deviceType:AUDIO_DEVICE_OUT_BLUETOOTH_A2DP(00000080)
+10-06 14:09:29.317  9130  9264 D BatteryNotifier: batteryHandler::send audio device update msg! 10159, 9130, 81009, 128
+10-06 14:09:29.317  9130  9288 D BatteryNotifier: BatteryNotifier::update device to power insight! 10159, 9130, 81009, 128
+10-06 14:09:29.714  9130  9130 I YYPlayerAudio: YYTEST_SWITCH path=SYSTEM requested=7945 device=OPPO Enco Free4 position=1191 actualConfirmed=true
+10-06 14:09:29.715  9130  9299 I AudioTrack: pause(sessionID=81009) pause(8181): prior state:STATE_ACTIVE packageName: yy.daniel.yyplayerforandroid
+10-06 14:09:29.716  9130  9299 D AudioTrack: reportAudioTimeMsg(8181) yy.daniel.yyplayerforandroid create:4 start:86 write:39 frames:22050 ret:0 (worst sum=125, samples=1)
+10-06 14:09:29.717  9130  9130 I ExoPlayerImpl: Init a657329 [AndroidXMedia3/1.11.1] [popsicle, 2509FPN0BC, Xiaomi, 37]
+10-06 14:09:29.721  9130  9130 I ExoPlayerImpl: Release cd34f0b [AndroidXMedia3/1.11.1] [popsicle, 2509FPN0BC, Xiaomi, 37] [media3.common, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor]
+10-06 14:09:29.722  9130  9319 I MediaCodec: [mId: 1] [audio-debug-dec] setState: FLUSHING
+10-06 14:09:29.723  9130  9319 I CCodecBufferChannel: [mId: 1] [audio-debug-dec] flush: flushing 0 works
+10-06 14:09:29.723  9130  9319 I MediaCodec: [mId: 1] [audio-debug-dec] setState: FLUSHED
+10-06 14:09:29.723  9130  9299 D MediaCodec: keep callback message for reclaim
+10-06 14:09:29.723  9130  9319 I MediaCodec: [mId: 1] [audio-debug-dec] setState: STARTED
+10-06 14:09:29.723  9130  9319 I CCodecConfig: query failed after returning 9 values (BAD_INDEX)
+10-06 14:09:29.724  9130  9319 I MediaCodec: [mId: 1] [audio-debug-dec] setState: RELEASING
+10-06 14:09:29.724  9130  9319 D CCodecBufferChannel: [c2.android.flac.decoder#853] MediaCodec discarded an unknown buffer
+10-06 14:09:29.724  9130  9319 D CCodecBufferChannel: [c2.android.flac.decoder#853] MediaCodec discarded an unknown buffer
+10-06 14:09:29.725  9130  9362 D CCodec  : hold CodecLooper(1) until release
+10-06 14:09:29.725  9130  9319 D CCodecBufferChannel: [c2.android.flac.decoder#853] MediaCodec discarded an unknown buffer
+10-06 14:09:29.725  9130  9319 D CCodecBufferChannel: [c2.android.flac.decoder#853] MediaCodec discarded an unknown buffer
+10-06 14:09:29.725  9130  9319 I MediaCodec: [mId: 1] [audio-debug-dec] setState: UNINITIALIZED
+10-06 14:09:29.726  9130  9319 I MediaCodec: MediaCodec::~MediaCodec()
+10-06 14:09:29.734  9130  9130 I ExoPlayerImpl: Init 6ef973f [AndroidXMedia3/1.11.1] [popsicle, 2509FPN0BC, Xiaomi, 37]
+10-06 14:09:29.735  9130  9130 I ExoPlayerImpl: Release a657329 [AndroidXMedia3/1.11.1] [popsicle, 2509FPN0BC, Xiaomi, 37] [media3.common, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor]
+10-06 14:09:29.742  9130  9361 D AudioTrack: flush(8181): prior state:STATE_PAUSED
+10-06 14:09:29.743  9130  9361 I AudioTrack: stop(sessionID=81009), packageName: yy.daniel.yyplayerforandroid
+10-06 14:09:29.743  9130  9361 D AudioTrack: stop(8181): prior state:STATE_FLUSHED
+10-06 14:09:29.743  9130  9361 D AudioTrack: ~AudioTrack(sessionID=81009)
+10-06 14:09:29.743  9130  9361 I AudioTrack: stop(sessionID=81009), packageName: yy.daniel.yyplayerforandroid
+10-06 14:09:29.743  9130  9361 D AudioTrack: stop(8181): prior state:STATE_FLUSHED
+10-06 14:09:29.765  9130  9366 I DMCodecAdapterFactory: Creating an asynchronous MediaCodec adapter for track type audio
+10-06 14:09:29.765  9130  9366 I MediaCodec: The process name is yy.daniel.yyplayerforandroid
+10-06 14:09:29.765  9130  9366 I MediaCodec: Retry enabled for HDCP failure
+10-06 14:09:29.765  9130  9366 D MediaCodec: MediaCodec overwrite invalid pid -1->9130
+10-06 14:09:29.765  9130  9366 D MediaCodec: MediaCodec u-p-n client:10159-9130-yy.daniel.yyplayerforandroid process:10159-9130-yy.daniel.yyplayerforandroid
+10-06 14:09:29.765  9130  9366 D MediaCodec: mWeChatVideoUploadOptimizationFlag 1
+10-06 14:09:29.765  9130  9366 I MediaCodec: MediaCodec::MediaCodec()
+10-06 14:09:29.767  9130  9366 W libc    : Access denied finding property "vendor.debug.stagefright.BufferCount"
+10-06 14:09:29.767  9130  9368 I MediaCodec: [mId: 2] [audio-debug-dec] setState: INITIALIZING
+10-06 14:09:29.767  9130  9368 D CCodec  : allocate(c2.android.flac.decoder)
+10-06 14:09:29.768  9130  9368 I CCodec  : setting up 'default' as default (vendor) store
+10-06 14:09:29.770  9130  9368 W layerforandroid: AIBinder_linkToDeath is being called with a non-null cookie and no onUnlink callback set. Use AIBinder_DeathRecipient_setOnUnlinked to manage the lifetime of the cookie. This will become an abort.
+10-06 14:09:29.770  9130  9368 I CCodec  : Created component [c2.android.flac.decoder] for [c2.android.flac.decoder]
+10-06 14:09:29.771  9130  9368 D CCodecConfig: read media type: audio/flac
+10-06 14:09:29.772  9130  9368 D ReflectedParamUpdater: extent() != 1 for single value type: algo.buffers.max-count.values
+10-06 14:09:29.772  9130  9368 D ReflectedParamUpdater: extent() != 1 for single value type: output.subscribed-indices.values
+10-06 14:09:29.772  9130  9368 D ReflectedParamUpdater: extent() != 1 for single value type: input.buffers.allocator-ids.values
+10-06 14:09:29.772  9130  9368 D ReflectedParamUpdater: extent() != 1 for single value type: output.buffers.allocator-ids.values
+10-06 14:09:29.772  9130  9368 D ReflectedParamUpdater: extent() != 1 for single value type: algo.buffers.allocator-ids.values
+10-06 14:09:29.772  9130  9368 D ReflectedParamUpdater: extent() != 1 for single value type: output.buffers.pool-ids.values
+10-06 14:09:29.772  9130  9368 D ReflectedParamUpdater: extent() != 1 for single value type: algo.buffers.pool-ids.values
+10-06 14:09:29.773  9130  9368 I CCodecConfig: query failed after returning 9 values (BAD_INDEX)
+10-06 14:09:29.773  9130  9368 D CCodecConfig: c2 config diff is Dict {
+10-06 14:09:29.773  9130  9368 D CCodecConfig:   c2::u32 coded.bitrate.value = 768000
+10-06 14:09:29.773  9130  9368 D CCodecConfig:   c2::u32 input.buffers.max-size.value = 32768
+10-06 14:09:29.773  9130  9368 D CCodecConfig:   c2::u32 input.delay.value = 0
+10-06 14:09:29.773  9130  9368 D CCodecConfig:   string input.media-type.value = "audio/flac"
+10-06 14:09:29.773  9130  9368 D CCodecConfig:   c2::u32 output.large-frame.max-size = 0
+10-06 14:09:29.773  9130  9368 D CCodecConfig:   c2::u32 output.large-frame.threshold-size = 0
+10-06 14:09:29.773  9130  9368 D CCodecConfig:   string output.media-type.value = "audio/raw"
+10-06 14:09:29.773  9130  9368 D CCodecConfig:   c2::u32 raw.channel-count.value = 1
+10-06 14:09:29.773  9130  9368 D CCodecConfig:   c2::u32 raw.pcm-encoding.value = 0
+10-06 14:09:29.773  9130  9368 D CCodecConfig:   c2::u32 raw.sample-rate.value = 44100
+10-06 14:09:29.773  9130  9368 D CCodecConfig: }
+10-06 14:09:29.773  9130  9368 I MediaCodec: [mId: 2] [audio-debug-dec] setState: INITIALIZED
+10-06 14:09:29.774  9130  9368 I MediaCodec: MediaCodec will operate in async mode
+10-06 14:09:29.774  9130  9366 I MediaCodec: [mId: 2] [audio-debug-dec] configure: ClientName: yy.daniel.yyplayerforandroid ComponentName: c2.android.flac.decoder
+10-06 14:09:29.774  9130  9366 I MediaCodec: [mId: 2] [audio-debug-dec] configure: ClientFormat: AMessage(what = 0x00000000) = {
+10-06 14:09:29.774  9130  9366 I MediaCodec:   float operating-rate = 44100.000000
+10-06 14:09:29.774  9130  9366 I MediaCodec:   string log-session-id = "PLewM0ADEb_x6oBZ"
+10-06 14:09:29.774  9130  9366 I MediaCodec:   int32_t sample-rate = 44100
+10-06 14:09:29.774  9130  9366 I MediaCodec:   int32_t pcm-encoding = 21
+10-06 14:09:29.774  9130  9366 I MediaCodec:   int32_t importance = 1000
+10-06 14:09:29.774  9130  9366 I MediaCodec:   string mime = "audio/flac"
+10-06 14:09:29.774  9130  9366 I MediaCodec:   int32_t channel-count = 2
+10-06 14:09:29.774  9130  9366 I MediaCodec:   int32_t priority = 0
+10-06 14:09:29.774  9130  9366 I MediaCodec:   int32_t max-output-channel-count = 99
+10-06 14:09:29.774  9130  9366 I MediaCodec:   int32_t max-input-size = 5576
+10-06 14:09:29.774  9130  9366 I MediaCodec:   Buffer csd-0 = {
+10-06 14:09:29.774  9130  9366 I MediaCodec:     00000000:  66 4c 61 43 80 00 00 22  04 00 04 00 00 04 f3 00  fLaC..."........
+10-06 14:09:29.774  9130  9366 I MediaCodec:     00000010:  15 c8 0a c4 43 70 00 b8  c5 89 2e 9c 2c 2d 6d a1  ....Cp......,-m.
+10-06 14:09:29.774  9130  9366 I MediaCodec:     00000020:  71 ac fb d7 9a 49 25 87  03 48                    q....I%..H
+10-06 14:09:29.774  9130  9366 I MediaCodec:   }
+10-06 14:09:29.774  9130  9366 I MediaCodec: }
+10-06 14:09:29.775  9130  9368 I MediaCodec: [mId: 2] [audio-debug-dec] setState: CONFIGURING
+10-06 14:09:29.775  9130  9368 D CCodec  : [c2.android.flac.decoder] buffers are bound to CCodec for this session
+10-06 14:09:29.775  9130  9368 D CCodecConfig: no c2 equivalents for log-session-id
+10-06 14:09:29.775  9130  9368 D CCodecConfig: no c2 equivalents for importance
+10-06 14:09:29.775  9130  9368 D CCodecConfig: no c2 equivalents for flags
+10-06 14:09:29.775  9130  9368 D CCodecConfig: config failed => CORRUPTED
+10-06 14:09:29.775  9130  9368 D CCodecConfig: c2 config diff is   c2::u32 raw.channel-count.value = 2
+10-06 14:09:29.775  9130  9368 D CCodec  : client requested max input size 5576, which is smaller than what component recommended (32768); overriding with component recommendation.
+10-06 14:09:29.775  9130  9368 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-06 14:09:29.775  9130  9368 D CCodec  : encoding statistics level = 0
+10-06 14:09:29.775  9130  9368 D CCodec  : setup formats input: AMessage(what = 0x00000000) = {
+10-06 14:09:29.775  9130  9368 D CCodec  :   int32_t android._codec-pcm-encoding = 2
+10-06 14:09:29.775  9130  9368 D CCodec  :   int32_t bitrate = 768000
+10-06 14:09:29.775  9130  9368 D CCodec  :   int32_t channel-count = 2
+10-06 14:09:29.775  9130  9368 D CCodec  :   int32_t max-input-size = 32768
+10-06 14:09:29.775  9130  9368 D CCodec  :   string mime = "audio/flac"
+10-06 14:09:29.775  9130  9368 D CCodec  :   int32_t pcm-encoding = 2
+10-06 14:09:29.775  9130  9368 D CCodec  :   int32_t sample-rate = 44100
+10-06 14:09:29.775  9130  9368 D CCodec  : }
+10-06 14:09:29.775  9130  9368 D CCodec  : setup formats output: AMessage(what = 0x00000000) = {
+10-06 14:09:29.775  9130  9368 D CCodec  :   int32_t android._codec-pcm-encoding = 2
+10-06 14:09:29.775  9130  9368 D CCodec  :   int32_t buffer-batch-max-output-size = 0
+10-06 14:09:29.775  9130  9368 D CCodec  :   int32_t buffer-batch-threshold-output-size = 0
+10-06 14:09:29.775  9130  9368 D CCodec  :   int32_t channel-count = 2
+10-06 14:09:29.775  9130  9368 D CCodec  :   string mime = "audio/raw"
+10-06 14:09:29.775  9130  9368 D CCodec  :   int32_t pcm-encoding = 2
+10-06 14:09:29.775  9130  9368 D CCodec  :   int32_t sample-rate = 44100
+10-06 14:09:29.775  9130  9368 D CCodec  :   int32_t android._config-pcm-encoding = 21
+10-06 14:09:29.775  9130  9368 D CCodec  : }
+10-06 14:09:29.775  9130  9368 I CCodecConfig: query failed after returning 9 values (BAD_INDEX)
+10-06 14:09:29.775  9130  9368 E layerforandroid: Failed to query component interface for required system resources: 6
+10-06 14:09:29.776  9130  9368 I MediaCodec: [mId: 2] [audio-debug-dec] setState: CONFIGURED
+10-06 14:09:29.776  9130  9366 D MediaCodec: keep callback message for reclaim
+10-06 14:09:29.776  9130  9368 I MediaCodec: [mId: 2] [audio-debug-dec] setState: STARTING
+10-06 14:09:29.776  9130  9368 D CCodecBufferChannel: [c2.android.flac.decoder#268] Created input block pool with allocatorID 16 => poolID 19 - OK (0)
+10-06 14:09:29.777  9130  9368 I CCodecBufferChannel: [mId: 2] [audio-debug-dec] start: inputFormat: AMessage(what = 0x00000000) = {
+10-06 14:09:29.777  9130  9368 I CCodecBufferChannel:   int32_t android._codec-pcm-encoding = 2
+10-06 14:09:29.777  9130  9368 I CCodecBufferChannel:   int32_t bitrate = 768000
+10-06 14:09:29.777  9130  9368 I CCodecBufferChannel:   int32_t channel-count = 2
+10-06 14:09:29.777  9130  9368 I CCodecBufferChannel:   int32_t max-input-size = 32768
+10-06 14:09:29.777  9130  9368 I CCodecBufferChannel:   string mime = "audio/flac"
+10-06 14:09:29.777  9130  9368 I CCodecBufferChannel:   int32_t pcm-encoding = 2
+10-06 14:09:29.777  9130  9368 I CCodecBufferChannel:   int32_t sample-rate = 44100
+10-06 14:09:29.777  9130  9368 I CCodecBufferChannel: }
+10-06 14:09:29.777  9130  9368 I CCodecBufferChannel: [c2.android.flac.decoder#268] Created output block pool with allocatorID 16 => poolID 2490 - OK
+10-06 14:09:29.777  9130  9368 D CCodecBufferChannel: [c2.android.flac.decoder#268] Configured output block pool ids 2490 => OK
+10-06 14:09:29.777  9130  9368 I CCodecBufferChannel: [mId: 2] [audio-debug-dec] start: outputFormat: AMessage(what = 0x00000000) = {
+10-06 14:09:29.777  9130  9368 I CCodecBufferChannel:   int32_t android._codec-pcm-encoding = 2
+10-06 14:09:29.777  9130  9368 I CCodecBufferChannel:   int32_t buffer-batch-max-output-size = 0
+10-06 14:09:29.777  9130  9368 I CCodecBufferChannel:   int32_t buffer-batch-threshold-output-size = 0
+10-06 14:09:29.777  9130  9368 I CCodecBufferChannel:   int32_t channel-count = 2
+10-06 14:09:29.777  9130  9368 I CCodecBufferChannel:   string mime = "audio/raw"
+10-06 14:09:29.777  9130  9368 I CCodecBufferChannel:   int32_t pcm-encoding = 2
+10-06 14:09:29.777  9130  9368 I CCodecBufferChannel:   int32_t sample-rate = 44100
+10-06 14:09:29.777  9130  9368 I CCodecBufferChannel:   int32_t android._config-pcm-encoding = 21
+10-06 14:09:29.777  9130  9368 I CCodecBufferChannel: }
+10-06 14:09:29.777  9130  9368 D CCodecBuffers: [c2.android.flac.decoder#268:1D-Output.Impl[N]] converted 0 buffers to array mode of 4
+10-06 14:09:29.777  9130  9368 D CCodecBufferChannel: [c2.android.flac.decoder#268] start: updating output delay 0
+10-06 14:09:29.778  9130  9368 I MediaCodec: [mId: 2] [audio-debug-dec] setState: STARTED
+10-06 14:09:29.778  9130  9368 W layerforandroid: AIBinder_linkToDeath is being called with a non-null cookie and no onUnlink callback set. Use AIBinder_DeathRecipient_setOnUnlinked to manage the lifetime of the cookie. This will become an abort.
+10-06 14:09:29.779  9130  9366 W LoudnessCodecController: MediaCodec mime type not supported for loudness annotation
+10-06 14:09:29.779  9130  9366 I MediaCodec: [mId: 2] [audio-debug-dec] queueInputBuffer: index: 1 pts: 1000001207437 timediff: 0
+10-06 14:09:29.779  9130  9366 I MediaCodec: [mId: 2] [audio-debug-dec] queueInputBuffer: index: 2 pts: 1000001230657 timediff: 0
+10-06 14:09:29.780  9130  9366 I MediaCodec: [mId: 2] [audio-debug-dec] queueInputBuffer: index: 3 pts: 1000001253877 timediff: 1
+10-06 14:09:29.780  9130  9363 W layerforandroid: AIBinder_linkToDeath is being called with a non-null cookie and no onUnlink callback set. Use AIBinder_DeathRecipient_setOnUnlinked to manage the lifetime of the cookie. This will become an abort.
+10-06 14:09:29.780  9130  9368 D CCodecBuffers: [c2.android.flac.decoder#268:Output[N]] Converter created from 2 to 21
+10-06 14:09:29.784  9130  9366 D AudioTrack: getMinFrameCount(): getMinFrameCount = 3536: afFrameCount = 1920, afSampleRate = 48000, afLatency = 109
+10-06 14:09:29.784  9130  9366 I AudioTrackImpl: initAudioTrackImpl()
+10-06 14:09:29.784  9130  9366 D AudioTrack: set(): (sessionId=0), mcallback is 1, streamType -1, sampleRate 44100, format 0x6, channelMask 0x3, frameCount 7072, flags 0, notificationFrames 0,transferType 3, mClientAttributionSource AttributionSourceState{pid: 9130, uid: 10159, deviceId: 0, packageName: yy.daniel.yyplayerforandroid, attributionTag: (null), token: binder:0xb40000756a42ba10, renouncedPermissions: [], next: []}
+10-06 14:09:29.786  9130  9366 D AudioTrack: audio_time_msg enable=1 mStreamType=3 usage=1 content_type=2
+10-06 14:09:29.787  9130  9366 W AudioTrack: restoreTrack_l(8182): dead IAudioTrack, 0xb40000759a415ed0, PCM, creating a new one from setOutputDevice()
+10-06 14:09:29.788  9130  9366 D android.media.AudioTrack: setStereoVolume setParameters is 0.0, rightVolume is 0.0, isMuted is true, mIsLastMute is false, mNeedNotifyedNative is true
+10-06 14:09:29.788  9130  9366 D AudioTrackImpl: setMediaSetMute(8183): Parameter media_set_track_muted is 1 return
+10-06 14:09:29.788  9130  9366 I AudioTrackImpl: before scaleVolumeForVideo L:0.000000 R:0.000000 and the pakage is yy.daniel.yyplayerforandroid
+10-06 14:09:29.788  9130  9366 D AudioTrack: AudioTrack::setVolume L:0.000000 R:0.000000 sessionid=81033
+10-06 14:09:29.788  9130  9366 D BatteryNotifier: batteryHandler::send audio track volume update msg! 10159, 9130, 81033
+10-06 14:09:29.788  9130  9366 D AudioTrack: AudioTrack::noteTrackVolumeChange L:0.000000 R:0.000000 old L:1.000000 R:1.000000 sessionid=81033
+10-06 14:09:29.788  9130  9288 D BatteryNotifier: BatteryNotifier::update TrackVolume to power insight! 10159, 9130, 81033, volume 0.000000 0.000000
+10-06 14:09:29.789  9130  9366 I YYPlayerAudio: YYPLAYER_MEDIA3_SINK open=s24_3/44100Hz/ch=2 widened=false mixerRequested=false mixerApplied=false source=s24_3
+10-06 14:09:29.792  9130  9366 I AudioTrack: start(8183): prior state:STATE_STOPPED packageName: yy.daniel.yyplayerforandroid
+10-06 14:09:29.871  9130  9366 D AudioRepeatStartCheck: [AudioRepeatStartStopCheck], enter: uid = 10159, session = 81033, uidnowTime = 1791266968
+10-06 14:09:29.871  9130  9366 D AudioRepeatStartCheck: [AudioRepeatStartStopCheck] uid = 10159, uidbeforeTimeGap = 0, uidnowTimeGap = 1, consecutiveStartCnt = 3
+10-06 14:09:29.871  9130  9366 D AudioRepeatStartCheck: [AudioRepeatStartStopCheck] isAnomaly = 0
+10-06 14:09:29.871  9130  9168 I AudioTrackImpl: before scaleVolumeForVideo L:0.000000 R:0.000000 and the pakage is yy.daniel.yyplayerforandroid
+10-06 14:09:29.872  9130  9168 D AudioTrack: AudioTrack::setVolume L:0.000000 R:0.000000 sessionid=81033
+10-06 14:09:29.875  9130  9168 D AudioTrack: onAudioDeviceUpdate AudioPortDebug[ID:00001F09] deviceType:AUDIO_DEVICE_OUT_BLUETOOTH_A2DP(00000080)
+10-06 14:09:29.875  9130  9168 D BatteryNotifier: batteryHandler::send audio device update msg! 10159, 9130, 81033, 128
+10-06 14:09:29.876  9130  9366 I AudioTrack: pause(sessionID=81033) pause(8183): prior state:STATE_ACTIVE packageName: yy.daniel.yyplayerforandroid
+10-06 14:09:29.876  9130  9366 I AudioTrack: pause(sessionID=81033) pause(8183): prior state:STATE_PAUSED packageName: yy.daniel.yyplayerforandroid
+10-06 14:09:29.876  9130  9366 D AudioTrack: flush(8183): prior state:STATE_PAUSED
+10-06 14:09:29.876  9130  9288 D BatteryNotifier: BatteryNotifier::update device to power insight! 10159, 9130, 81033, 128
+10-06 14:09:29.880  9130  9366 E ExoPlayerImplInternal: Playback error
+10-06 14:09:29.880  9130  9366 E ExoPlayerImplInternal:   androidx.media3.exoplayer.ExoPlaybackException: MediaCodecAudioRenderer error, index=1, format=Format(null, null, audio/flac, audio/flac, null, -1, null, [-1, -1, -1.0, null], [2, -1, 44100]), format_supported=YES
+10-06 14:09:29.880  9130  9366 E ExoPlayerImplInternal:       at androidx.media3.exoplayer.BaseRenderer.createRendererException(BaseRenderer.java:586)
+10-06 14:09:29.880  9130  9366 E ExoPlayerImplInternal:       at androidx.media3.exoplayer.audio.MediaCodecAudioRenderer.processOutputBuffer(MediaCodecAudioRenderer.java:954)
+10-06 14:09:29.880  9130  9366 E ExoPlayerImplInternal:       at androidx.media3.exoplayer.mediacodec.MediaCodecRenderer.drainOutputBuffer(MediaCodecRenderer.java:2325)
+10-06 14:09:29.880  9130  9366 E ExoPlayerImplInternal:       at androidx.media3.exoplayer.mediacodec.MediaCodecRenderer.render(MediaCodecRenderer.java:981)
+10-06 14:09:29.880  9130  9366 E ExoPlayerImplInternal:       at androidx.media3.exoplayer.RendererHolder.render(RendererHolder.java:425)
+10-06 14:09:29.880  9130  9366 E ExoPlayerImplInternal:       at androidx.media3.exoplayer.ExoPlayerImplInternal.doSomeWork(ExoPlayerImplInternal.java:1484)
+10-06 14:09:29.880  9130  9366 E ExoPlayerImplInternal:       at androidx.media3.exoplayer.ExoPlayerImplInternal.handleMessage(ExoPlayerImplInternal.java:765)
+10-06 14:09:29.880  9130  9366 E ExoPlayerImplInternal:       at android.os.Handler.dispatchMessageImpl(Handler.java:142)
+10-06 14:09:29.880  9130  9366 E ExoPlayerImplInternal:       at android.os.Handler.dispatchMessage(Handler.java:129)
+10-06 14:09:29.880  9130  9366 E ExoPlayerImplInternal:       at android.os.Looper.loopOnce(Looper.java:315)
+10-06 14:09:29.880  9130  9366 E ExoPlayerImplInternal:       at android.os.Looper.loop(Looper.java:419)
+10-06 14:09:29.880  9130  9366 E ExoPlayerImplInternal:       at android.os.HandlerThread.run(HandlerThread.java:139)
+10-06 14:09:29.880  9130  9366 E ExoPlayerImplInternal:   Caused by: androidx.media3.exoplayer.audio.AudioSink$WriteException: AudioTrack write failed: -6
+10-06 14:09:29.880  9130  9366 E ExoPlayerImplInternal:       at yy.daniel.yyplayerforandroid.audio.NativeOutputAudioSink.checkRoute(NativeOutputAudioSink.kt:441)
+10-06 14:09:29.880  9130  9366 E ExoPlayerImplInternal:       at yy.daniel.yyplayerforandroid.audio.NativeOutputAudioSink.handleBuffer(NativeOutputAudioSink.kt:259)
+10-06 14:09:29.880  9130  9366 E ExoPlayerImplInternal:       at androidx.media3.exoplayer.audio.MediaCodecAudioRenderer.lambda$processOutputBuffer$0$androidx-media3-exoplayer-audio-MediaCodecAudioRenderer(MediaCodecAudioRenderer.java:938)
+10-06 14:09:29.880  9130  9366 E ExoPlayerImplInternal:       at androidx.media3.exoplayer.audio.MediaCodecAudioRenderer$$ExternalSyntheticLambda0.run(D8$$SyntheticClass:0)
+10-06 14:09:29.880  9130  9366 E ExoPlayerImplInternal:       at androidx.media3.exoplayer.mediacodec.AsynchronousMediaCodecAdapter.lambda$useBuffer$0$androidx-media3-exoplayer-mediacodec-AsynchronousMediaCodecAdapter(AsynchronousMediaCodecAdapter.java:274)
+10-06 14:09:29.880  9130  9366 E ExoPlayerImplInternal:       at androidx.media3.exoplayer.mediacodec.AsynchronousMediaCodecAdapter$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+10-06 14:09:29.880  9130  9366 E ExoPlayerImplInternal:       at androidx.media3.exoplayer.mediacodec.AsynchronousMediaCodecCallback.useBuffer(AsynchronousMediaCodecCallback.java:147)
+10-06 14:09:29.880  9130  9366 E ExoPlayerImplInternal:       at androidx.media3.exoplayer.mediacodec.AsynchronousMediaCodecAdapter.useBuffer(AsynchronousMediaCodecAdapter.java:271)
+10-06 14:09:29.880  9130  9366 E ExoPlayerImplInternal:       at androidx.media3.exoplayer.audio.MediaCodecAudioRenderer.processOutputBuffer(MediaCodecAudioRenderer.java:940)
+10-06 14:09:29.880  9130  9366 E ExoPlayerImplInternal:       ... 10 more
+10-06 14:09:29.880  9130  9366 I AudioTrack: pause(sessionID=81033) pause(8183): prior state:STATE_FLUSHED packageName: yy.daniel.yyplayerforandroid
+10-06 14:09:29.880  9130  9366 I AudioTrack: pause(sessionID=81033) pause(8183): prior state:STATE_FLUSHED packageName: yy.daniel.yyplayerforandroid
+10-06 14:09:29.880  9130  9366 D AudioTrack: flush(8183): prior state:STATE_FLUSHED
+10-06 14:09:29.880  9130  9368 I MediaCodec: [mId: 2] [audio-debug-dec] setState: FLUSHING
+10-06 14:09:29.881  9130  9368 I CCodecBufferChannel: [mId: 2] [audio-debug-dec] flush: flushing 0 works
+10-06 14:09:29.881  9130  9368 D CCodecBuffers: [c2.android.flac.decoder#268:1D-Output.Impl[N]] Client returned a buffer it does not own according to our record: 0
+10-06 14:09:29.881  9130  9368 D CCodecBuffers: [c2.android.flac.decoder#268:1D-Output.Impl[N]] Client returned a buffer it does not own according to our record: 1
+10-06 14:09:29.881  9130  9368 D CCodecBuffers: [c2.android.flac.decoder#268:1D-Output.Impl[N]] Client returned a buffer it does not own according to our record: 2
+10-06 14:09:29.881  9130  9368 I MediaCodec: [mId: 2] [audio-debug-dec] setState: FLUSHED
+10-06 14:09:29.881  9130  9366 D MediaCodec: keep callback message for reclaim
+10-06 14:09:29.881  9130  9368 I MediaCodec: [mId: 2] [audio-debug-dec] setState: STARTED
+10-06 14:09:29.881  9130  9368 I CCodecConfig: query failed after returning 9 values (BAD_INDEX)
+10-06 14:09:29.882  9130  9368 I MediaCodec: [mId: 2] [audio-debug-dec] setState: RELEASING
+10-06 14:09:29.882  9130  9368 D CCodecBufferChannel: [c2.android.flac.decoder#268] MediaCodec discarded an unknown buffer
+10-06 14:09:29.882  9130  9368 D CCodecBufferChannel: [c2.android.flac.decoder#268] MediaCodec discarded an unknown buffer
+10-06 14:09:29.882  9130  9368 D CCodecBufferChannel: [c2.android.flac.decoder#268] MediaCodec discarded an unknown buffer
+10-06 14:09:29.882  9130  9374 D CCodec  : hold CodecLooper(1) until release
+10-06 14:09:29.882  9130  9368 D CCodecBufferChannel: [c2.android.flac.decoder#268] MediaCodec discarded an unknown buffer
+10-06 14:09:29.882  9130  9366 I AudioTrack: pause(sessionID=81033) pause(8183): prior state:STATE_FLUSHED packageName: yy.daniel.yyplayerforandroid
+10-06 14:09:29.882  9130  9366 D AudioTrack: flush(8183): prior state:STATE_FLUSHED
+10-06 14:09:29.882  9130  9366 I AudioTrack: stop(sessionID=81033), packageName: yy.daniel.yyplayerforandroid
+10-06 14:09:29.882  9130  9366 D AudioTrack: stop(8183): prior state:STATE_FLUSHED
+10-06 14:09:29.882  9130  9368 I MediaCodec: [mId: 2] [audio-debug-dec] setState: UNINITIALIZED
+10-06 14:09:29.882  9130  9366 D AudioTrack: ~AudioTrack(sessionID=81033)
+10-06 14:09:29.882  9130  9366 I AudioTrack: stop(sessionID=81033), packageName: yy.daniel.yyplayerforandroid
+10-06 14:09:29.882  9130  9366 D AudioTrack: stop(8183): prior state:STATE_FLUSHED
+10-06 14:09:29.882  9130  9368 I MediaCodec: MediaCodec::~MediaCodec()
+10-06 14:09:30.116  9130  9162 I layerforandroid: This is non sticky GC, maxfree is 33554432 minfree is 8388608
+10-06 14:09:32.879  9130  9277 D AidlBufferPool: bufferpool2 0xb4000073ea41f178 : 0(0 size) total buffers - 0(0 size) used buffers - 58/63 (recycle/alloc) - 5/114 (fetch/transfer)
+10-06 14:09:32.879  9130  9277 D AidlBufferPoolAcc: evictor expired: 1, evicted: 1
+10-06 14:09:33.512  9130  9380 D ProfileInstaller: Installing profile for yy.daniel.yyplayerforandroid
+10-06 14:09:35.015  9130  9277 D AidlBufferPool: bufferpool2 0xb4000073ea421fb8 : 0(0 size) total buffers - 0(0 size) used buffers - 44/49 (recycle/alloc) - 5/86 (fetch/transfer)
+10-06 14:09:35.015  9130  9277 D AidlBufferPool: bufferpool2 0xb4000073ea42acc8 : 0(0 size) total buffers - 0(0 size) used buffers - 13/18 (recycle/alloc) - 5/24 (fetch/transfer)
+10-06 14:09:35.015  9130  9277 D AidlBufferPoolAcc: evictor expired: 2, evicted: 2
+10-06 14:12:28.443  9130  9148 I layerforandroid: Thread[6,tid=9148,WaitingInMainSignalCatcherLoop,Thread*=0xb4000075da41ae90,peer=0xf2c0360,"Signal Catcher"]: reacting to signal 3
+10-06 14:12:28.444  9130  9148 I layerforandroid:
+10-06 14:12:28.461  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.461  9130  9130 E libunwindstack: system timeout 3
+10-06 14:12:28.505  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.506  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.506  9130  9149 E libunwindstack: system timeout 3
+10-06 14:12:28.506  9130  9130 I ExoPlayerImpl: Release 6ef973f [AndroidXMedia3/1.11.1] [popsicle, 2509FPN0BC, Xiaomi, 37] [media3.common, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor]
+10-06 14:12:28.507  9130  9218 E TestRunner: failed: bothPathsSwitchActualDevicesAndRetainPosition(yy.daniel.yyplayerforandroid.OutputAuditDeviceTest)
+10-06 14:12:28.508  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.508  9130  9218 E TestRunner: ----- begin exception -----
+10-06 14:12:28.508  9130  9218 E TestRunner: java.lang.AssertionError: 超时：NATIVE_EXACT → USB-Audio - lifeme HiFi Audio Pro
+10-06 14:12:28.508  9130  9218 E TestRunner: 	at org.junit.Assert.fail(Assert.java:89)
+10-06 14:12:28.508  9130  9218 E TestRunner: 	at yy.daniel.yyplayerforandroid.OutputAuditDeviceTest.bothPathsSwitchActualDevicesAndRetainPosition$await(OutputAuditDeviceTest.kt:39)
+10-06 14:12:28.508  9130  9218 E TestRunner: 	at yy.daniel.yyplayerforandroid.OutputAuditDeviceTest.bothPathsSwitchActualDevicesAndRetainPosition(OutputAuditDeviceTest.kt:57)
+10-06 14:12:28.508  9130  9218 E TestRunner: 	at java.lang.reflect.Method.invoke(Native Method)
+10-06 14:12:28.508  9130  9218 E TestRunner: 	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+10-06 14:12:28.508  9130  9218 E TestRunner: 	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+10-06 14:12:28.508  9130  9218 E TestRunner: 	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+10-06 14:12:28.508  9130  9218 E TestRunner: 	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+10-06 14:12:28.508  9130  9218 E TestRunner: 	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+10-06 14:12:28.508  9130  9218 E TestRunner: 	at org.junit.runners.BlockJUnit4ClassRunner$1.evaluate(BlockJUnit4ClassRunner.java:100)
+10-06 14:12:28.508  9130  9218 E TestRunner: 	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:366)
+10-06 14:12:28.508  9130  9218 E TestRunner: 	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:103)
+10-06 14:12:28.508  9130  9218 E TestRunner: 	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:63)
+10-06 14:12:28.508  9130  9218 E TestRunner: 	at org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)
+10-06 14:12:28.508  9130  9218 E TestRunner: 	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)
+10-06 14:12:28.508  9130  9218 E TestRunner: 	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)
+10-06 14:12:28.508  9130  9218 E TestRunner: 	at org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)
+10-06 14:12:28.508  9130  9218 E TestRunner: 	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)
+10-06 14:12:28.508  9130  9218 E TestRunner: 	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+10-06 14:12:28.508  9130  9218 E TestRunner: 	at org.junit.runners.ParentRunner.run(ParentRunner.java:413)
+10-06 14:12:28.508  9130  9218 E TestRunner: 	at androidx.test.ext.junit.runners.AndroidJUnit4.run(AndroidJUnit4.java:162)
+10-06 14:12:28.508  9130  9218 E TestRunner: 	at org.junit.runners.Suite.runChild(Suite.java:128)
+10-06 14:12:28.508  9130  9218 E TestRunner: 	at org.junit.runners.Suite.runChild(Suite.java:27)
+10-06 14:12:28.508  9130  9218 E TestRunner: 	at org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)
+10-06 14:12:28.508  9130  9218 E TestRunner: 	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)
+10-06 14:12:28.508  9130  9218 E TestRunner: 	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)
+10-06 14:12:28.508  9130  9218 E TestRunner: 	at org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)
+10-06 14:12:28.508  9130  9218 E TestRunner: 	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)
+10-06 14:12:28.508  9130  9218 E TestRunner: 	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+10-06 14:12:28.508  9130  9218 E TestRunner: 	at org.junit.runners.ParentRunner.run(ParentRunner.java:413)
+10-06 14:12:28.508  9130  9218 E TestRunner: 	at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+10-06 14:12:28.508  9130  9218 E TestRunner: 	at org.junit.runner.JUnitCore.run(JUnitCore.java:115)
+10-06 14:12:28.508  9130  9218 E TestRunner: 	at androidx.test.internal.runner.TestExecutor.execute(TestExecutor.java:68)
+10-06 14:12:28.508  9130  9218 E TestRunner: 	at androidx.test.internal.runner.TestExecutor.execute(TestExecutor.java:59)
+10-06 14:12:28.508  9130  9218 E TestRunner: 	at androidx.test.runner.AndroidJUnitRunner.onStart(AndroidJUnitRunner.java:467)
+10-06 14:12:28.508  9130  9218 E TestRunner: 	at android.app.Instrumentation$InstrumentationThread.run(Instrumentation.java:2705)
+10-06 14:12:28.508  9130  9218 E TestRunner: ----- end exception -----
+10-06 14:12:28.508  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.508  9130  9151 E libunwindstack: system timeout 3
+10-06 14:12:28.509  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.509  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.509  9130  9159 E libunwindstack: system timeout 3
+10-06 14:12:28.509  9130  9218 I TestRunner: finished: bothPathsSwitchActualDevicesAndRetainPosition(yy.daniel.yyplayerforandroid.OutputAuditDeviceTest)
+10-06 14:12:28.510  9130  9218 I TestRunner: started: policyReadsProfilesBeyond32AndNormalizesAndroidChannelMasks(yy.daniel.yyplayerforandroid.OutputAuditDeviceTest)
+10-06 14:12:28.512  9130  9218 I TestRunner: finished: policyReadsProfilesBeyond32AndNormalizesAndroidChannelMasks(yy.daniel.yyplayerforandroid.OutputAuditDeviceTest)
+10-06 14:12:28.512  9130  9218 I TestRunner: started: nativeSinkPlaysALocalFileThroughExoPlayer(yy.daniel.yyplayerforandroid.NativeOutputPlaybackTest)
+10-06 14:12:28.513  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.513  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.514  9130  9162 E libunwindstack: system timeout 3
+10-06 14:12:28.519  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.519  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.519  9130  9168 E libunwindstack: system timeout 3
+10-06 14:12:28.522  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.522  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.522  9130  9169 E libunwindstack: system timeout 3
+10-06 14:12:28.522  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.522  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.522  9130  9170 E libunwindstack: system timeout 3
+10-06 14:12:28.524  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.525  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.525  9130  9172 E libunwindstack: system timeout 3
+10-06 14:12:28.525  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.525  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.525  9130  9211 E libunwindstack: system timeout 3
+10-06 14:12:28.525  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.525  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.525  9130  9214 E libunwindstack: system timeout 3
+10-06 14:12:28.525  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.525  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.525  9130  9217 E libunwindstack: system timeout 3
+10-06 14:12:28.525  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.526  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.526  9130  9223 E libunwindstack: system timeout 3
+10-06 14:12:28.526  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.526  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.526  9130  9224 E libunwindstack: system timeout 3
+10-06 14:12:28.526  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.526  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.526  9130  9244 E libunwindstack: system timeout 3
+10-06 14:12:28.526  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.528  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.528  9130  9264 E libunwindstack: system timeout 3
+10-06 14:12:28.528  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.528  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.529  9130  9288 E libunwindstack: system timeout 3
+10-06 14:12:28.529  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.529  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.529  9130  9332 E libunwindstack: system timeout 3
+10-06 14:12:28.529  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.529  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.529  9130  9363 E libunwindstack: system timeout 3
+10-06 14:12:28.529  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.537  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.537  9130  9270 E libunwindstack: system timeout 3
+10-06 14:12:28.538  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.539  9130  9218 I YYPlayerAudio: YYTEST_native_TRACK=编织光流 (For Your Name) uri=content://com.android.externalstorage.documents/tree/primary%3AMusic/document/primary%3AMusic%2F%E9%93%81%E7%97%95%E7%94%B5%E5%8F%B0-MSR%2CEdine%20-%20%E7%BC%96%E7%BB%87%E5%85%89%E6%B5%81%20(For%20Your%20Name).flac
+10-06 14:12:28.540  9130  9218 I MediaMetadataRetriever: MAX_METADATA_RESOURCE:4, temp_MAX_METADATA_RESOURCE:4, MAX_METADATA_RESOURCE_STR:4
+10-06 14:12:28.541  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.541  9130  9271 E libunwindstack: system timeout 3
+10-06 14:12:28.543  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.546  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.546  9130  9276 E libunwindstack: system timeout 3
+10-06 14:12:28.549  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.552  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.553  9130  9277 E libunwindstack: system timeout 3
+10-06 14:12:28.553  9130  9148 E libunwindstack: system timeout 3
+10-06 14:12:28.560  9130  9148 I libc    : tombstoned_notify_completion, socket: 5
+10-06 14:12:28.560  9130  9148 I layerforandroid: Wrote stack traces to tombstoned
+10-06 14:12:28.572  9130  9218 I YYPlayerAudio: YYTEST_native_FILE durationMs=274585 sampleRate=44100 expectedFrames=12109198
+10-06 14:12:28.573  9130  9130 I ExoPlayerImpl: Init 5a2a7a3 [AndroidXMedia3/1.11.1] [popsicle, 2509FPN0BC, Xiaomi, 37]
+10-06 14:12:28.576  9130  9130 I YYPlayerAudio: YYTEST_native_STATE=2
+10-06 14:12:28.594  9130  9936 I DMCodecAdapterFactory: Creating an asynchronous MediaCodec adapter for track type audio
+10-06 14:12:28.595  9130  9936 I MediaCodec: The process name is yy.daniel.yyplayerforandroid
+10-06 14:12:28.595  9130  9936 I MediaCodec: Retry enabled for HDCP failure
+10-06 14:12:28.595  9130  9936 D MediaCodec: MediaCodec overwrite invalid pid -1->9130
+10-06 14:12:28.595  9130  9936 D MediaCodec: MediaCodec u-p-n client:10159-9130-yy.daniel.yyplayerforandroid process:10159-9130-yy.daniel.yyplayerforandroid
+10-06 14:12:28.595  9130  9936 D MediaCodec: mWeChatVideoUploadOptimizationFlag 1
+10-06 14:12:28.595  9130  9936 I MediaCodec: MediaCodec::MediaCodec()
+10-06 14:12:28.596  9130  9936 W libc    : Access denied finding property "vendor.debug.stagefright.BufferCount"
+10-06 14:12:28.597  9130  9940 I MediaCodec: [mId: 3] [audio-debug-dec] setState: INITIALIZING
+10-06 14:12:28.597  9130  9940 D CCodec  : allocate(c2.android.flac.decoder)
+10-06 14:12:28.597  9130  9940 I CCodec  : setting up 'default' as default (vendor) store
+10-06 14:12:28.599  9130  9169 D AidlBufferPool: bufferpool2 0xb4000073ea41f178 : 0(0 size) total buffers - 0(0 size) used buffers - 58/63 (recycle/alloc) - 5/114 (fetch/transfer)
+10-06 14:12:28.599  9130  9169 D AidlBufferPool: Destruction - bufferpool2 0xb4000073ea41f178 cached: 0/0M, 0/0% in use; allocs: 63, 92% recycled; transfers: 114, 96% unfetched
+10-06 14:12:28.600  9130  9169 D AidlBufferPool: bufferpool2 0xb4000073ea421fb8 : 0(0 size) total buffers - 0(0 size) used buffers - 44/49 (recycle/alloc) - 5/86 (fetch/transfer)
+10-06 14:12:28.600  9130  9169 D AidlBufferPool: Destruction - bufferpool2 0xb4000073ea421fb8 cached: 0/0M, 0/0% in use; allocs: 49, 90% recycled; transfers: 86, 94% unfetched
+10-06 14:12:28.600  9130  9169 D AidlBufferPool: bufferpool2 0xb4000073ea42acc8 : 0(0 size) total buffers - 0(0 size) used buffers - 13/18 (recycle/alloc) - 5/24 (fetch/transfer)
+10-06 14:12:28.600  9130  9169 D AidlBufferPool: Destruction - bufferpool2 0xb4000073ea42acc8 cached: 0/0M, 0/0% in use; allocs: 18, 72% recycled; transfers: 24, 79% unfetched
+10-06 14:12:28.600  9130  9940 W layerforandroid: AIBinder_linkToDeath is being called with a non-null cookie and no onUnlink callback set. Use AIBinder_DeathRecipient_setOnUnlinked to manage the lifetime of the cookie. This will become an abort.
+10-06 14:12:28.600  9130  9940 I CCodec  : Created component [c2.android.flac.decoder] for [c2.android.flac.decoder]
+10-06 14:12:28.600  9130  9940 D CCodecConfig: read media type: audio/flac
+10-06 14:12:28.602  9130  9940 D ReflectedParamUpdater: extent() != 1 for single value type: algo.buffers.max-count.values
+10-06 14:12:28.602  9130  9940 D ReflectedParamUpdater: extent() != 1 for single value type: output.subscribed-indices.values
+10-06 14:12:28.602  9130  9940 D ReflectedParamUpdater: extent() != 1 for single value type: input.buffers.allocator-ids.values
+10-06 14:12:28.602  9130  9940 D ReflectedParamUpdater: extent() != 1 for single value type: output.buffers.allocator-ids.values
+10-06 14:12:28.602  9130  9940 D ReflectedParamUpdater: extent() != 1 for single value type: algo.buffers.allocator-ids.values
+10-06 14:12:28.602  9130  9940 D ReflectedParamUpdater: extent() != 1 for single value type: output.buffers.pool-ids.values
+10-06 14:12:28.602  9130  9940 D ReflectedParamUpdater: extent() != 1 for single value type: algo.buffers.pool-ids.values
+10-06 14:12:28.603  9130  9940 I CCodecConfig: query failed after returning 9 values (BAD_INDEX)
+10-06 14:12:28.603  9130  9940 D CCodecConfig: c2 config diff is Dict {
+10-06 14:12:28.603  9130  9940 D CCodecConfig:   c2::u32 coded.bitrate.value = 768000
+10-06 14:12:28.603  9130  9940 D CCodecConfig:   c2::u32 input.buffers.max-size.value = 32768
+10-06 14:12:28.603  9130  9940 D CCodecConfig:   c2::u32 input.delay.value = 0
+10-06 14:12:28.603  9130  9940 D CCodecConfig:   string input.media-type.value = "audio/flac"
+10-06 14:12:28.603  9130  9940 D CCodecConfig:   c2::u32 output.large-frame.max-size = 0
+10-06 14:12:28.603  9130  9940 D CCodecConfig:   c2::u32 output.large-frame.threshold-size = 0
+10-06 14:12:28.603  9130  9940 D CCodecConfig:   string output.media-type.value = "audio/raw"
+10-06 14:12:28.603  9130  9940 D CCodecConfig:   c2::u32 raw.channel-count.value = 1
+10-06 14:12:28.603  9130  9940 D CCodecConfig:   c2::u32 raw.pcm-encoding.value = 0
+10-06 14:12:28.603  9130  9940 D CCodecConfig:   c2::u32 raw.sample-rate.value = 44100
+10-06 14:12:28.603  9130  9940 D CCodecConfig: }
+10-06 14:12:28.603  9130  9940 I MediaCodec: [mId: 3] [audio-debug-dec] setState: INITIALIZED
+10-06 14:12:28.605  9130  9940 I MediaCodec: MediaCodec will operate in async mode
+10-06 14:12:28.605  9130  9936 I MediaCodec: [mId: 3] [audio-debug-dec] configure: ClientName: yy.daniel.yyplayerforandroid ComponentName: c2.android.flac.decoder
+10-06 14:12:28.605  9130  9936 I MediaCodec: [mId: 3] [audio-debug-dec] configure: ClientFormat: AMessage(what = 0x00000000) = {
+10-06 14:12:28.605  9130  9936 I MediaCodec:   float operating-rate = 44100.000000
+10-06 14:12:28.605  9130  9936 I MediaCodec:   string log-session-id = "jZYkQrfhxqNdT04d"
+10-06 14:12:28.605  9130  9936 I MediaCodec:   int32_t sample-rate = 44100
+10-06 14:12:28.605  9130  9936 I MediaCodec:   int32_t pcm-encoding = 21
+10-06 14:12:28.605  9130  9936 I MediaCodec:   int32_t importance = 1000
+10-06 14:12:28.605  9130  9936 I MediaCodec:   string mime = "audio/flac"
+10-06 14:12:28.605  9130  9936 I MediaCodec:   int32_t channel-count = 2
+10-06 14:12:28.605  9130  9936 I MediaCodec:   int32_t priority = 0
+10-06 14:12:28.605  9130  9936 I MediaCodec:   int32_t max-output-channel-count = 99
+10-06 14:12:28.605  9130  9936 I MediaCodec:   int32_t max-input-size = 5576
+10-06 14:12:28.605  9130  9936 I MediaCodec:   Buffer csd-0 = {
+10-06 14:12:28.605  9130  9936 I MediaCodec:     00000000:  66 4c 61 43 80 00 00 22  04 00 04 00 00 04 f3 00  fLaC..."........
+10-06 14:12:28.605  9130  9936 I MediaCodec:     00000010:  15 c8 0a c4 43 70 00 b8  c5 89 2e 9c 2c 2d 6d a1  ....Cp......,-m.
+10-06 14:12:28.605  9130  9936 I MediaCodec:     00000020:  71 ac fb d7 9a 49 25 87  03 48                    q....I%..H
+10-06 14:12:28.605  9130  9936 I MediaCodec:   }
+10-06 14:12:28.605  9130  9936 I MediaCodec: }
+10-06 14:12:28.605  9130  9940 I MediaCodec: [mId: 3] [audio-debug-dec] setState: CONFIGURING
+10-06 14:12:28.605  9130  9940 D CCodec  : [c2.android.flac.decoder] buffers are bound to CCodec for this session
+10-06 14:12:28.605  9130  9940 D CCodecConfig: no c2 equivalents for log-session-id
+10-06 14:12:28.605  9130  9940 D CCodecConfig: no c2 equivalents for importance
+10-06 14:12:28.605  9130  9940 D CCodecConfig: no c2 equivalents for flags
+10-06 14:12:28.605  9130  9940 D CCodecConfig: config failed => CORRUPTED
+10-06 14:12:28.606  9130  9940 D CCodecConfig: c2 config diff is   c2::u32 raw.channel-count.value = 2
+10-06 14:12:28.606  9130  9940 D CCodec  : client requested max input size 5576, which is smaller than what component recommended (32768); overriding with component recommendation.
+10-06 14:12:28.606  9130  9940 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-06 14:12:28.606  9130  9940 D CCodec  : encoding statistics level = 0
+10-06 14:12:28.606  9130  9940 D CCodec  : setup formats input: AMessage(what = 0x00000000) = {
+10-06 14:12:28.606  9130  9940 D CCodec  :   int32_t android._codec-pcm-encoding = 2
+10-06 14:12:28.606  9130  9940 D CCodec  :   int32_t bitrate = 768000
+10-06 14:12:28.606  9130  9940 D CCodec  :   int32_t channel-count = 2
+10-06 14:12:28.606  9130  9940 D CCodec  :   int32_t max-input-size = 32768
+10-06 14:12:28.606  9130  9940 D CCodec  :   string mime = "audio/flac"
+10-06 14:12:28.606  9130  9940 D CCodec  :   int32_t pcm-encoding = 2
+10-06 14:12:28.606  9130  9940 D CCodec  :   int32_t sample-rate = 44100
+10-06 14:12:28.606  9130  9940 D CCodec  : }
+10-06 14:12:28.606  9130  9940 D CCodec  : setup formats output: AMessage(what = 0x00000000) = {
+10-06 14:12:28.606  9130  9940 D CCodec  :   int32_t android._codec-pcm-encoding = 2
+10-06 14:12:28.606  9130  9940 D CCodec  :   int32_t buffer-batch-max-output-size = 0
+10-06 14:12:28.606  9130  9940 D CCodec  :   int32_t buffer-batch-threshold-output-size = 0
+10-06 14:12:28.606  9130  9940 D CCodec  :   int32_t channel-count = 2
+10-06 14:12:28.606  9130  9940 D CCodec  :   string mime = "audio/raw"
+10-06 14:12:28.606  9130  9940 D CCodec  :   int32_t pcm-encoding = 2
+10-06 14:12:28.606  9130  9940 D CCodec  :   int32_t sample-rate = 44100
+10-06 14:12:28.606  9130  9940 D CCodec  :   int32_t android._config-pcm-encoding = 21
+10-06 14:12:28.606  9130  9940 D CCodec  : }
+10-06 14:12:28.606  9130  9940 I CCodecConfig: query failed after returning 9 values (BAD_INDEX)
+10-06 14:12:28.606  9130  9940 E layerforandroid: Failed to query component interface for required system resources: 6
+10-06 14:12:28.606  9130  9940 I MediaCodec: [mId: 3] [audio-debug-dec] setState: CONFIGURED
+10-06 14:12:28.606  9130  9936 D MediaCodec: keep callback message for reclaim
+10-06 14:12:28.606  9130  9940 I MediaCodec: [mId: 3] [audio-debug-dec] setState: STARTING
+10-06 14:12:28.608  9130  9940 I libbinder.BpBinder: onLastStrongRef automatically unlinking death recipients for binder (0xb40000750a49c1d0) with descriptor: 'android.hardware.media.bufferpool2.IAccessor'
+10-06 14:12:28.608  9130  9940 I libbinder.BpBinder: onLastStrongRef automatically unlinking death recipients for binder (0xb40000750a487b40) with descriptor: 'android.hardware.media.bufferpool2.IAccessor'
+10-06 14:12:28.608  9130  9940 I libbinder.BpBinder: onLastStrongRef automatically unlinking death recipients for binder (0xb40000750a486280) with descriptor: 'android.hardware.media.bufferpool2.IAccessor'
+10-06 14:12:28.608  9130  9940 D CCodecBufferChannel: [c2.android.flac.decoder#838] Created input block pool with allocatorID 16 => poolID 20 - OK (0)
+10-06 14:12:28.608  9130  9940 I CCodecBufferChannel: [mId: 3] [audio-debug-dec] start: inputFormat: AMessage(what = 0x00000000) = {
+10-06 14:12:28.608  9130  9940 I CCodecBufferChannel:   int32_t android._codec-pcm-encoding = 2
+10-06 14:12:28.608  9130  9940 I CCodecBufferChannel:   int32_t bitrate = 768000
+10-06 14:12:28.608  9130  9940 I CCodecBufferChannel:   int32_t channel-count = 2
+10-06 14:12:28.608  9130  9940 I CCodecBufferChannel:   int32_t max-input-size = 32768
+10-06 14:12:28.608  9130  9940 I CCodecBufferChannel:   string mime = "audio/flac"
+10-06 14:12:28.608  9130  9940 I CCodecBufferChannel:   int32_t pcm-encoding = 2
+10-06 14:12:28.608  9130  9940 I CCodecBufferChannel:   int32_t sample-rate = 44100
+10-06 14:12:28.608  9130  9940 I CCodecBufferChannel: }
+10-06 14:12:28.609  9130  9940 I CCodecBufferChannel: [c2.android.flac.decoder#838] Created output block pool with allocatorID 16 => poolID 2492 - OK
+10-06 14:12:28.610  9130  9940 D CCodecBufferChannel: [c2.android.flac.decoder#838] Configured output block pool ids 2492 => OK
+10-06 14:12:28.610  9130  9940 I CCodecBufferChannel: [mId: 3] [audio-debug-dec] start: outputFormat: AMessage(what = 0x00000000) = {
+10-06 14:12:28.610  9130  9940 I CCodecBufferChannel:   int32_t android._codec-pcm-encoding = 2
+10-06 14:12:28.610  9130  9940 I CCodecBufferChannel:   int32_t buffer-batch-max-output-size = 0
+10-06 14:12:28.610  9130  9940 I CCodecBufferChannel:   int32_t buffer-batch-threshold-output-size = 0
+10-06 14:12:28.610  9130  9940 I CCodecBufferChannel:   int32_t channel-count = 2
+10-06 14:12:28.610  9130  9940 I CCodecBufferChannel:   string mime = "audio/raw"
+10-06 14:12:28.610  9130  9940 I CCodecBufferChannel:   int32_t pcm-encoding = 2
+10-06 14:12:28.610  9130  9940 I CCodecBufferChannel:   int32_t sample-rate = 44100
+10-06 14:12:28.610  9130  9940 I CCodecBufferChannel:   int32_t android._config-pcm-encoding = 21
+10-06 14:12:28.610  9130  9940 I CCodecBufferChannel: }
+10-06 14:12:28.610  9130  9940 D CCodecBuffers: [c2.android.flac.decoder#838:1D-Output.Impl[N]] converted 0 buffers to array mode of 4
+10-06 14:12:28.610  9130  9940 D CCodecBufferChannel: [c2.android.flac.decoder#838] start: updating output delay 0
+10-06 14:12:28.610  9130  9940 I MediaCodec: [mId: 3] [audio-debug-dec] setState: STARTED
+10-06 14:12:28.611  9130  9940 W layerforandroid: AIBinder_linkToDeath is being called with a non-null cookie and no onUnlink callback set. Use AIBinder_DeathRecipient_setOnUnlinked to manage the lifetime of the cookie. This will become an abort.
+10-06 14:12:28.611  9130  9936 W LoudnessCodecController: MediaCodec mime type not supported for loudness annotation
+10-06 14:12:28.611  9130  9936 I MediaCodec: [mId: 3] [audio-debug-dec] queueInputBuffer: index: 1 pts: 1000000000000 timediff: 0
+10-06 14:12:28.612  9130  9936 I MediaCodec: [mId: 3] [audio-debug-dec] queueInputBuffer: index: 2 pts: 1000000023219 timediff: 0
+10-06 14:12:28.612  9130  9936 I MediaCodec: [mId: 3] [audio-debug-dec] queueInputBuffer: index: 3 pts: 1000000046439 timediff: 0
+10-06 14:12:28.612  9130  9169 W layerforandroid: AIBinder_linkToDeath is being called with a non-null cookie and no onUnlink callback set. Use AIBinder_DeathRecipient_setOnUnlinked to manage the lifetime of the cookie. This will become an abort.
+10-06 14:12:28.612  9130  9940 D PipelineWatcher: [0xb40000759a416aa0] pipelineFull: too many frames in pipeline (4)
+10-06 14:12:28.612  9130  9940 D CCodecBuffers: [c2.android.flac.decoder#838:Output[N]] Converter created from 2 to 21
+10-06 14:12:28.618  9130  9936 D AudioTrack: getMinFrameCount(): getMinFrameCount = 3536: afFrameCount = 1920, afSampleRate = 48000, afLatency = 109
+10-06 14:12:28.618  9130  9936 I AudioTrackImpl: initAudioTrackImpl()
+10-06 14:12:28.619  9130  9936 D AudioTrack: set(): (sessionId=0), mcallback is 1, streamType -1, sampleRate 44100, format 0x6, channelMask 0x3, frameCount 7072, flags 0, notificationFrames 0,transferType 3, mClientAttributionSource AttributionSourceState{pid: 9130, uid: 10159, deviceId: 0, packageName: yy.daniel.yyplayerforandroid, attributionTag: (null), token: binder:0xb40000756a42ba10, renouncedPermissions: [], next: []}
+10-06 14:12:28.623  9130  9936 D AudioTrack: audio_time_msg enable=1 mStreamType=3 usage=1 content_type=2
+10-06 14:12:28.623  9130  9936 D android.media.AudioTrack: setStereoVolume setParameters is 1.0, rightVolume is 1.0, isMuted is false, mIsLastMute is false, mNeedNotifyedNative is true
+10-06 14:12:28.623  9130  9936 D AudioTrackImpl: setMediaSetMute(8184): Parameter media_set_track_muted is 0 return
+10-06 14:12:28.624  9130  9936 I AudioTrackImpl: before scaleVolumeForVideo L:1.000000 R:1.000000 and the pakage is yy.daniel.yyplayerforandroid
+10-06 14:12:28.624  9130  9936 D AudioTrack: AudioTrack::setVolume L:1.000000 R:1.000000 sessionid=81049
+10-06 14:12:28.624  9130  9936 I YYPlayerAudio: YYTEST_native_NEGOTIATED format=s24_3/44100Hz widened=false bitPerfectRequested=false reason=ok
+10-06 14:12:28.624  9130  9936 I YYPlayerAudio: YYPLAYER_MEDIA3_SINK open=s24_3/44100Hz/ch=2 widened=false mixerRequested=false mixerApplied=false source=s24_3
+10-06 14:12:28.628  9130  9936 I AudioTrack: start(8184): prior state:STATE_STOPPED packageName: yy.daniel.yyplayerforandroid
+10-06 14:12:28.664  9130  9162 I layerforandroid: This is sticky GC, maxfree is 33554432 minfree is 8388608
+10-06 14:12:28.682  9130  9162 I layerforandroid: This is non sticky GC, maxfree is 33554432 minfree is 8388608
+10-06 14:12:28.696  9130  9936 D AudioRepeatStartCheck: [AudioRepeatStartStopCheck], enter: uid = 10159, session = 81049, uidnowTime = 1791266969
+10-06 14:12:28.697  9130  9936 D AudioRepeatStartCheck: [AudioRepeatStartStopCheck] isAnomaly = 0
+10-06 14:12:28.698  9130  9130 I YYPlayerAudio: YYTEST_native_STATE=3
+10-06 14:12:28.705  9130  9332 I AudioTrackImpl: before scaleVolumeForVideo L:1.000000 R:1.000000 and the pakage is yy.daniel.yyplayerforandroid
+10-06 14:12:28.705  9130  9332 D AudioTrack: AudioTrack::setVolume L:1.000000 R:1.000000 sessionid=81049
+10-06 14:12:28.709  9130  9332 D AudioTrack: onAudioDeviceUpdate AudioPortDebug[ID:00001F09] deviceType:AUDIO_DEVICE_OUT_BLUETOOTH_A2DP(00000080)
+10-06 14:12:28.709  9130  9332 D BatteryNotifier: batteryHandler::send audio device update msg! 10159, 9130, 81049, 128
+10-06 14:12:28.710  9130  9288 D BatteryNotifier: BatteryNotifier::update device to power insight! 10159, 9130, 81049, 128
+10-06 14:12:28.742  9130  9162 I layerforandroid: This is sticky GC, maxfree is 33554432 minfree is 8388608
+10-06 14:12:28.757  9130  9162 I layerforandroid: This is non sticky GC, maxfree is 33554432 minfree is 8388608
+10-06 14:12:28.791  9130  9162 I layerforandroid: This is sticky GC, maxfree is 33554432 minfree is 8388608
+10-06 14:12:28.819  9130  9162 I layerforandroid: This is non sticky GC, maxfree is 33554432 minfree is 8388608
+10-06 14:12:28.861  9130  9162 I layerforandroid: This is sticky GC, maxfree is 33554432 minfree is 8388608
+10-06 14:12:32.578  9130  9130 I YYPlayerAudio: YYTEST_native_PROGRESS step=0 isPlaying=true state=3 position=3560 duration=274584 buffered=52709 error=null decodedFrames=164068 fileFrames=12109198 counters=submitted=164068 played=158760 buffered=5308 starving=0 partial=0 bufferFrames=7072 opened=s24_3
+10-06 14:12:33.265  9130  9940 D PipelineWatcher: [0xb40000759a416aa0] pipelineFull: too many frames in pipeline (4)
+10-06 14:12:33.601  9130  9277 D AidlBufferPoolAcc: evictor expired: 3, evicted: 0
+10-06 14:12:33.685  9130  9936 D AudioTrackImpl: [audioTrackData][fine] 5s(f:5061 m:0 s:0 k:0 z:0) : pid 9130 uid 10159 sessionId 81049 sr 44100 ch 2 fmt 6 maxAmplitude 2147419597
+10-06 14:12:33.685  9130  9940 I MediaCodec: [mId: 3] [audio-debug-dec] state STARTED mFlags 19456 Stats 5079ms:Client:yy.daniel.yyplayerforandroid,Component:c2.android.flac.decoder,Qin:212,DQin:0/0,Render:0,Drop:205,DQout:0/0
+10-06 14:12:34.244  9130  9940 D AidlBufferPool: bufferpool2 0xb4000073ea40ab68 : 5(163840 size) total buffers - 1(32768 size) used buffers - 232/237 (recycle/alloc) - 5/470 (fetch/transfer)
+10-06 14:12:36.581  9130  9130 I YYPlayerAudio: YYTEST_native_PROGRESS step=1 isPlaying=true state=3 position=7600 duration=274584 buffered=52709 error=null decodedFrames=338704 fileFrames=12109198 counters=submitted=338704 played=335160 buffered=3544 starving=0 partial=0 bufferFrames=7072 opened=s24_3
+10-06 14:12:36.586  9130  9940 D PipelineWatcher: [0xb40000759a416aa0] pipelineFull: too many frames in pipeline (4)
+10-06 14:12:38.628  9130  9936 D AudioTrackImpl: [audioTrackData][fine] 10s(f:10005 m:0 s:0 k:0 z:0) : pid 9130 uid 10159 sessionId 81049 sr 44100 ch 2 fmt 6 maxAmplitude 2147481475
+10-06 14:12:38.709  9130  9940 I MediaCodec: [mId: 3] [audio-debug-dec] state STARTED mFlags 19456 Stats 5023ms:Client:yy.daniel.yyplayerforandroid,Component:c2.android.flac.decoder,Qin:217,DQin:0/0,Render:0,Drop:217,DQout:0/0
+10-06 14:12:39.349  9130  9940 D AidlBufferPool: bufferpool2 0xb4000073ea40ab68 : 5(163840 size) total buffers - 1(32768 size) used buffers - 451/456 (recycle/alloc) - 5/908 (fetch/transfer)
+10-06 14:12:40.579  9130  9130 I YYPlayerAudio: YYTEST_native_PROGRESS step=2 isPlaying=true state=3 position=11520 duration=274584 buffered=52709 error=null decodedFrames=515104 fileFrames=12109198 counters=submitted=515104 played=511560 buffered=3544 starving=0 partial=0 bufferFrames=7072 opened=s24_3
+10-06 14:12:43.098  9130  9940 D PipelineWatcher: [0xb40000759a416aa0] pipelineFull: too many frames in pipeline (4)
+10-06 14:12:43.660  9130  9936 D AudioTrackImpl: [audioTrackData][fine] 15s(f:15036 m:0 s:0 k:0 z:0) : pid 9130 uid 10159 sessionId 81049 sr 44100 ch 2 fmt 6 maxAmplitude 2147482924
+10-06 14:12:43.747  9130  9940 I MediaCodec: [mId: 3] [audio-debug-dec] state STARTED mFlags 19456 Stats 5038ms:Client:yy.daniel.yyplayerforandroid,Component:c2.android.flac.decoder,Qin:217,DQin:0/0,Render:0,Drop:217,DQout:0/0
+10-06 14:12:44.581  9130  9130 I YYPlayerAudio: YYTEST_native_PROGRESS step=3 isPlaying=true state=3 position=15600 duration=274584 buffered=52709 error=null decodedFrames=695032 fileFrames=12109198 counters=submitted=695032 played=687960 buffered=7072 starving=0 partial=0 bufferFrames=7072 opened=s24_3
+10-06 14:12:44.581  9130  9130 I ExoPlayerImpl: Release 5a2a7a3 [AndroidXMedia3/1.11.1] [popsicle, 2509FPN0BC, Xiaomi, 37] [media3.common, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor]
+10-06 14:12:44.583  9130  9936 I AudioTrack: pause(sessionID=81049) pause(8184): prior state:STATE_ACTIVE packageName: yy.daniel.yyplayerforandroid
+10-06 14:12:44.584  9130  9936 D AudioTrack: reportAudioTimeMsg(8184) yy.daniel.yyplayerforandroid create:2 start:68 write:386 frames:7072 ret:0 (worst sum=454, samples=1)
+10-06 14:12:44.584  9130  9936 I AudioTrack: pause(sessionID=81049) pause(8184): prior state:STATE_PAUSED packageName: yy.daniel.yyplayerforandroid
+10-06 14:12:44.584  9130  9936 D AudioTrack: flush(8184): prior state:STATE_PAUSED
+10-06 14:12:44.585  9130  9940 I MediaCodec: [mId: 3] [audio-debug-dec] setState: FLUSHING
+10-06 14:12:44.586  9130  9940 I CCodecBufferChannel: [mId: 3] [audio-debug-dec] flush: flushing 0 works
+10-06 14:12:44.586  9130  9940 D CCodecBuffers: [c2.android.flac.decoder#838:1D-Output.Impl[N]] Client returned a buffer it does not own according to our record: 0
+10-06 14:12:44.586  9130  9940 D CCodecBuffers: [c2.android.flac.decoder#838:1D-Output.Impl[N]] Client returned a buffer it does not own according to our record: 1
+10-06 14:12:44.586  9130  9940 D CCodecBuffers: [c2.android.flac.decoder#838:1D-Output.Impl[N]] Client returned a buffer it does not own according to our record: 2
+10-06 14:12:44.586  9130  9940 I MediaCodec: [mId: 3] [audio-debug-dec] setState: FLUSHED
+10-06 14:12:44.586  9130  9936 D MediaCodec: keep callback message for reclaim
+10-06 14:12:44.586  9130  9940 I MediaCodec: [mId: 3] [audio-debug-dec] setState: STARTED
+10-06 14:12:44.587  9130  9940 I CCodecConfig: query failed after returning 9 values (BAD_INDEX)
+10-06 14:12:44.588  9130  9940 I MediaCodec: [mId: 3] [audio-debug-dec] setState: RELEASING
+10-06 14:12:44.588  9130  9940 D CCodecBufferChannel: [c2.android.flac.decoder#838] MediaCodec discarded an unknown buffer
+10-06 14:12:44.588  9130  9940 D CCodecBufferChannel: [c2.android.flac.decoder#838] MediaCodec discarded an unknown buffer
+10-06 14:12:44.588  9130  9940 D CCodecBufferChannel: [c2.android.flac.decoder#838] MediaCodec discarded an unknown buffer
+10-06 14:12:44.588  9130  9940 D CCodecBufferChannel: [c2.android.flac.decoder#838] MediaCodec discarded an unknown buffer
+10-06 14:12:44.588  9130  9982 D CCodec  : hold CodecLooper(1) until release
+10-06 14:12:44.589  9130  9936 I AudioTrack: pause(sessionID=81049) pause(8184): prior state:STATE_FLUSHED packageName: yy.daniel.yyplayerforandroid
+10-06 14:12:44.589  9130  9936 D AudioTrack: flush(8184): prior state:STATE_FLUSHED
+10-06 14:12:44.589  9130  9936 I AudioTrack: stop(sessionID=81049), packageName: yy.daniel.yyplayerforandroid
+10-06 14:12:44.589  9130  9936 D AudioTrack: stop(8184): prior state:STATE_FLUSHED
+10-06 14:12:44.590  9130  9936 D AudioTrack: ~AudioTrack(sessionID=81049)
+10-06 14:12:44.590  9130  9936 I AudioTrack: stop(sessionID=81049), packageName: yy.daniel.yyplayerforandroid
+10-06 14:12:44.590  9130  9936 D AudioTrack: stop(8184): prior state:STATE_FLUSHED
+10-06 14:12:44.590  9130  9940 D AidlBufferPool: bufferpool2 0xb4000073ea40ab68 : 0(0 size) total buffers - 0(0 size) used buffers - 687/692 (recycle/alloc) - 5/1372 (fetch/transfer)
+10-06 14:12:44.590  9130  9940 I MediaCodec: [mId: 3] [audio-debug-dec] setState: UNINITIALIZED
+10-06 14:12:44.591  9130  9940 I MediaCodec: MediaCodec::~MediaCodec()
+10-06 14:12:44.592  9130  9218 I YYPlayerAudio: YYTEST_native_RESULT reached=true error=null negotiated=format=s24_3/44100Hz widened=false bitPerfectRequested=false reason=ok
+10-06 14:12:44.592  9130  9218 I TestRunner: finished: nativeSinkPlaysALocalFileThroughExoPlayer(yy.daniel.yyplayerforandroid.NativeOutputPlaybackTest)
+10-06 14:12:44.593  9130  9218 I TestRunner: started: sinkRefusesCompressedBytesAndUnprovenStrictPolicies(yy.daniel.yyplayerforandroid.NativeOutputPlaybackTest)
+10-06 14:12:44.599  9130  9218 I TestRunner: finished: sinkRefusesCompressedBytesAndUnprovenStrictPolicies(yy.daniel.yyplayerforandroid.NativeOutputPlaybackTest)
+10-06 14:12:44.600  9130  9218 I TestRunner: started: systemSinkPlaysTheSameFile(yy.daniel.yyplayerforandroid.NativeOutputPlaybackTest)
+10-06 14:12:44.615  9130  9218 I YYPlayerAudio: YYTEST_system_TRACK=编织光流 (For Your Name) uri=content://com.android.externalstorage.documents/tree/primary%3AMusic/document/primary%3AMusic%2F%E9%93%81%E7%97%95%E7%94%B5%E5%8F%B0-MSR%2CEdine%20-%20%E7%BC%96%E7%BB%87%E5%85%89%E6%B5%81%20(For%20Your%20Name).flac
+10-06 14:12:44.630  9130  9218 I YYPlayerAudio: YYTEST_system_FILE durationMs=274585 sampleRate=44100 expectedFrames=12109198
+10-06 14:12:44.630  9130  9130 I ExoPlayerImpl: Init 251667c [AndroidXMedia3/1.11.1] [popsicle, 2509FPN0BC, Xiaomi, 37]
+10-06 14:12:44.633  9130  9130 I YYPlayerAudio: YYTEST_system_STATE=2
+10-06 14:12:44.653  9130  9983 I DMCodecAdapterFactory: Creating an asynchronous MediaCodec adapter for track type audio
+10-06 14:12:44.654  9130  9983 I MediaCodec: The process name is yy.daniel.yyplayerforandroid
+10-06 14:12:44.654  9130  9983 I MediaCodec: Retry enabled for HDCP failure
+10-06 14:12:44.654  9130  9983 D MediaCodec: MediaCodec overwrite invalid pid -1->9130
+10-06 14:12:44.654  9130  9983 D MediaCodec: MediaCodec u-p-n client:10159-9130-yy.daniel.yyplayerforandroid process:10159-9130-yy.daniel.yyplayerforandroid
+10-06 14:12:44.654  9130  9983 D MediaCodec: mWeChatVideoUploadOptimizationFlag 1
+10-06 14:12:44.654  9130  9983 I MediaCodec: MediaCodec::MediaCodec()
+10-06 14:12:44.655  9130  9162 I layerforandroid: This is sticky GC, maxfree is 33554432 minfree is 8388608
+10-06 14:12:44.655  9130  9983 W libc    : Access denied finding property "vendor.debug.stagefright.BufferCount"
+10-06 14:12:44.655  9130  9986 I MediaCodec: [mId: 4] [audio-debug-dec] setState: INITIALIZING
+10-06 14:12:44.655  9130  9986 D CCodec  : allocate(c2.android.flac.decoder)
+10-06 14:12:44.655  9130  9986 I CCodec  : setting up 'default' as default (vendor) store
+10-06 14:12:44.657  9130  9986 W layerforandroid: AIBinder_linkToDeath is being called with a non-null cookie and no onUnlink callback set. Use AIBinder_DeathRecipient_setOnUnlinked to manage the lifetime of the cookie. This will become an abort.
+10-06 14:12:44.657  9130  9986 I CCodec  : Created component [c2.android.flac.decoder] for [c2.android.flac.decoder]
+10-06 14:12:44.657  9130  9986 D CCodecConfig: read media type: audio/flac
+10-06 14:12:44.657  9130  9986 D ReflectedParamUpdater: extent() != 1 for single value type: algo.buffers.max-count.values
+10-06 14:12:44.658  9130  9986 D ReflectedParamUpdater: extent() != 1 for single value type: output.subscribed-indices.values
+10-06 14:12:44.658  9130  9986 D ReflectedParamUpdater: extent() != 1 for single value type: input.buffers.allocator-ids.values
+10-06 14:12:44.658  9130  9986 D ReflectedParamUpdater: extent() != 1 for single value type: output.buffers.allocator-ids.values
+10-06 14:12:44.658  9130  9986 D ReflectedParamUpdater: extent() != 1 for single value type: algo.buffers.allocator-ids.values
+10-06 14:12:44.658  9130  9986 D ReflectedParamUpdater: extent() != 1 for single value type: output.buffers.pool-ids.values
+10-06 14:12:44.658  9130  9986 D ReflectedParamUpdater: extent() != 1 for single value type: algo.buffers.pool-ids.values
+10-06 14:12:44.658  9130  9986 I CCodecConfig: query failed after returning 9 values (BAD_INDEX)
+10-06 14:12:44.658  9130  9986 D CCodecConfig: c2 config diff is Dict {
+10-06 14:12:44.658  9130  9986 D CCodecConfig:   c2::u32 coded.bitrate.value = 768000
+10-06 14:12:44.658  9130  9986 D CCodecConfig:   c2::u32 input.buffers.max-size.value = 32768
+10-06 14:12:44.658  9130  9986 D CCodecConfig:   c2::u32 input.delay.value = 0
+10-06 14:12:44.658  9130  9986 D CCodecConfig:   string input.media-type.value = "audio/flac"
+10-06 14:12:44.658  9130  9986 D CCodecConfig:   c2::u32 output.large-frame.max-size = 0
+10-06 14:12:44.658  9130  9986 D CCodecConfig:   c2::u32 output.large-frame.threshold-size = 0
+10-06 14:12:44.658  9130  9986 D CCodecConfig:   string output.media-type.value = "audio/raw"
+10-06 14:12:44.658  9130  9986 D CCodecConfig:   c2::u32 raw.channel-count.value = 1
+10-06 14:12:44.658  9130  9986 D CCodecConfig:   c2::u32 raw.pcm-encoding.value = 0
+10-06 14:12:44.658  9130  9986 D CCodecConfig:   c2::u32 raw.sample-rate.value = 44100
+10-06 14:12:44.658  9130  9986 D CCodecConfig: }
+10-06 14:12:44.658  9130  9986 I MediaCodec: [mId: 4] [audio-debug-dec] setState: INITIALIZED
+10-06 14:12:44.659  9130  9986 I MediaCodec: MediaCodec will operate in async mode
+10-06 14:12:44.659  9130  9983 I MediaCodec: [mId: 4] [audio-debug-dec] configure: ClientName: yy.daniel.yyplayerforandroid ComponentName: c2.android.flac.decoder
+10-06 14:12:44.659  9130  9983 I MediaCodec: [mId: 4] [audio-debug-dec] configure: ClientFormat: AMessage(what = 0x00000000) = {
+10-06 14:12:44.659  9130  9983 I MediaCodec:   float operating-rate = 44100.000000
+10-06 14:12:44.659  9130  9983 I MediaCodec:   string log-session-id = "XeyP4BCcj5YFr3In"
+10-06 14:12:44.659  9130  9983 I MediaCodec:   int32_t sample-rate = 44100
+10-06 14:12:44.659  9130  9983 I MediaCodec:   int32_t importance = 1000
+10-06 14:12:44.659  9130  9983 I MediaCodec:   string mime = "audio/flac"
+10-06 14:12:44.659  9130  9983 I MediaCodec:   int32_t channel-count = 2
+10-06 14:12:44.659  9130  9983 I MediaCodec:   int32_t priority = 0
+10-06 14:12:44.659  9130  9983 I MediaCodec:   int32_t max-output-channel-count = 99
+10-06 14:12:44.659  9130  9983 I MediaCodec:   int32_t max-input-size = 5576
+10-06 14:12:44.659  9130  9983 I MediaCodec:   Buffer csd-0 = {
+10-06 14:12:44.659  9130  9983 I MediaCodec:     00000000:  66 4c 61 43 80 00 00 22  04 00 04 00 00 04 f3 00  fLaC..."........
+10-06 14:12:44.659  9130  9983 I MediaCodec:     00000010:  15 c8 0a c4 43 70 00 b8  c5 89 2e 9c 2c 2d 6d a1  ....Cp......,-m.
+10-06 14:12:44.659  9130  9983 I MediaCodec:     00000020:  71 ac fb d7 9a 49 25 87  03 48                    q....I%..H
+10-06 14:12:44.659  9130  9983 I MediaCodec:   }
+10-06 14:12:44.659  9130  9983 I MediaCodec: }
+10-06 14:12:44.659  9130  9986 I MediaCodec: [mId: 4] [audio-debug-dec] setState: CONFIGURING
+10-06 14:12:44.659  9130  9986 D CCodec  : [c2.android.flac.decoder] buffers are bound to CCodec for this session
+10-06 14:12:44.659  9130  9986 D CCodecConfig: no c2 equivalents for log-session-id
+10-06 14:12:44.659  9130  9986 D CCodecConfig: no c2 equivalents for importance
+10-06 14:12:44.659  9130  9986 D CCodecConfig: no c2 equivalents for flags
+10-06 14:12:44.659  9130  9986 D CCodecConfig: config failed => CORRUPTED
+10-06 14:12:44.659  9130  9986 D CCodecConfig: c2 config diff is   c2::u32 raw.channel-count.value = 2
+10-06 14:12:44.660  9130  9986 D CCodec  : client requested max input size 5576, which is smaller than what component recommended (32768); overriding with component recommendation.
+10-06 14:12:44.660  9130  9986 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-06 14:12:44.660  9130  9986 D CCodec  : encoding statistics level = 0
+10-06 14:12:44.660  9130  9986 D CCodec  : setup formats input: AMessage(what = 0x00000000) = {
+10-06 14:12:44.660  9130  9986 D CCodec  :   int32_t android._codec-pcm-encoding = 2
+10-06 14:12:44.660  9130  9986 D CCodec  :   int32_t bitrate = 768000
+10-06 14:12:44.660  9130  9986 D CCodec  :   int32_t channel-count = 2
+10-06 14:12:44.660  9130  9986 D CCodec  :   int32_t max-input-size = 32768
+10-06 14:12:44.660  9130  9986 D CCodec  :   string mime = "audio/flac"
+10-06 14:12:44.660  9130  9986 D CCodec  :   int32_t pcm-encoding = 2
+10-06 14:12:44.660  9130  9986 D CCodec  :   int32_t sample-rate = 44100
+10-06 14:12:44.660  9130  9986 D CCodec  : }
+10-06 14:12:44.660  9130  9986 D CCodec  : setup formats output: AMessage(what = 0x00000000) = {
+10-06 14:12:44.660  9130  9986 D CCodec  :   int32_t android._codec-pcm-encoding = 2
+10-06 14:12:44.660  9130  9986 D CCodec  :   int32_t buffer-batch-max-output-size = 0
+10-06 14:12:44.660  9130  9986 D CCodec  :   int32_t buffer-batch-threshold-output-size = 0
+10-06 14:12:44.660  9130  9986 D CCodec  :   int32_t channel-count = 2
+10-06 14:12:44.660  9130  9986 D CCodec  :   string mime = "audio/raw"
+10-06 14:12:44.660  9130  9986 D CCodec  :   int32_t pcm-encoding = 2
+10-06 14:12:44.660  9130  9986 D CCodec  :   int32_t sample-rate = 44100
+10-06 14:12:44.660  9130  9986 D CCodec  :   int32_t android._config-pcm-encoding = 2
+10-06 14:12:44.660  9130  9986 D CCodec  : }
+10-06 14:12:44.660  9130  9986 I CCodecConfig: query failed after returning 9 values (BAD_INDEX)
+10-06 14:12:44.660  9130  9986 E layerforandroid: Failed to query component interface for required system resources: 6
+10-06 14:12:44.660  9130  9986 I MediaCodec: [mId: 4] [audio-debug-dec] setState: CONFIGURED
+10-06 14:12:44.660  9130  9983 D MediaCodec: keep callback message for reclaim
+10-06 14:12:44.660  9130  9986 I MediaCodec: [mId: 4] [audio-debug-dec] setState: STARTING
+10-06 14:12:44.660  9130  9986 D CCodecBufferChannel: [c2.android.flac.decoder#838] Created input block pool with allocatorID 16 => poolID 21 - OK (0)
+10-06 14:12:44.660  9130  9986 I CCodecBufferChannel: [mId: 4] [audio-debug-dec] start: inputFormat: AMessage(what = 0x00000000) = {
+10-06 14:12:44.660  9130  9986 I CCodecBufferChannel:   int32_t android._codec-pcm-encoding = 2
+10-06 14:12:44.660  9130  9986 I CCodecBufferChannel:   int32_t bitrate = 768000
+10-06 14:12:44.660  9130  9986 I CCodecBufferChannel:   int32_t channel-count = 2
+10-06 14:12:44.660  9130  9986 I CCodecBufferChannel:   int32_t max-input-size = 32768
+10-06 14:12:44.660  9130  9986 I CCodecBufferChannel:   string mime = "audio/flac"
+10-06 14:12:44.660  9130  9986 I CCodecBufferChannel:   int32_t pcm-encoding = 2
+10-06 14:12:44.660  9130  9986 I CCodecBufferChannel:   int32_t sample-rate = 44100
+10-06 14:12:44.660  9130  9986 I CCodecBufferChannel: }
+10-06 14:12:44.661  9130  9986 I CCodecBufferChannel: [c2.android.flac.decoder#838] Created output block pool with allocatorID 16 => poolID 2494 - OK
+10-06 14:12:44.661  9130  9986 D CCodecBufferChannel: [c2.android.flac.decoder#838] Configured output block pool ids 2494 => OK
+10-06 14:12:44.661  9130  9986 I CCodecBufferChannel: [mId: 4] [audio-debug-dec] start: outputFormat: AMessage(what = 0x00000000) = {
+10-06 14:12:44.661  9130  9986 I CCodecBufferChannel:   int32_t android._codec-pcm-encoding = 2
+10-06 14:12:44.661  9130  9986 I CCodecBufferChannel:   int32_t buffer-batch-max-output-size = 0
+10-06 14:12:44.661  9130  9986 I CCodecBufferChannel:   int32_t buffer-batch-threshold-output-size = 0
+10-06 14:12:44.661  9130  9986 I CCodecBufferChannel:   int32_t channel-count = 2
+10-06 14:12:44.661  9130  9986 I CCodecBufferChannel:   string mime = "audio/raw"
+10-06 14:12:44.661  9130  9986 I CCodecBufferChannel:   int32_t pcm-encoding = 2
+10-06 14:12:44.661  9130  9986 I CCodecBufferChannel:   int32_t sample-rate = 44100
+10-06 14:12:44.661  9130  9986 I CCodecBufferChannel:   int32_t android._config-pcm-encoding = 2
+10-06 14:12:44.661  9130  9986 I CCodecBufferChannel: }
+10-06 14:12:44.661  9130  9986 D CCodecBuffers: [c2.android.flac.decoder#838:1D-Output.Impl[N]] converted 0 buffers to array mode of 4
+10-06 14:12:44.661  9130  9986 D CCodecBufferChannel: [c2.android.flac.decoder#838] start: updating output delay 0
+10-06 14:12:44.661  9130  9986 I MediaCodec: [mId: 4] [audio-debug-dec] setState: STARTED
+10-06 14:12:44.662  9130  9986 W layerforandroid: AIBinder_linkToDeath is being called with a non-null cookie and no onUnlink callback set. Use AIBinder_DeathRecipient_setOnUnlinked to manage the lifetime of the cookie. This will become an abort.
+10-06 14:12:44.662  9130  9983 W LoudnessCodecController: MediaCodec mime type not supported for loudness annotation
+10-06 14:12:44.663  9130  9983 I MediaCodec: [mId: 4] [audio-debug-dec] queueInputBuffer: index: 1 pts: 1000000000000 timediff: 0
+10-06 14:12:44.663  9130  9983 I MediaCodec: [mId: 4] [audio-debug-dec] queueInputBuffer: index: 2 pts: 1000000023219 timediff: 0
+10-06 14:12:44.663  9130  9983 I MediaCodec: [mId: 4] [audio-debug-dec] queueInputBuffer: index: 3 pts: 1000000046439 timediff: 0
+10-06 14:12:44.663  9130  9172 W layerforandroid: AIBinder_linkToDeath is being called with a non-null cookie and no onUnlink callback set. Use AIBinder_DeathRecipient_setOnUnlinked to manage the lifetime of the cookie. This will become an abort.
+10-06 14:12:44.663  9130  9986 D PipelineWatcher: [0xb40000759a4238a0] pipelineFull: too many frames in pipeline (4)
+10-06 14:12:44.665  9130  9983 D AudioTrack: getMinFrameCount(): getMinFrameCount = 3536: afFrameCount = 1920, afSampleRate = 48000, afLatency = 109
+10-06 14:12:44.666  9130  9983 I AudioTrackImpl: initAudioTrackImpl()
+10-06 14:12:44.666  9130  9983 D AudioTrack: set(): (sessionId=81057), mcallback is 1, streamType -1, sampleRate 44100, format 0x1, channelMask 0x3, frameCount 22050, flags 0, notificationFrames 0,transferType 3, mClientAttributionSource AttributionSourceState{pid: 9130, uid: 10159, deviceId: 0, packageName: yy.daniel.yyplayerforandroid, attributionTag: (null), token: binder:0xb40000756a42ba10, renouncedPermissions: [], next: []}
+10-06 14:12:44.668  9130  9983 D AudioTrack: audio_time_msg enable=1 mStreamType=3 usage=1 content_type=0
+10-06 14:12:44.669  9130  9983 D android.media.AudioTrack: setStereoVolume setParameters is 1.0, rightVolume is 1.0, isMuted is false, mIsLastMute is false, mNeedNotifyedNative is true
+10-06 14:12:44.669  9130  9983 D AudioTrackImpl: setMediaSetMute(8185): Parameter media_set_track_muted is 0 return
+10-06 14:12:44.669  9130  9983 I AudioTrackImpl: before scaleVolumeForVideo L:1.000000 R:1.000000 and the pakage is yy.daniel.yyplayerforandroid
+10-06 14:12:44.669  9130  9983 D AudioTrack: AudioTrack::setVolume L:1.000000 R:1.000000 sessionid=81057
+10-06 14:12:44.677  9130  9983 I AudioTrack: start(8185): prior state:STATE_STOPPED packageName: yy.daniel.yyplayerforandroid
+10-06 14:12:44.680  9130  9983 D AudioRepeatStartCheck: [AudioRepeatStartStopCheck], enter: uid = 10159, session = 81057, uidnowTime = 1791267148
+10-06 14:12:44.680  9130  9983 D AudioRepeatStartCheck: [AudioRepeatStartStopCheck] isAnomaly = 0
+10-06 14:12:44.680  9130  9130 I YYPlayerAudio: YYTEST_system_STATE=3
+10-06 14:12:44.684  9130  9332 I AudioTrackImpl: before scaleVolumeForVideo L:1.000000 R:1.000000 and the pakage is yy.daniel.yyplayerforandroid
+10-06 14:12:44.684  9130  9332 D AudioTrack: AudioTrack::setVolume L:1.000000 R:1.000000 sessionid=81057
+10-06 14:12:44.686  9130  9332 D AudioTrack: onAudioDeviceUpdate AudioPortDebug[ID:00001F09] deviceType:AUDIO_DEVICE_OUT_BLUETOOTH_A2DP(00000080)
+10-06 14:12:44.686  9130  9288 D BatteryNotifier: BatteryNotifier::update device to power insight! 10159, 9130, 81057, 128
+10-06 14:12:44.686  9130  9332 D BatteryNotifier: batteryHandler::send audio device update msg! 10159, 9130, 81057, 128
+10-06 14:12:44.700  9130  9983 D AudioTrack: getTimestamp_l(8185): device stall time corrected using current time 529517347785972
+10-06 14:12:44.744  9130  9162 I layerforandroid: This is non sticky GC, maxfree is 33554432 minfree is 8388608
+10-06 14:12:44.789  9130  9162 I layerforandroid: This is sticky GC, maxfree is 33554432 minfree is 8388608
+10-06 14:12:44.825  9130  9162 I layerforandroid: This is non sticky GC, maxfree is 33554432 minfree is 8388608
+10-06 14:12:44.882  9130  9162 I layerforandroid: This is sticky GC, maxfree is 33554432 minfree is 8388608
+10-06 14:12:46.775  9130  9986 D PipelineWatcher: [0xb40000759a4238a0] pipelineFull: too many frames in pipeline (4)
+10-06 14:12:48.637  9130  9130 I YYPlayerAudio: YYTEST_system_PROGRESS step=0 isPlaying=true state=3 position=3462 duration=274584 buffered=52709 error=null decodedFrames=0 fileFrames=12109198 counters=null opened=null
+10-06 14:12:49.607  9130  9277 D AidlBufferPool: bufferpool2 0xb4000073ea40ab68 : 0(0 size) total buffers - 0(0 size) used buffers - 687/692 (recycle/alloc) - 5/1372 (fetch/transfer)
+10-06 14:12:49.607  9130  9277 D AidlBufferPoolAcc: evictor expired: 1, evicted: 1
+10-06 14:12:49.673  9130  9983 D AudioTrackImpl: [audioTrackData][fine] 5s(f:5002 m:0 s:0 k:0 z:0) : pid 9130 uid 10159 sessionId 81057 sr 44100 ch 2 fmt 1 maxAmplitude 1177
+10-06 14:12:49.674  9130  9986 I MediaCodec: [mId: 4] [audio-debug-dec] state STARTED mFlags 19456 Stats 5014ms:Client:yy.daniel.yyplayerforandroid,Component:c2.android.flac.decoder,Qin:232,DQin:0/0,Render:0,Drop:226,DQout:0/0
+10-06 14:12:49.936  9130  9986 D AidlBufferPool: bufferpool2 0xb4000073ea430258 : 5(163840 size) total buffers - 1(32768 size) used buffers - 241/246 (recycle/alloc) - 5/488 (fetch/transfer)
+10-06 14:12:52.638  9130  9130 I YYPlayerAudio: YYTEST_system_PROGRESS step=1 isPlaying=true state=3 position=7408 duration=274584 buffered=52709 error=null decodedFrames=0 fileFrames=12109198 counters=null opened=null
+10-06 14:12:54.675  9130  9983 D AudioTrackImpl: [audioTrackData][fine] 10s(f:10003 m:0 s:0 k:0 z:0) : pid 9130 uid 10159 sessionId 81057 sr 44100 ch 2 fmt 1 maxAmplitude 2479
+10-06 14:12:54.675  9130  9986 I MediaCodec: [mId: 4] [audio-debug-dec] state STARTED mFlags 19456 Stats 5001ms:Client:yy.daniel.yyplayerforandroid,Component:c2.android.flac.decoder,Qin:221,DQin:0/0,Render:0,Drop:220,DQout:0/0
+10-06 14:12:55.196  9130  9986 D AidlBufferPool: bufferpool2 0xb4000073ea430258 : 5(163840 size) total buffers - 1(32768 size) used buffers - 468/473 (recycle/alloc) - 5/942 (fetch/transfer)
+10-06 14:12:56.635  9130  9130 I YYPlayerAudio: YYTEST_system_PROGRESS step=2 isPlaying=true state=3 position=11355 duration=274584 buffered=52709 error=null decodedFrames=0 fileFrames=12109198 counters=null opened=null
+10-06 14:12:59.922  9130  9983 D AudioTrackImpl: [audioTrackData][fine] 15s(f:15250 m:0 s:0 k:0 z:0) : pid 9130 uid 10159 sessionId 81057 sr 44100 ch 2 fmt 1 maxAmplitude 5793
+10-06 14:12:59.923  9130  9986 I MediaCodec: [mId: 4] [audio-debug-dec] state STARTED mFlags 19456 Stats 5248ms:Client:yy.daniel.yyplayerforandroid,Component:c2.android.flac.decoder,Qin:218,DQin:0/0,Render:0,Drop:221,DQout:0/0
+10-06 14:13:00.450  9130  9986 D AidlBufferPool: bufferpool2 0xb4000073ea430258 : 5(163840 size) total buffers - 1(32768 size) used buffers - 691/696 (recycle/alloc) - 5/1388 (fetch/transfer)
+10-06 14:13:00.637  9130  9130 I YYPlayerAudio: YYTEST_system_PROGRESS step=3 isPlaying=true state=3 position=15297 duration=274584 buffered=52709 error=null decodedFrames=0 fileFrames=12109198 counters=null opened=null
+10-06 14:13:00.637  9130  9130 I ExoPlayerImpl: Release 251667c [AndroidXMedia3/1.11.1] [popsicle, 2509FPN0BC, Xiaomi, 37] [media3.common, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor]
+10-06 14:13:00.639  9130  9983 I AudioTrack: pause(sessionID=81057) pause(8185): prior state:STATE_ACTIVE packageName: yy.daniel.yyplayerforandroid
+10-06 14:13:00.640  9130  9983 D AudioTrack: reportAudioTimeMsg(8185) yy.daniel.yyplayerforandroid create:1 start:2 write:20 frames:22050 ret:0 (worst sum=22, samples=1)
+10-06 14:13:00.641  9130  9986 I MediaCodec: [mId: 4] [audio-debug-dec] setState: FLUSHING
+10-06 14:13:00.642  9130  9986 I CCodecBufferChannel: [mId: 4] [audio-debug-dec] flush: flushing 0 works
+10-06 14:13:00.642  9130  9986 D CCodecBuffers: [c2.android.flac.decoder#838:1D-Output.Impl[N]] Client returned a buffer it does not own according to our record: 0
+10-06 14:13:00.642  9130  9986 D CCodecBuffers: [c2.android.flac.decoder#838:1D-Output.Impl[N]] Client returned a buffer it does not own according to our record: 1
+10-06 14:13:00.642  9130  9986 D CCodecBuffers: [c2.android.flac.decoder#838:1D-Output.Impl[N]] Client returned a buffer it does not own according to our record: 2
+10-06 14:13:00.642  9130  9986 I MediaCodec: [mId: 4] [audio-debug-dec] setState: FLUSHED
+10-06 14:13:00.643  9130  9983 D MediaCodec: keep callback message for reclaim
+10-06 14:13:00.643  9130  9986 I MediaCodec: [mId: 4] [audio-debug-dec] setState: STARTED
+10-06 14:13:00.643  9130  9986 I CCodecConfig: query failed after returning 9 values (BAD_INDEX)
+10-06 14:13:00.644  9130  9986 I MediaCodec: [mId: 4] [audio-debug-dec] setState: RELEASING
+10-06 14:13:00.644  9130  9986 D CCodecBufferChannel: [c2.android.flac.decoder#838] MediaCodec discarded an unknown buffer
+10-06 14:13:00.644  9130  9986 D CCodecBufferChannel: [c2.android.flac.decoder#838] MediaCodec discarded an unknown buffer
+10-06 14:13:00.644  9130  9986 D CCodecBufferChannel: [c2.android.flac.decoder#838] MediaCodec discarded an unknown buffer
+10-06 14:13:00.644  9130  9986 D CCodecBufferChannel: [c2.android.flac.decoder#838] MediaCodec discarded an unknown buffer
+10-06 14:13:00.644  9130 10016 D CCodec  : hold CodecLooper(1) until release
+10-06 14:13:00.646  9130  9986 I MediaCodec: [mId: 4] [audio-debug-dec] setState: UNINITIALIZED
+10-06 14:13:00.647  9130  9986 I MediaCodec: MediaCodec::~MediaCodec()
+10-06 14:13:00.649  9130  9218 I YYPlayerAudio: YYTEST_system_RESULT reached=true error=null negotiated=null
+10-06 14:13:00.649  9130  9218 I TestRunner: finished: systemSinkPlaysTheSameFile(yy.daniel.yyplayerforandroid.NativeOutputPlaybackTest)
+10-06 14:13:00.650  9130  9218 I TestRunner: started: sessionFollowsOutputSwitchAndKeepsMusicAliveWithoutAnActivity(yy.daniel.yyplayerforandroid.PlayerSessionServiceDeviceTest)
+10-06 14:13:00.652  9130  9218 I YYPlayerAudio: YYTEST_SESSION_STAGE start
+10-06 14:13:00.661  9130 10015 D AudioTrack: flush(8185): prior state:STATE_PAUSED
+10-06 14:13:00.661  9130 10015 I AudioTrack: stop(sessionID=81057), packageName: yy.daniel.yyplayerforandroid
+10-06 14:13:00.661  9130 10015 D AudioTrack: stop(8185): prior state:STATE_FLUSHED
+10-06 14:13:00.661  9130 10015 D AudioTrack: ~AudioTrack(sessionID=81057)
+10-06 14:13:00.661  9130 10015 I AudioTrack: stop(sessionID=81057), packageName: yy.daniel.yyplayerforandroid
+10-06 14:13:00.661  9130 10015 D AudioTrack: stop(8185): prior state:STATE_FLUSHED
+10-06 14:13:00.672  9130  9218 I YYPlayerAudio: YYTEST_SESSION_STAGE library
+10-06 14:13:00.673  9130  9130 I ExoPlayerImpl: Init 9d8fbad [AndroidXMedia3/1.11.1] [popsicle, 2509FPN0BC, Xiaomi, 37]
+10-06 14:13:00.674  9130  9218 I YYPlayerAudio: YYTEST_SESSION_STAGE engine
+10-06 14:13:00.697  9130  9130 I MediaSessionImpl: Init d87fd5 [AndroidXMedia3/1.11.1] [popsicle, 2509FPN0BC, Xiaomi, 37]
+10-06 14:13:00.701  9130 10017 I DMCodecAdapterFactory: Creating an asynchronous MediaCodec adapter for track type audio
+10-06 14:13:00.701  9130 10017 I MediaCodec: The process name is yy.daniel.yyplayerforandroid
+10-06 14:13:00.701  9130 10017 I MediaCodec: Retry enabled for HDCP failure
+10-06 14:13:00.701  9130 10017 D MediaCodec: MediaCodec overwrite invalid pid -1->9130
+10-06 14:13:00.701  9130 10017 D MediaCodec: MediaCodec u-p-n client:10159-9130-yy.daniel.yyplayerforandroid process:10159-9130-yy.daniel.yyplayerforandroid
+10-06 14:13:00.701  9130 10017 D MediaCodec: mWeChatVideoUploadOptimizationFlag 1
+10-06 14:13:00.701  9130 10017 I MediaCodec: MediaCodec::MediaCodec()
+10-06 14:13:00.702  9130 10017 W libc    : Access denied finding property "vendor.debug.stagefright.BufferCount"
+10-06 14:13:00.702  9130 10025 I MediaCodec: [mId: 5] [audio-debug-dec] setState: INITIALIZING
+10-06 14:13:00.702  9130 10025 D CCodec  : allocate(c2.android.flac.decoder)
+10-06 14:13:00.702  9130 10025 I CCodec  : setting up 'default' as default (vendor) store
+10-06 14:13:00.703  9130  9332 D AidlBufferPool: bufferpool2 0xb4000073ea40ab68 : 0(0 size) total buffers - 0(0 size) used buffers - 687/692 (recycle/alloc) - 5/1372 (fetch/transfer)
+10-06 14:13:00.703  9130  9332 D AidlBufferPool: Destruction - bufferpool2 0xb4000073ea40ab68 cached: 0/0M, 0/0% in use; allocs: 692, 99% recycled; transfers: 1372, 100% unfetched
+10-06 14:13:00.704  9130 10025 W layerforandroid: AIBinder_linkToDeath is being called with a non-null cookie and no onUnlink callback set. Use AIBinder_DeathRecipient_setOnUnlinked to manage the lifetime of the cookie. This will become an abort.
+10-06 14:13:00.704  9130 10025 I CCodec  : Created component [c2.android.flac.decoder] for [c2.android.flac.decoder]
+10-06 14:13:00.704  9130 10025 D CCodecConfig: read media type: audio/flac
+10-06 14:13:00.704  9130 10025 D ReflectedParamUpdater: extent() != 1 for single value type: algo.buffers.max-count.values
+10-06 14:13:00.705  9130 10025 D ReflectedParamUpdater: extent() != 1 for single value type: output.subscribed-indices.values
+10-06 14:13:00.705  9130 10025 D ReflectedParamUpdater: extent() != 1 for single value type: input.buffers.allocator-ids.values
+10-06 14:13:00.705  9130 10025 D ReflectedParamUpdater: extent() != 1 for single value type: output.buffers.allocator-ids.values
+10-06 14:13:00.705  9130 10025 D ReflectedParamUpdater: extent() != 1 for single value type: algo.buffers.allocator-ids.values
+10-06 14:13:00.705  9130 10025 D ReflectedParamUpdater: extent() != 1 for single value type: output.buffers.pool-ids.values
+10-06 14:13:00.705  9130 10025 D ReflectedParamUpdater: extent() != 1 for single value type: algo.buffers.pool-ids.values
+10-06 14:13:00.705  9130 10025 I CCodecConfig: query failed after returning 9 values (BAD_INDEX)
+10-06 14:13:00.705  9130 10025 D CCodecConfig: c2 config diff is Dict {
+10-06 14:13:00.705  9130 10025 D CCodecConfig:   c2::u32 coded.bitrate.value = 768000
+10-06 14:13:00.705  9130 10025 D CCodecConfig:   c2::u32 input.buffers.max-size.value = 32768
+10-06 14:13:00.705  9130 10025 D CCodecConfig:   c2::u32 input.delay.value = 0
+10-06 14:13:00.705  9130 10025 D CCodecConfig:   string input.media-type.value = "audio/flac"
+10-06 14:13:00.705  9130 10025 D CCodecConfig:   c2::u32 output.large-frame.max-size = 0
+10-06 14:13:00.705  9130 10025 D CCodecConfig:   c2::u32 output.large-frame.threshold-size = 0
+10-06 14:13:00.705  9130 10025 D CCodecConfig:   string output.media-type.value = "audio/raw"
+10-06 14:13:00.705  9130 10025 D CCodecConfig:   c2::u32 raw.channel-count.value = 1
+10-06 14:13:00.705  9130 10025 D CCodecConfig:   c2::u32 raw.pcm-encoding.value = 0
+10-06 14:13:00.705  9130 10025 D CCodecConfig:   c2::u32 raw.sample-rate.value = 44100
+10-06 14:13:00.705  9130 10025 D CCodecConfig: }
+10-06 14:13:00.705  9130 10025 I MediaCodec: [mId: 5] [audio-debug-dec] setState: INITIALIZED
+10-06 14:13:00.705  9130  9130 I MediaSessionCompat: Couldn't find a unique registered media button receiver in the given context.
+10-06 14:13:00.706  9130 10025 I MediaCodec: MediaCodec will operate in async mode
+10-06 14:13:00.706  9130 10017 I MediaCodec: [mId: 5] [audio-debug-dec] configure: ClientName: yy.daniel.yyplayerforandroid ComponentName: c2.android.flac.decoder
+10-06 14:13:00.706  9130 10017 I MediaCodec: [mId: 5] [audio-debug-dec] configure: ClientFormat: AMessage(what = 0x00000000) = {
+10-06 14:13:00.706  9130 10017 I MediaCodec:   float operating-rate = 44100.000000
+10-06 14:13:00.706  9130 10017 I MediaCodec:   string log-session-id = "0j1H24GIT5ZOJC40"
+10-06 14:13:00.706  9130 10017 I MediaCodec:   int32_t sample-rate = 44100
+10-06 14:13:00.706  9130 10017 I MediaCodec:   int32_t pcm-encoding = 21
+10-06 14:13:00.706  9130 10017 I MediaCodec:   int32_t importance = 1000
+10-06 14:13:00.706  9130 10017 I MediaCodec:   string mime = "audio/flac"
+10-06 14:13:00.706  9130 10017 I MediaCodec:   int32_t channel-count = 2
+10-06 14:13:00.706  9130 10017 I MediaCodec:   int32_t priority = 0
+10-06 14:13:00.706  9130 10017 I MediaCodec:   int32_t max-output-channel-count = 99
+10-06 14:13:00.706  9130 10017 I MediaCodec:   int32_t max-input-size = 5576
+10-06 14:13:00.706  9130 10017 I MediaCodec:   Buffer csd-0 = {
+10-06 14:13:00.706  9130 10017 I MediaCodec:     00000000:  66 4c 61 43 80 00 00 22  04 00 04 00 00 04 f3 00  fLaC..."........
+10-06 14:13:00.706  9130 10017 I MediaCodec:     00000010:  15 c8 0a c4 43 70 00 b8  c5 89 2e 9c 2c 2d 6d a1  ....Cp......,-m.
+10-06 14:13:00.706  9130 10017 I MediaCodec:     00000020:  71 ac fb d7 9a 49 25 87  03 48                    q....I%..H
+10-06 14:13:00.706  9130 10017 I MediaCodec:   }
+10-06 14:13:00.706  9130 10017 I MediaCodec: }
+10-06 14:13:00.706  9130 10025 I MediaCodec: [mId: 5] [audio-debug-dec] setState: CONFIGURING
+10-06 14:13:00.706  9130 10025 D CCodec  : [c2.android.flac.decoder] buffers are bound to CCodec for this session
+10-06 14:13:00.706  9130 10025 D CCodecConfig: no c2 equivalents for log-session-id
+10-06 14:13:00.706  9130 10025 D CCodecConfig: no c2 equivalents for importance
+10-06 14:13:00.706  9130 10025 D CCodecConfig: no c2 equivalents for flags
+10-06 14:13:00.706  9130 10025 D CCodecConfig: config failed => CORRUPTED
+10-06 14:13:00.706  9130 10025 D CCodecConfig: c2 config diff is   c2::u32 raw.channel-count.value = 2
+10-06 14:13:00.707  9130 10025 D CCodec  : client requested max input size 5576, which is smaller than what component recommended (32768); overriding with component recommendation.
+10-06 14:13:00.707  9130 10025 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-06 14:13:00.707  9130 10025 D CCodec  : encoding statistics level = 0
+10-06 14:13:00.707  9130 10025 D CCodec  : setup formats input: AMessage(what = 0x00000000) = {
+10-06 14:13:00.707  9130 10025 D CCodec  :   int32_t android._codec-pcm-encoding = 2
+10-06 14:13:00.707  9130 10025 D CCodec  :   int32_t bitrate = 768000
+10-06 14:13:00.707  9130 10025 D CCodec  :   int32_t channel-count = 2
+10-06 14:13:00.707  9130 10025 D CCodec  :   int32_t max-input-size = 32768
+10-06 14:13:00.707  9130 10025 D CCodec  :   string mime = "audio/flac"
+10-06 14:13:00.707  9130 10025 D CCodec  :   int32_t pcm-encoding = 2
+10-06 14:13:00.707  9130 10025 D CCodec  :   int32_t sample-rate = 44100
+10-06 14:13:00.707  9130 10025 D CCodec  : }
+10-06 14:13:00.707  9130 10025 D CCodec  : setup formats output: AMessage(what = 0x00000000) = {
+10-06 14:13:00.707  9130 10025 D CCodec  :   int32_t android._codec-pcm-encoding = 2
+10-06 14:13:00.707  9130 10025 D CCodec  :   int32_t buffer-batch-max-output-size = 0
+10-06 14:13:00.707  9130 10025 D CCodec  :   int32_t buffer-batch-threshold-output-size = 0
+10-06 14:13:00.707  9130 10025 D CCodec  :   int32_t channel-count = 2
+10-06 14:13:00.707  9130 10025 D CCodec  :   string mime = "audio/raw"
+10-06 14:13:00.707  9130 10025 D CCodec  :   int32_t pcm-encoding = 2
+10-06 14:13:00.707  9130 10025 D CCodec  :   int32_t sample-rate = 44100
+10-06 14:13:00.707  9130 10025 D CCodec  :   int32_t android._config-pcm-encoding = 21
+10-06 14:13:00.707  9130 10025 D CCodec  : }
+10-06 14:13:00.707  9130 10025 I CCodecConfig: query failed after returning 9 values (BAD_INDEX)
+10-06 14:13:00.707  9130 10025 E layerforandroid: Failed to query component interface for required system resources: 6
+10-06 14:13:00.707  9130 10025 I MediaCodec: [mId: 5] [audio-debug-dec] setState: CONFIGURED
+10-06 14:13:00.707  9130 10017 D MediaCodec: keep callback message for reclaim
+10-06 14:13:00.707  9130 10025 I MediaCodec: [mId: 5] [audio-debug-dec] setState: STARTING
+10-06 14:13:00.708  9130 10025 I libbinder.BpBinder: onLastStrongRef automatically unlinking death recipients for binder (0xb40000750a486280) with descriptor: 'android.hardware.media.bufferpool2.IAccessor'
+10-06 14:13:00.708  9130 10025 D CCodecBufferChannel: [c2.android.flac.decoder#413] Created input block pool with allocatorID 16 => poolID 22 - OK (0)
+10-06 14:13:00.708  9130 10025 I CCodecBufferChannel: [mId: 5] [audio-debug-dec] start: inputFormat: AMessage(what = 0x00000000) = {
+10-06 14:13:00.708  9130 10025 I CCodecBufferChannel:   int32_t android._codec-pcm-encoding = 2
+10-06 14:13:00.708  9130 10025 I CCodecBufferChannel:   int32_t bitrate = 768000
+10-06 14:13:00.708  9130 10025 I CCodecBufferChannel:   int32_t channel-count = 2
+10-06 14:13:00.708  9130 10025 I CCodecBufferChannel:   int32_t max-input-size = 32768
+10-06 14:13:00.708  9130 10025 I CCodecBufferChannel:   string mime = "audio/flac"
+10-06 14:13:00.708  9130 10025 I CCodecBufferChannel:   int32_t pcm-encoding = 2
+10-06 14:13:00.708  9130 10025 I CCodecBufferChannel:   int32_t sample-rate = 44100
+10-06 14:13:00.708  9130 10025 I CCodecBufferChannel: }
+10-06 14:13:00.708  9130 10025 I CCodecBufferChannel: [c2.android.flac.decoder#413] Created output block pool with allocatorID 16 => poolID 2496 - OK
+10-06 14:13:00.708  9130 10025 D CCodecBufferChannel: [c2.android.flac.decoder#413] Configured output block pool ids 2496 => OK
+10-06 14:13:00.708  9130 10025 I CCodecBufferChannel: [mId: 5] [audio-debug-dec] start: outputFormat: AMessage(what = 0x00000000) = {
+10-06 14:13:00.708  9130 10025 I CCodecBufferChannel:   int32_t android._codec-pcm-encoding = 2
+10-06 14:13:00.708  9130 10025 I CCodecBufferChannel:   int32_t buffer-batch-max-output-size = 0
+10-06 14:13:00.708  9130 10025 I CCodecBufferChannel:   int32_t buffer-batch-threshold-output-size = 0
+10-06 14:13:00.708  9130 10025 I CCodecBufferChannel:   int32_t channel-count = 2
+10-06 14:13:00.708  9130 10025 I CCodecBufferChannel:   string mime = "audio/raw"
+10-06 14:13:00.708  9130 10025 I CCodecBufferChannel:   int32_t pcm-encoding = 2
+10-06 14:13:00.708  9130 10025 I CCodecBufferChannel:   int32_t sample-rate = 44100
+10-06 14:13:00.708  9130 10025 I CCodecBufferChannel:   int32_t android._config-pcm-encoding = 21
+10-06 14:13:00.708  9130 10025 I CCodecBufferChannel: }
+10-06 14:13:00.708  9130 10025 D CCodecBuffers: [c2.android.flac.decoder#413:1D-Output.Impl[N]] converted 0 buffers to array mode of 4
+10-06 14:13:00.708  9130 10025 D CCodecBufferChannel: [c2.android.flac.decoder#413] start: updating output delay 0
+10-06 14:13:00.709  9130 10025 I MediaCodec: [mId: 5] [audio-debug-dec] setState: STARTED
+10-06 14:13:00.709  9130 10025 W layerforandroid: AIBinder_linkToDeath is being called with a non-null cookie and no onUnlink callback set. Use AIBinder_DeathRecipient_setOnUnlinked to manage the lifetime of the cookie. This will become an abort.
+10-06 14:13:00.712  9130 10017 W LoudnessCodecController: MediaCodec mime type not supported for loudness annotation
+10-06 14:13:00.713  9130 10017 I MediaCodec: [mId: 5] [audio-debug-dec] queueInputBuffer: index: 1 pts: 1000000000000 timediff: 0
+10-06 14:13:00.714  9130 10017 I MediaCodec: [mId: 5] [audio-debug-dec] queueInputBuffer: index: 2 pts: 1000000023219 timediff: 1
+10-06 14:13:00.714  9130 10017 I MediaCodec: [mId: 5] [audio-debug-dec] queueInputBuffer: index: 3 pts: 1000000046439 timediff: 0
+10-06 14:13:00.714  9130  9172 W layerforandroid: AIBinder_linkToDeath is being called with a non-null cookie and no onUnlink callback set. Use AIBinder_DeathRecipient_setOnUnlinked to manage the lifetime of the cookie. This will become an abort.
+10-06 14:13:00.715  9130 10025 D PipelineWatcher: [0xb40000759a419e20] pipelineFull: too many frames in pipeline (4)
+10-06 14:13:00.715  9130 10025 D CCodecBuffers: [c2.android.flac.decoder#413:Output[N]] Converter created from 2 to 21
+10-06 14:13:00.719  9130 10017 D AudioTrack: getMinFrameCount(): getMinFrameCount = 3536: afFrameCount = 1920, afSampleRate = 48000, afLatency = 480
+10-06 14:13:00.720  9130 10017 I AudioTrackImpl: initAudioTrackImpl()
+10-06 14:13:00.720  9130 10017 D AudioTrack: set(): (sessionId=0), mcallback is 1, streamType -1, sampleRate 44100, format 0x6, channelMask 0x3, frameCount 7072, flags 0, notificationFrames 0,transferType 3, mClientAttributionSource AttributionSourceState{pid: 9130, uid: 10159, deviceId: 0, packageName: yy.daniel.yyplayerforandroid, attributionTag: (null), token: binder:0xb40000756a42ba10, renouncedPermissions: [], next: []}
+10-06 14:13:00.723  9130  9162 I layerforandroid: This is non sticky GC, maxfree is 33554432 minfree is 8388608
+10-06 14:13:00.724  9130 10017 D AudioTrack: audio_time_msg enable=1 mStreamType=3 usage=1 content_type=2
+10-06 14:13:00.725  9130 10017 D android.media.AudioTrack: setStereoVolume setParameters is 1.0, rightVolume is 1.0, isMuted is false, mIsLastMute is false, mNeedNotifyedNative is true
+10-06 14:13:00.725  9130 10017 D AudioTrackImpl: setMediaSetMute(8186): Parameter media_set_track_muted is 0 return
+10-06 14:13:00.725  9130 10017 I AudioTrackImpl: before scaleVolumeForVideo L:1.000000 R:1.000000 and the pakage is yy.daniel.yyplayerforandroid
+10-06 14:13:00.725  9130 10017 D AudioTrack: AudioTrack::setVolume L:1.000000 R:1.000000 sessionid=81073
+10-06 14:13:00.725  9130 10017 I YYPlayerAudio: YYPLAYER_MEDIA3_SINK open=s24_3/44100Hz/ch=2 widened=false mixerRequested=false mixerApplied=false source=s24_3
+10-06 14:13:00.727  9130  9130 I MediaController: Init 641d48d [AndroidXMedia3/1.11.1] [popsicle, 2509FPN0BC, Xiaomi, 37]
+10-06 14:13:00.731  9130 10017 I AudioTrack: start(8186): prior state:STATE_STOPPED packageName: yy.daniel.yyplayerforandroid

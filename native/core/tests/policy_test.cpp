@@ -58,6 +58,17 @@ void yy::test::RunPolicyTests(Context& context) {
     context.Begin("policy");
 
     const PcmFormat source48 = SourceFormat(48000, 2, SampleEncoding::kS24In32);
+    YY_CASE(context, "prefer preserves DSP but revokes pristine and bit-perfect expectations");
+    {
+        const MixerProfile profile = Profile(48000, 2, SampleEncoding::kS24In32, true);
+        auto processed = NoProcessing();
+        processed.software_volume = true;
+        const auto decision = Evaluate(UsbBitPerfectRoute(&profile, 1), source48,
+            SharingRequest::kShared, TransparencyRequest::kPreferUnprocessed, processed);
+        YY_EXPECT(context, decision.accepted);
+        YY_EXPECT(context, !decision.plan.request_bit_perfect);
+        YY_EXPECT(context, !decision.plan.pristine_expected);
+    }
 
     YY_CASE(context, "no route selected is a refusal, not a fallback");
     {

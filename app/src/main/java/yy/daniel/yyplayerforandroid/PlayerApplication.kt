@@ -31,6 +31,8 @@ internal data class PlayerPreferences(
     val audioSharing: yy.daniel.yyplayerforandroid.audio.SharingRequest = yy.daniel.yyplayerforandroid.audio.SharingRequest.SHARED,
     val audioTransparency: yy.daniel.yyplayerforandroid.audio.TransparencyRequest =
         yy.daniel.yyplayerforandroid.audio.TransparencyRequest.PREFER_UNPROCESSED,
+    val audioOutputPath: yy.daniel.yyplayerforandroid.audio.OutputPath =
+        yy.daniel.yyplayerforandroid.audio.OutputPath.SYSTEM,
 )
 
 @androidx.annotation.OptIn(markerClass = [androidx.media3.common.util.UnstableApi::class])
@@ -58,6 +60,9 @@ internal class PlayerRuntime(context: Context) {
         audioTransparency = yy.daniel.yyplayerforandroid.audio.TransparencyRequest.entries
             .firstOrNull { it.name == storage.getString("audio_transparency", null) }
             ?: yy.daniel.yyplayerforandroid.audio.TransparencyRequest.PREFER_UNPROCESSED,
+        audioOutputPath = yy.daniel.yyplayerforandroid.audio.OutputPath.fromWire(
+            storage.getString("audio_output_path", null),
+        ),
     ))
     val preferences = _preferences.asStateFlow()
     val library = MediaLibraryRepository(context.applicationContext)
@@ -69,7 +74,7 @@ internal class PlayerRuntime(context: Context) {
      * engine so the device callback is only registered while a screen is alive.
      */
     val audioOutput: yy.daniel.yyplayerforandroid.audio.AudioOutputController by lazy {
-        yy.daniel.yyplayerforandroid.audio.AudioOutputController(appContext).also {
+        yy.daniel.yyplayerforandroid.audio.AudioOutputController(appContext) { engine?.stopForOutputLoss() }.also {
             val preferences = _preferences.value
             it.setPolicy(preferences.audioSharing, preferences.audioTransparency)
         }
@@ -77,13 +82,75 @@ internal class PlayerRuntime(context: Context) {
     val libraryRevision = MutableStateFlow(0L)
     init { scope.launch { online.load() } }
     private var engine: AndroidMedia3PlaybackBackend? = null
-    val playback: AndroidMedia3PlaybackBackend get() = engine ?: AndroidMedia3PlaybackBackend(appContext) { preferences.value.onlineMusic }.also { engine = it }
+
+    /**
+     * The one playback engine of this process. Created here and borrowed by [playback.PlayerSessionService]
+     * so the platform MediaSession and the in-app UI drive the same player: two engines would mean two
+     * output streams and two clocks.
+     */
+    fun ensureEngine(): AndroidMedia3PlaybackBackend = engine ?: AndroidMedia3PlaybackBackend(
+        appContext,
+        { preferences.value.onlineMusic },
+        { preferences.value.audioOutputPath },
+        { audioOutput.state.value.selectedDeviceId },
+        { negotiated ->
+            // The native path reports what it really opened; the audio output screen shows it as evidence.
+            audioOutput.publishNegotiatedOutput(negotiated)
+        },
+        { preferences.value.audioSharing },
+        { preferences.value.audioTransparency },
+    ).also { engine = it }
+
+    val playback: AndroidMedia3PlaybackBackend get() = ensureEngine()
+
+    /** Set while the media session service is alive, so the output path can be applied to it. */
+    private var session: yy.daniel.yyplayerforandroid.playback.PlayerSessionService? = null
+
+    internal fun attachSession(session: yy.daniel.yyplayerforandroid.playback.PlayerSessionService) {
+        this.session = session
+        acquire() // The service keeps the single engine alive after the last Activity is destroyed.
+        ensureTicker()
+    }
+
+    internal fun detachSession(session: yy.daniel.yyplayerforandroid.playback.PlayerSessionService) {
+        if (this.session === session) {
+            this.session = null
+            release(false)
+            if (started == 0) ticker?.cancel()
+        }
+    }
+
+    /**
+     * Starts the media session service, which is what publishes the session to the system. Called when
+     * playback is about to begin, because a session that nothing is playing into should not hold a
+     * foreground service.
+     */
+    internal fun ensureSessionService() {
+        runCatching {
+            appContext.startService(
+                android.content.Intent(appContext, yy.daniel.yyplayerforandroid.playback.PlayerSessionService::class.java),
+            )
+        }
+    }
     private var owners = 0
     private var started = 0
     private var cleanup: Job? = null
     private var ticker: Job? = null
     private var pause: Job? = null
     private var onlineLyricJob: Job? = null
+    private var onlineArtworkJob: Job? = null
+    fun fetchOnlineArtwork(song: OnlineSong, media: LocalMedia) {
+        onlineArtworkJob?.cancel()
+        val generation = playback.state.value.mediaGeneration
+        onlineArtworkJob = scope.launch {
+            try {
+                if (online.artwork(song) != null && engine?.state?.value?.let {
+                        it.mediaGeneration == generation && it.current?.identity == media.identity
+                    } == true) invalidateMediaArtwork()
+            } catch (e: CancellationException) { throw e }
+            catch (_: Exception) { /* Artwork failure must not delay or stop the music. */ }
+        }
+    }
     fun fetchOnlineLyrics(song: OnlineSong, media: LocalMedia) {
         onlineLyricJob?.cancel()
         onlineLyricJob = scope.launch { online.automaticLyrics(song, media, lyrics) }
@@ -96,22 +163,30 @@ internal class PlayerRuntime(context: Context) {
             delay(700) // Allow a normal Activity hand-off to acquire the same engine.
             if (owners == 0) {
                 audioOutput.stop()
-                ticker?.cancel(); onlineLyricJob?.cancel(); engine?.close(); engine = null
+                ticker?.cancel(); onlineLyricJob?.cancel(); onlineArtworkJob?.cancel(); engine?.close(); engine = null
             }
         }
     }
     fun start() {
         pause?.cancel()
-        if (started++ == 0) ticker = scope.launch {
+        ensureSessionService()
+        started++
+        ensureTicker()
+    }
+    private fun ensureTicker() {
+        if (ticker?.isActive == true) return
+        ticker = scope.launch {
             while (isActive) { engine?.refreshPosition(); delay(300) }
         }
     }
     fun stop() {
         if (--started == 0) {
-            ticker?.cancel()
+            if (session == null) ticker?.cancel()
             pause = scope.launch {
                 delay(500) // Internal Activity hand-off must not pause the music.
-                if (started == 0) engine?.let { if (it.state.value.isPlaying) it.togglePlayPause() }
+                if (started == 0) engine?.let {
+                    if (it.state.value.isPlaying && (session == null || it.state.value.isVideo)) it.togglePlayPause()
+                }
             }
         }
     }
@@ -119,7 +194,7 @@ internal class PlayerRuntime(context: Context) {
     fun setAccent(value: AccentChoice) { _preferences.value = _preferences.value.copy(accent = value); storage.edit { putString("accent", value.name) } }
     fun setReduceMotion(value: Boolean) { _preferences.value = _preferences.value.copy(reduceMotion = value); storage.edit { putBoolean("reduce_motion", value) } }
     fun setOrientation(value: OrientationChoice) { _preferences.value = _preferences.value.copy(orientation = value); storage.edit { putString("orientation", value.name) } }
-    fun setOnlineMusic(value: Boolean) { _preferences.value = _preferences.value.copy(onlineMusic = value); storage.edit { putBoolean("online_music", value) }; if (!value) engine?.stopOnline() }
+    fun setOnlineMusic(value: Boolean) { _preferences.value = _preferences.value.copy(onlineMusic = value); storage.edit { putBoolean("online_music", value) }; if (!value) { onlineArtworkJob?.cancel(); engine?.stopOnline() } }
     fun setOnlineLyrics(value: Boolean) { _preferences.value = _preferences.value.copy(onlineLyrics = value); storage.edit { putBoolean("online_lyrics", value) }; if (!value) onlineLyricJob?.cancel() }
     fun toggleFavorite(key: String) { setFavorites(_preferences.value.favorites.let { if (key in it) it - key else it + key }) }
     fun setLyricStyle(value: yy.daniel.yyplayerforandroid.ui.LyricStyle) {
@@ -131,14 +206,43 @@ internal class PlayerRuntime(context: Context) {
     private fun setFavorites(value: Set<String>) { _preferences.value = _preferences.value.copy(favorites = value); storage.edit { putStringSet("favorites", value) } }
 
     fun setAudioSharing(value: yy.daniel.yyplayerforandroid.audio.SharingRequest) {
+        if (audioOutput.state.value.selfTestRunning) return
         _preferences.value = _preferences.value.copy(audioSharing = value)
         storage.edit { putString("audio_sharing", value.name) }
         audioOutput.setPolicy(value, _preferences.value.audioTransparency)
+        if (preferences.value.audioOutputPath == yy.daniel.yyplayerforandroid.audio.OutputPath.NATIVE_EXACT) engine?.reconfigureOutput()
     }
     fun setAudioTransparency(value: yy.daniel.yyplayerforandroid.audio.TransparencyRequest) {
+        if (audioOutput.state.value.selfTestRunning) return
         _preferences.value = _preferences.value.copy(audioTransparency = value)
         storage.edit { putString("audio_transparency", value.name) }
         audioOutput.setPolicy(_preferences.value.audioSharing, value)
+        if (preferences.value.audioOutputPath == yy.daniel.yyplayerforandroid.audio.OutputPath.NATIVE_EXACT) engine?.reconfigureOutput()
     }
-    fun selectAudioOutputDevice(deviceId: Int?) = audioOutput.selectDevice(deviceId)
+
+    /**
+     * Switches the playback output path. The two paths each own the platform stream, so the running
+     * player is rebuilt at its current position rather than having a second sink attached. The session
+     * service applies it too, so a session started later is built with the current setting.
+     */
+    fun setAudioOutputPath(value: yy.daniel.yyplayerforandroid.audio.OutputPath) {
+        if (audioOutput.state.value.selfTestRunning) return
+        audioOutput.clearPlaybackEvidence()
+        _preferences.value = _preferences.value.copy(audioOutputPath = value)
+        storage.edit { putString("audio_output_path", value.wire) }
+        session?.applyOutputPath(value) ?: engine?.setOutputPath(value)
+    }
+    fun selectAudioOutputDevice(deviceId: Int?) {
+        if (audioOutput.state.value.selfTestRunning) return
+        audioOutput.selectDevice(deviceId)
+        engine?.reconfigureOutput()
+    }
+
+    /** Explicit user action: play the reference signal out of the native ring and report the facts. */
+    fun runAudioOutputSelfTest() {
+        if (audioOutput.state.value.selfTestRunning) return
+        val retainedVolume = engine?.exoPlayer()?.volume ?: 1f
+        engine?.setOutputTestActive(true)
+        audioOutput.runOutputSelfTest(retainedVolume) { engine?.setOutputTestActive(false) }
+    }
 }

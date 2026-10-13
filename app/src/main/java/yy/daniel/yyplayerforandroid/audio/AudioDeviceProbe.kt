@@ -13,6 +13,16 @@ internal object AudioDeviceProbe {
         return devices.mapNotNull { describe(manager, it) }
     }
 
+    /** A planning hint, never evidence of the route of an opened track. */
+    fun anticipatedDeviceId(manager: android.media.AudioManager, attributes: android.media.AudioAttributes): Int? =
+        if (android.os.Build.VERSION.SDK_INT >= 33) Api33Route.deviceId(manager, attributes) else null
+
+    @androidx.annotation.RequiresApi(33)
+    private object Api33Route {
+        fun deviceId(manager: android.media.AudioManager, attributes: android.media.AudioAttributes): Int? =
+            runCatching { manager.getAudioDevicesForAttributes(attributes).singleOrNull()?.id }.getOrNull()
+    }
+
     private fun describe(
         manager: android.media.AudioManager,
         device: android.media.AudioDeviceInfo,
@@ -30,7 +40,7 @@ internal object AudioDeviceProbe {
             type = device.type,
             typeLabel = typeLabel(device.type),
             productName = device.productName?.toString()?.takeIf { it.isNotBlank() } ?: typeLabel(device.type),
-            address = runCatching { device.address }.getOrDefault(""),
+            address = if (android.os.Build.VERSION.SDK_INT >= 28) runCatching { device.address }.getOrDefault("") else "",
             isUsb = isUsb,
             sampleRates = runCatching { device.sampleRates.toList() }.getOrDefault(emptyList()),
             channelCounts = runCatching { device.channelCounts.toList() }.getOrDefault(emptyList()),
@@ -86,17 +96,41 @@ internal object AudioDeviceProbe {
 
     fun audioFormatEncodingOf(encoding: SampleEncoding): Int = when (encoding) {
         SampleEncoding.S16 -> android.media.AudioFormat.ENCODING_PCM_16BIT
-        SampleEncoding.S24_3 -> android.media.AudioFormat.ENCODING_PCM_24BIT_PACKED
-        SampleEncoding.S32 -> android.media.AudioFormat.ENCODING_PCM_32BIT
+        SampleEncoding.S24_3 -> if (android.os.Build.VERSION.SDK_INT >= 31)
+            android.media.AudioFormat.ENCODING_PCM_24BIT_PACKED else android.media.AudioFormat.ENCODING_INVALID
+        SampleEncoding.S32 -> if (android.os.Build.VERSION.SDK_INT >= 31)
+            android.media.AudioFormat.ENCODING_PCM_32BIT else android.media.AudioFormat.ENCODING_INVALID
         SampleEncoding.F32 -> android.media.AudioFormat.ENCODING_PCM_FLOAT
         else -> android.media.AudioFormat.ENCODING_INVALID
     }
+
+    /**
+     * The positional channel mask for a plain interleaved channel count. `ENCODING_PCM_24BIT_PACKED`
+     * and the other integer encodings are only valid with a positional mask, and the platform's
+     * preset masks cover at most the layouts this core produces.
+     */
+    fun audioChannelMask(channels: Int): Int = when (channels) {
+        1 -> android.media.AudioFormat.CHANNEL_OUT_MONO
+        2 -> android.media.AudioFormat.CHANNEL_OUT_STEREO
+        3 -> android.media.AudioFormat.CHANNEL_OUT_STEREO or android.media.AudioFormat.CHANNEL_OUT_FRONT_CENTER
+        4 -> android.media.AudioFormat.CHANNEL_OUT_QUAD
+        6 -> android.media.AudioFormat.CHANNEL_OUT_5POINT1
+        8 -> android.media.AudioFormat.CHANNEL_OUT_7POINT1_SURROUND
+        else -> 0
+    }
+
+    /** True for the device types the platform treats as a USB audio output. */
+    fun isUsbOutput(device: android.media.AudioDeviceInfo): Boolean =
+        device.type == android.media.AudioDeviceInfo.TYPE_USB_DEVICE ||
+            device.type == android.media.AudioDeviceInfo.TYPE_USB_HEADSET ||
+            device.type == android.media.AudioDeviceInfo.TYPE_USB_ACCESSORY
 
     /**
      * Preferred mixer attributes exist only on API 34+. Keeping every reference in this nested
      * object means API 26-33 never loads the class, which is the same isolation rule the blur
      * facade uses (see ADR 0002).
      */
+    @androidx.annotation.RequiresApi(34)
     private object Api34Mixer {
         fun profiles(
             manager: android.media.AudioManager,

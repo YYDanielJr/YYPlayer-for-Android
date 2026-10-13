@@ -1,0 +1,7 @@
+
+yy.daniel.yyplayerforandroid.AudioOutputDeviceTest:.......
+yy.daniel.yyplayerforandroid.AudioOutputSinkDeviceTest:...........
+
+Time: 37.3
+
+OK (18 tests)

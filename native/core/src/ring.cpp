@@ -10,7 +10,7 @@ namespace {
 constexpr std::uint64_t kMaxRingBytes = 64ull * 1024ull * 1024ull;
 
 std::uint64_t ClampCapacity(const PcmFormat& format, std::uint64_t capacity_frames) {
-    const std::uint64_t frame_bytes = format.IsValid() ? [&format] {
+    const std::uint64_t frame_bytes = IsPlausibleFormat(format) ? [&format] {
         const std::uint32_t sample_bytes = BytesPerSample(format.encoding);
         if (sample_bytes == kBytesPerSampleUnknown) return std::uint64_t{0};
         return static_cast<std::uint64_t>(sample_bytes) * static_cast<std::uint64_t>(format.channel_count);

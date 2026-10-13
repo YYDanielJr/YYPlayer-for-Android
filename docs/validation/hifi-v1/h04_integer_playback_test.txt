@@ -1,0 +1,6 @@
+
+yy.daniel.yyplayerforandroid.NativeOutputPlaybackTest:.
+
+Time: 16.16
+
+OK (1 test)

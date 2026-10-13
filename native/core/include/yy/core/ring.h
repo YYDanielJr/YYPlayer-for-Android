@@ -47,8 +47,9 @@ class PcmRing {
     // underrun. `frames` is capped by the destination capacity the caller passes as `max_frames`.
     std::uint64_t Read(std::uint8_t* dst, std::uint64_t max_frames) noexcept;
 
-    // Discards every buffered frame. Used on seek, format change and route loss. Safe to call from
-    // the writer thread only; a reader that is already inside Read() sees a consistent tail.
+    // Discards buffered frames. Both producer and consumer must be quiescent, or an outer normal
+    // worker lock must serialize Clear with Read/Write (as the JNI adapter does). Writer-only access
+    // while a reader is copying would let fresh writes overwrite that reader's unread samples.
     void Clear() noexcept;
 
     RingStats Stats() const noexcept;

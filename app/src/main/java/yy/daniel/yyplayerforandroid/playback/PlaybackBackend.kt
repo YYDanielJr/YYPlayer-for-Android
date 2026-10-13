@@ -2,6 +2,8 @@ package yy.daniel.yyplayerforandroid.playback
 
 import android.net.Uri
 import kotlinx.coroutines.flow.StateFlow
+import yy.daniel.yyplayerforandroid.audio.NativeOutputAudioSink
+import yy.daniel.yyplayerforandroid.audio.OutputPath
 
 enum class MediaKind { AUDIO, VIDEO }
 
@@ -49,6 +51,13 @@ data class PlaybackSnapshot(
     val audioDecoderName: String? = null,
     val audioSampleRate: Int? = null,
     val audioChannels: Int? = null,
+    /** Which output path the engine was built with; a switch rebuilds the player. */
+    val outputPath: OutputPath = OutputPath.SYSTEM,
+    /**
+     * What the native output negotiated for the current stream, or null on the system path. This is
+     * evidence about the opened output, not a request.
+     */
+    val negotiatedOutput: NativeOutputAudioSink.Negotiated? = null,
     val videoWidth: Int = 0,
     val videoHeight: Int = 0,
     val videoPixelRatio: Float = 1f,

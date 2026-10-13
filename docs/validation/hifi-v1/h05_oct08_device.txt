@@ -1,0 +1,5 @@
+serial=192.168.1.246:33103
+ro.product.model=2509FPN0BC
+ro.build.version.sdk=37
+ro.build.version.release=17
+ro.build.version.incremental=OS4.0.0.44.XPBCNXM

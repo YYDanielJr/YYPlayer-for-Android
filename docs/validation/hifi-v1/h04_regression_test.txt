@@ -1,0 +1,9 @@
+
+yy.daniel.yyplayerforandroid.NativeOutputPlaybackTest:...
+yy.daniel.yyplayerforandroid.PlayerSessionServiceDeviceTest:.
+yy.daniel.yyplayerforandroid.AudioOutputDeviceTest:.......
+yy.daniel.yyplayerforandroid.AudioOutputSinkDeviceTest:...........
+
+Time: 78.68
+
+OK (22 tests)

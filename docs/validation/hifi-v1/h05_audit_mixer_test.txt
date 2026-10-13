@@ -1,0 +1,6 @@
+
+yy.daniel.yyplayerforandroid.OutputAuditDeviceTest:.....
+
+Time: 4.93
+
+OK (5 tests)

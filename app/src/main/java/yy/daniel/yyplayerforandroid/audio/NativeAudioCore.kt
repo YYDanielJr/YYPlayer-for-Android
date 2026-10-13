@@ -17,7 +17,7 @@ import yy.daniel.yyplayerforandroid.audio.json.JsonValue
  */
 object NativeAudioCore {
     /** Bumped whenever the JNI contract changes; Kotlin refuses to run on a version mismatch. */
-    const val EXPECTED_VERSION = 1
+    const val EXPECTED_VERSION = 2
 
     /**
      * The native methods live in a nested object so the pure translation above stays usable from
@@ -44,6 +44,7 @@ object NativeAudioCore {
         external fun ringClear(handle: Long): Boolean
         external fun ringStats(handle: Long): LongArray?
         external fun releaseRing(handle: Long): Boolean
+        external fun nativeIsPristineConversion(fromWire: String, toWire: String): Boolean
         external fun convertPcm(
             fromWire: String,
             toWire: String,
@@ -70,20 +71,30 @@ object NativeAudioCore {
         channelMask: Int,
         capacityFrames: Long,
     ): Long = runCatching {
-        Bridge.createRing(sampleRate, channels, encoding.wire, channelMask, capacityFrames)
+        require(channels in 1..32 && (channelMask == 0 || Integer.bitCount(channelMask) == channels))
+        Bridge.createRing(sampleRate, channels, encoding.wire,
+            if (channelMask == 0 || channels == 32) 0 else (1 shl channels) - 1, capacityFrames)
     }.getOrDefault(0L)
 
     fun ringWrite(handle: Long, buffer: java.nio.ByteBuffer, frames: Int): Int =
-        runCatching { Bridge.ringWrite(handle, buffer, frames) }.getOrDefault(0)
+        runCatching { require(buffer.isDirect && frames >= 0); Bridge.ringWrite(handle, buffer.slice(), frames) }.getOrDefault(0)
 
     fun ringRead(handle: Long, buffer: java.nio.ByteBuffer, maxFrames: Int): Int =
-        runCatching { Bridge.ringRead(handle, buffer, maxFrames) }.getOrDefault(0)
+        runCatching { require(buffer.isDirect && !buffer.isReadOnly && maxFrames >= 0); Bridge.ringRead(handle, buffer.slice(), maxFrames) }.getOrDefault(0)
 
     fun ringClear(handle: Long): Boolean = runCatching { Bridge.ringClear(handle) }.getOrDefault(false)
 
     fun ringStats(handle: Long): LongArray? = runCatching { Bridge.ringStats(handle) }.getOrNull()
 
     fun releaseRing(handle: Long): Boolean = runCatching { Bridge.releaseRing(handle) }.getOrDefault(false)
+
+    /**
+     * True when the core can move samples from [from] into [to] without dropping a significant bit or
+     * going through floating point. Callers must refuse the conversion when this is false rather than
+     * converting and presenting the result as original samples.
+     */
+    fun isPristineConversion(from: SampleEncoding, to: SampleEncoding): Boolean =
+        runCatching { Bridge.nativeIsPristineConversion(from.wire, to.wire) }.getOrDefault(false)
 
     fun convertPcm(
         from: SampleEncoding,
@@ -94,7 +105,9 @@ object NativeAudioCore {
         dstBytes: Int,
         channels: Int,
     ): Int = runCatching {
-        Bridge.convertPcm(from.wire, to.wire, src, srcBytes, dst, dstBytes, channels)
+        require(src.isDirect && dst.isDirect && !dst.isReadOnly)
+        require(srcBytes in 0..src.remaining() && dstBytes in 0..dst.remaining())
+        Bridge.convertPcm(from.wire, to.wire, src.slice(), srcBytes, dst.slice(), dstBytes, channels)
     }.getOrDefault(-1)
 
     /**
@@ -167,7 +180,11 @@ object NativeAudioCore {
             if (index > 0) append(',')
             append("{\"encoding\":\"").append(profile.encoding.wire).append("\",")
             append("\"sampleRate\":").append(profile.sampleRate).append(',')
-            append("\"channelMask\":").append(profile.channelMask).append(',')
+            // The portable core uses contiguous channel bits; Android positional masks stay in the
+            // platform adapter. Comparing stereo 0b11 to Android CHANNEL_OUT_STEREO (0b1100) refuses
+            // every otherwise matching mixer profile.
+            val count = Integer.bitCount(profile.channelMask)
+            append("\"channelMask\":").append(if (count in 1..31) (1 shl count) - 1 else 0).append(',')
             append("\"bitPerfect\":").append(profile.bitPerfect).append(',')
             append("\"mixesWithOthers\":").append(profile.mixesWithOthers)
             append('}')

@@ -224,7 +224,8 @@ Decision Evaluate(const RouteCapability& route,
     decision.plan.request_bit_perfect = profile.bit_perfect && exact_format &&
                                         transparency != TransparencyRequest::kCompatible &&
                                         !processing.Any();
-    decision.plan.pristine_expected = exact_format && transparency != TransparencyRequest::kCompatible;
+    decision.plan.pristine_expected = exact_format && transparency != TransparencyRequest::kCompatible &&
+                                      !processing.Any();
     decision.plan.same_route_fallback_used = !exact_format;
 
     if (decision.plan.request_bit_perfect) {

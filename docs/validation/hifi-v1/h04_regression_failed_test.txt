@@ -1,0 +1,36 @@
+
+yy.daniel.yyplayerforandroid.NativeOutputPlaybackTest:...
+yy.daniel.yyplayerforandroid.PlayerSessionServiceDeviceTest:
+Error in sessionFollowsOutputSwitchAndKeepsMusicAliveWithoutAnActivity(yy.daniel.yyplayerforandroid.PlayerSessionServiceDeviceTest):
+java.lang.IllegalStateException: Player is accessed on the wrong thread.
+Current thread: 'Instr: androidx.test.runner.AndroidJUnitRunner'
+Expected thread: 'main'
+See https://developer.android.com/guide/topics/media/issues/player-accessed-on-wrong-thread
+	at androidx.media3.exoplayer.ExoPlayerImpl.verifyApplicationThread(ExoPlayerImpl.java:3150)
+	at androidx.media3.exoplayer.ExoPlayerImpl.setPlaybackParameters(ExoPlayerImpl.java:1023)
+	at yy.daniel.yyplayerforandroid.playback.AndroidMedia3PlaybackBackend.newPlayer(AndroidMedia3PlaybackBackend.kt:242)
+	at yy.daniel.yyplayerforandroid.playback.AndroidMedia3PlaybackBackend.<init>(AndroidMedia3PlaybackBackend.kt:49)
+	at yy.daniel.yyplayerforandroid.PlayerRuntime.ensureEngine(PlayerApplication.kt:91)
+	at yy.daniel.yyplayerforandroid.PlayerRuntime.getPlayback(PlayerApplication.kt:104)
+	at yy.daniel.yyplayerforandroid.PlayerSessionServiceDeviceTest.sessionFollowsOutputSwitchAndKeepsMusicAliveWithoutAnActivity(PlayerSessionServiceDeviceTest.kt:46)
+
+yy.daniel.yyplayerforandroid.AudioOutputDeviceTest:.......
+yy.daniel.yyplayerforandroid.AudioOutputSinkDeviceTest:...........
+
+Time: 69.543
+There was 1 failure:
+1) sessionFollowsOutputSwitchAndKeepsMusicAliveWithoutAnActivity(yy.daniel.yyplayerforandroid.PlayerSessionServiceDeviceTest)
+java.lang.IllegalStateException: Player is accessed on the wrong thread.
+Current thread: 'Instr: androidx.test.runner.AndroidJUnitRunner'
+Expected thread: 'main'
+See https://developer.android.com/guide/topics/media/issues/player-accessed-on-wrong-thread
+	at androidx.media3.exoplayer.ExoPlayerImpl.verifyApplicationThread(ExoPlayerImpl.java:3150)
+	at androidx.media3.exoplayer.ExoPlayerImpl.setPlaybackParameters(ExoPlayerImpl.java:1023)
+	at yy.daniel.yyplayerforandroid.playback.AndroidMedia3PlaybackBackend.newPlayer(AndroidMedia3PlaybackBackend.kt:242)
+	at yy.daniel.yyplayerforandroid.playback.AndroidMedia3PlaybackBackend.<init>(AndroidMedia3PlaybackBackend.kt:49)
+	at yy.daniel.yyplayerforandroid.PlayerRuntime.ensureEngine(PlayerApplication.kt:91)
+	at yy.daniel.yyplayerforandroid.PlayerRuntime.getPlayback(PlayerApplication.kt:104)
+	at yy.daniel.yyplayerforandroid.PlayerSessionServiceDeviceTest.sessionFollowsOutputSwitchAndKeepsMusicAliveWithoutAnActivity(PlayerSessionServiceDeviceTest.kt:46)
+
+FAILURES!!!
+Tests run: 22,  Failures: 1

@@ -175,7 +175,7 @@ data class AudioOutputChannel(
 }
 
 /** What the app currently reports about its output path. Everything here is evidence, not intent. */
-data class AudioOutputState(
+internal data class AudioOutputState(
     val channels: List<AudioOutputChannel> = emptyList(),
     val selectedDeviceId: Int? = null,
     val followDefault: Boolean = true,
@@ -187,6 +187,15 @@ data class AudioOutputState(
     val routedDeviceId: Int? = null,
     val mixerAttributesActive: Boolean = false,
     val underrunFrames: Long = 0,
+    /** Result of the last explicit output self-test; null until one has been run in this session. */
+    val selfTest: OutputSelfTestResult? = null,
+    val selfTestRunning: Boolean = false,
+    /**
+     * What the playback output reported for the stream that is actually playing, or null when nothing
+     * has been opened. Published by the sink that owns the output, so it is evidence rather than a
+     * restatement of the setting.
+     */
+    val negotiatedOutput: NativeOutputAudioSink.Negotiated? = null,
     val message: String? = null,
     val lastUpdatedMs: Long = 0,
 ) {

@@ -1,5 +1,11 @@
 # U05：音乐库、封面与歌词详情
 
+## 2026-10-08 U10：歌词显示入口与间距修正
+
+歌曲详情右上“…”的“歌词与播放”菜单新增“歌词显示”，打开既有 LyricStyleActivity；返回保持歌曲和歌词分页，样式仍使用共享偏好 StateFlow。定时歌词移除额外上下7dp padding与48dp布局最小高度，纯文本歌词移除上下7dp padding；条目之间的间距统一由 lineSpacing 决定，与设置预览一致。定时歌词保留 clickable 的自动触控扩展与点句 seek，不用触控最小高度扩大排版间距；原字号、字重、颜色、行内1.35倍行高和强调动画保留。
+
+小米当前真实定时歌词在20sp非选中字号下，0dp／40dp相邻句位置差分别80／200px，增加120px对应density3的40dp；快捷入口／返回即时应用／点句seek已验，原0dp及25／20sp恢复。构建、30项现有JVM单测、lint通过。详见 [U10验收](validation/ui-lyrics-spacing/README.md)。
+
 2026-10-05。用户本轮授权重构音乐前端；视频、设置和方向页面保留 U02 的原生 Activity。音乐使用 MainActivity 内覆盖层，决定见 [ADR0004](adr/0004-inline-music-player.md)。本轮没有修改只读桌面工程，没有提交或发布。
 
 ## 已实现

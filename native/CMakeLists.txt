@@ -56,8 +56,9 @@ if(YY_BUILD_JNI)
     target_link_libraries(yyplayer_jni PRIVATE yy_core)
     # The bridge runs on the control and writer threads, never on a realtime callback, but it still
     # must not throw across the JNI boundary.
-    target_compile_options(yyplayer_jni PRIVATE -Wall -Wextra -fno-exceptions -fno-rtti)
     if(MSVC)
-        target_compile_options(yyplayer_jni PRIVATE /EHs-c-)
+        target_compile_options(yyplayer_jni PRIVATE /W4 /EHsc)
+    else()
+        target_compile_options(yyplayer_jni PRIVATE -Wall -Wextra -fexceptions -fno-rtti)
     endif()
 endif()
