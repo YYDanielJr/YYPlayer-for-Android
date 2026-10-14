@@ -1,5 +1,7 @@
 # Android 技术设计与选型
 
+2026-10-14 U21：实体机 libmpv 输入改为授权 `fd://` 租约；视频控制器精简，新增可配置单指手势与后台有限预览。Media3 视频短缓冲／低延迟模式、mpv AAudio 共享输出决定与限制见 [ADR0009](adr/0009-video-rate-response.md)，实测见 [U21](validation/video-u21/README.md)。音乐路径未变；本轮未提交，不能将下面早期计划覆盖当前工作区。
+
 2026-10-14 U20：工具内视频倍速统一 0.1×–8×／步进 0.1×，外侧快捷档位保留。Media3 与 libmpv 范围一致，移除 U19 的超过 8× 自动切换和仅硬解专用范围。用户授权提交到 dev；见 [ADR0008](adr/0008-video-speed-range.md) 和 [U20 验证](validation/video-u20/README.md)。
 
 2026-10-14 U16 更新：视频增加固定 libmpv-android AAR 的可选路径，使用独立 C++ worker／JNI／真实 SimpleBasePlayer 会话适配器；音乐仍走原有 Media3 与可选 native PCM sink。默认保持 Media3，最终供应链与物理资格仍未完成。具体决定见 [ADR0007](adr/0007-libmpv-video-adapter.md)，下文关于未引入 FFmpeg／libmpv 的早期纵切叙述属于历史基线。

@@ -7,6 +7,10 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import top.yukonga.miuix.kmp.basic.Switch
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -36,7 +40,7 @@ import top.yukonga.miuix.kmp.basic.DropdownItem
 import top.yukonga.miuix.kmp.basic.Text
 import yy.daniel.yyplayerforandroid.playback.*
 
-private enum class VideoPanel { TOOLS, SPEED, CUSTOM_SPEED, TRACKS, PICTURE, QUEUE, INFO, LOOP, SYNC, CHAPTERS }
+private enum class VideoPanel { TOOLS, SPEED, CUSTOM_SPEED, TRACKS, PICTURE, QUEUE, INFO, LOOP, SYNC, CHAPTERS, GESTURES }
 
 @Composable
 @androidx.annotation.OptIn(markerClass = [androidx.media3.common.util.UnstableApi::class])
@@ -47,6 +51,23 @@ internal fun VideoPlayerPage(backend: AndroidMedia3PlaybackBackend, snapshot: Pl
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val reduced = rememberMusicReduceMotion(reduceMotion)
+    var gestures by remember { mutableStateOf(VideoGestureSettings.load(context)) }
+    fun updateGestures(value: VideoGestureSettings) { gestures = value; value.save(context) }
+    var feedback by remember(current.uri) { mutableStateOf<VideoGestureFeedback?>(null) }
+    val preview = remember(current.uri) { VideoSeekPreview(context.applicationContext, current.uri) }
+    val previewFrame by preview.frame.collectAsState()
+    DisposableEffect(preview) { onDispose { preview.close() } }
+    val window = remember(context) {
+        var c = context
+        while (c is android.content.ContextWrapper && c !is android.app.Activity) c = c.baseContext
+        (c as? android.app.Activity)?.window
+    }
+    DisposableEffect(window) {
+        val original = window?.attributes?.screenBrightness
+        onDispose { if (original != null) window.attributes = window.attributes.apply { screenBrightness = original } }
+    }
+    fun brightness(): Float = window?.attributes?.screenBrightness?.takeIf { it >= 0f }
+        ?: (android.provider.Settings.System.getInt(context.contentResolver, android.provider.Settings.System.SCREEN_BRIGHTNESS, 128) / 255f)
     var panel by remember { mutableStateOf<VideoPanel?>(null) }
     val panelHistory = remember { mutableStateListOf<VideoPanel>() }
     fun openPanel(next: VideoPanel) {
@@ -111,8 +132,8 @@ internal fun VideoPlayerPage(backend: AndroidMedia3PlaybackBackend, snapshot: Pl
             finally { importing = false }
         }
     }
-    LaunchedEffect(visible, snapshot.isPlaying, panel, interaction, dragging, locked, surfaceActive) {
-        if (visible && snapshot.isPlaying && panel == null && !dragging && !locked && surfaceActive) {
+    LaunchedEffect(visible, snapshot.isPlaying, panel, interaction, dragging, locked, surfaceActive, feedback != null) {
+        if (visible && snapshot.isPlaying && panel == null && !dragging && feedback == null && !locked && surfaceActive) {
             delay(3500); visible = false
         }
     }
@@ -120,50 +141,76 @@ internal fun VideoPlayerPage(backend: AndroidMedia3PlaybackBackend, snapshot: Pl
     LaunchedEffect(snapshot.subtitleName) { snapshot.subtitleName?.let { message = "已载入 $it" } }
     LaunchedEffect(current.uri) { panel = null; boost = false }
     BackHandler(locked) { locked = false; visible = true; interaction++ }
-    val controls = !locked && panel == null && (visible || !snapshot.isPlaying || snapshot.error != null)
+    val controls = !locked && panel == null && (visible || snapshot.error != null)
     val extended = snapshot.videoEngine == VideoEngine.MPV
     LaunchedEffect(extended, subtitleSize, controls) {
-        if (extended) backend.setVideoSubtitleAppearance(subtitleSize, if (controls) .28f else .08f)
+        if (extended) backend.setVideoSubtitleAppearance(subtitleSize, if (controls) .18f else .08f)
     }
     Box(Modifier.fillMaxSize().background(Color.Black).testTag("video-player")
         .then(if (panel != null) Modifier.clearAndSetSemantics { } else Modifier)) {
         VideoSurface(Modifier.fillMaxSize().testTag("video-surface"), backend.exoPlayer(), backend, snapshot, reset,
             onTap = { visible = !visible; interaction++ }, onBoostChanged = { boost = it },
+            gestureSettings = gestures,
+            onDoubleTap = { backend.togglePlayPause(); interaction++ }, readBrightness = ::brightness,
+            onGestureFeedback = { value ->
+                feedback = value
+                preview.request(value?.takeIf { it.drag == VideoDrag.SEEK }?.positionMs)
+                when (value?.drag) {
+                    VideoDrag.BRIGHTNESS -> window?.let { it.attributes = it.attributes.apply { screenBrightness = value.fraction.coerceAtLeast(.01f) } }
+                    VideoDrag.VOLUME -> { backend.exoPlayer().volume = value.fraction }
+                    else -> Unit
+                }
+            },
             surfaceActive = surfaceActive, gesturesEnabled = inputActive && !locked && panel == null,
-            fit = fit, subtitleSize = subtitleSize, subtitleBottomPadding = if (controls) .28f else .08f,
+            fit = fit, subtitleSize = subtitleSize, subtitleBottomPadding = if (controls) .18f else .08f,
             onTransformChanged = { transformed = it }, onViewReady = { viewport = it })
         AnimatedVisibility(controls, enter = fadeIn(tween(if (reduced) 0 else 180)), exit = fadeOut(tween(if (reduced) 0 else 180))) {
             Box(Modifier.fillMaxSize()) {
                 Row(Modifier.align(Alignment.TopCenter).fillMaxWidth()
                     .background(Brush.verticalGradient(listOf(Color.Black.copy(alpha = .78f), Color.Transparent)))
-                    .safeDrawingPadding().padding(start = 8.dp, end = 12.dp, bottom = 28.dp), verticalAlignment = Alignment.CenterVertically) {
+                    .safeDrawingPadding().padding(start = 8.dp, end = 8.dp, bottom = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                     HyperIconButton(PlayerIcons.Back, "返回媒体库", onBack, tint = Color.White)
                     Text(displayTitle(current.title), Modifier.weight(1f).padding(horizontal = 8.dp), color = Color.White,
                         fontSize = 18.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     HyperIconButton(PlayerIcons.More, "播放工具", { openPanel(VideoPanel.TOOLS) }, tint = Color.White)
                 }
-                Column(Modifier.align(Alignment.BottomCenter).fillMaxWidth()
-                    .background(Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = .88f))))
-                    .navigationBarsPadding().displayCutoutPadding().padding(start = 24.dp, end = 24.dp, top = 30.dp, bottom = 10.dp)) {
+                Column(Modifier.align(Alignment.BottomCenter).fillMaxWidth().testTag("video-controls-bottom")
+                    .background(Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = .72f))))
+                    .navigationBarsPadding().displayCutoutPadding().padding(horizontal = 16.dp, vertical = 4.dp)) {
                     if (snapshot.error != null) PlaybackError(snapshot, backend)
-                    SeekControl(snapshot, backend, true, reduced) { dragging = it; interaction++ }
-                    Row(Modifier.fillMaxWidth().padding(top = 6.dp), verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    var seekValue by remember(current.uri) { mutableFloatStateOf(0f) }
+                    PlaybackSeekBar(snapshot, backend, Color.White, reduced,
+                        if (dragging) seekValue else snapshot.progress, dragging,
+                        onPreview = { seekValue = it; dragging = true
+                            val target = (it * snapshot.durationMs).toLong()
+                            feedback = VideoGestureFeedback(VideoDrag.SEEK, target); preview.request(target) },
+                        onEnd = { dragging = false; feedback = null; preview.request(null); interaction++ },
+                        onBegin = { dragging = true; seekValue = snapshot.progress; interaction++ })
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                         HyperIconButton(if (snapshot.isPlaying) PlayerIcons.Pause else PlayerIcons.Play,
                             if (snapshot.isPlaying) "暂停" else "播放", { backend.togglePlayPause(); interaction++ }, tint = Color.White)
-                        VideoChip("−10秒", { backend.seekBy(-10_000); interaction++ })
-                        VideoChip("+10秒", { backend.seekBy(10_000); interaction++ })
-                        Spacer(Modifier.weight(1f))
+                        Text("${formatTime(if (dragging) (seekValue * snapshot.durationMs).toLong() else snapshot.positionMs)} / ${formatTime(snapshot.durationMs)}",
+                            Modifier.weight(1f).padding(horizontal = 6.dp), color = Color.White.copy(alpha = .85f), fontSize = 12.sp, maxLines = 1)
+                        VideoChip(speedLabel(snapshot.speed), { openPanel(VideoPanel.SPEED) })
                         HyperIconButton(PlayerIcons.Rotate, "屏幕方向", onOrientation, tint = Color.White)
                     }
-                    FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                        VideoChip(speedLabel(snapshot.speed), { openPanel(VideoPanel.SPEED) })
-                        VideoChip("字幕 / 音轨", { openPanel(VideoPanel.TRACKS) })
-                        VideoChip("画面", { openPanel(VideoPanel.PICTURE) })
-                        VideoChip("队列", { openPanel(VideoPanel.QUEUE) })
-                        VideoChip("锁定", { locked = true; visible = false })
-                    }
                 }
+            }
+        }
+        feedback?.let { f ->
+            Column(Modifier.align(Alignment.Center).testTag("video-gesture-feedback")
+                .clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
+                .background(Color.Black.copy(alpha = .75f)).padding(12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                if (f.drag == VideoDrag.SEEK) {
+                    val frame = previewFrame?.takeIf { it.requestMs / 500 == f.positionMs / 500 }
+                    Box(Modifier.size(176.dp, 99.dp), contentAlignment = Alignment.Center) {
+                        if (frame?.bitmap != null) Image(frame.bitmap.asImageBitmap(), "拖动位置的视频预览",
+                            Modifier.fillMaxSize().testTag("video-seek-thumbnail"), contentScale = ContentScale.Fit)
+                        else Text(if (frame != null) "此视频暂无预览" else "正在生成预览…", color = Color.White.copy(alpha = .7f), fontSize = 12.sp)
+                    }
+                    Text("${formatTime(f.positionMs)} / ${formatTime(snapshot.durationMs)}", color = Color.White, fontSize = 16.sp)
+                } else Text("${if (f.drag == VideoDrag.BRIGHTNESS) "亮度" else "音量"} ${(f.fraction * 100).toInt()}%",
+                    color = Color.White, fontSize = 18.sp)
             }
         }
         // Kept outside the auto-hiding controls; reset stays available after any two-finger transform.
@@ -192,6 +239,11 @@ internal fun VideoPlayerPage(backend: AndroidMedia3PlaybackBackend, snapshot: Pl
                 selectedIndex = snapshot.videoEngine.ordinal, onSelectedIndexChange = { backend.setVideoEngine(VideoEngine.entries[it]) })
             HyperSettingRow("播放倍速", "0.1×–8× · 每次调节 0.1×", value = speedLabel(snapshot.speed),
                 onClick = { openPanel(VideoPanel.CUSTOM_SPEED) })
+            HyperSettingRow("快捷手势", "双击、滑动与长按", onClick = { openPanel(VideoPanel.GESTURES) })
+            HyperSettingRow("播放队列", onClick = { openPanel(VideoPanel.QUEUE) })
+            HyperSettingRow("锁定屏幕", onClick = { locked = true; visible = false; panel = null })
+            HyperSettingRow("后退 10 秒", onClick = { backend.seekBy(-10_000); panel = null })
+            HyperSettingRow("前进 10 秒", onClick = { backend.seekBy(10_000); panel = null })
             HyperSettingRow("字幕与音轨", onClick = { openPanel(VideoPanel.TRACKS) })
             if (extended) {
                 HyperSettingRow("章节", if (snapshot.chapters.isEmpty()) "当前文件没有章节" else "共 ${snapshot.chapters.size} 章", onClick = { openPanel(VideoPanel.CHAPTERS) })
@@ -214,6 +266,13 @@ internal fun VideoPlayerPage(backend: AndroidMedia3PlaybackBackend, snapshot: Pl
                 }
             })
             HyperSettingRow("媒体信息", onClick = { openPanel(VideoPanel.INFO) })
+        }
+        HyperDialog("快捷手势", { panel = null }, show = shownPanel == VideoPanel.GESTURES, buttonText = "完成") {
+            HyperSettingRow("双击暂停 / 播放", trailing = { Switch(gestures.doubleTap, { updateGestures(gestures.copy(doubleTap = it)) }) })
+            HyperSettingRow("左右滑动快进 / 快退", "显示目标时间和画面预览，松手跳转", trailing = { Switch(gestures.seek, { updateGestures(gestures.copy(seek = it)) }) })
+            HyperSettingRow("左侧上下滑动调节亮度", "仅影响当前播放窗口", trailing = { Switch(gestures.brightness, { updateGestures(gestures.copy(brightness = it)) }) })
+            HyperSettingRow("右侧上下滑动调节音量", "调节播放器音量，不改变系统音量", trailing = { Switch(gestures.volume, { updateGestures(gestures.copy(volume = it)) }) })
+            HyperSettingRow("长按 3× 快进", trailing = { Switch(gestures.boost, { updateGestures(gestures.copy(boost = it)) }) })
         }
         HyperDialog("画面", { panel = null }, show = shownPanel == VideoPanel.PICTURE, buttonText = "完成") {
             if (extended) HyperSpinnerPreference("平滑色阶", items = listOf(DropdownItem("关闭"), DropdownItem("开启")),

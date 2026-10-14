@@ -9,6 +9,9 @@ import androidx.media3.common.PlaybackException
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.audio.AudioSink
+import androidx.media3.exoplayer.audio.DefaultAudioSink
+import androidx.media3.exoplayer.audio.AudioTrackAudioOutputProvider
+import androidx.media3.exoplayer.audio.DefaultAudioTrackBufferSizeProvider
 import androidx.media3.exoplayer.audio.AudioRendererEventListener
 import androidx.media3.exoplayer.audio.MediaCodecAudioRenderer
 import androidx.media3.exoplayer.Renderer
@@ -24,8 +27,8 @@ import yy.daniel.yyplayerforandroid.audio.OutputPath
  * player. The caller therefore builds a new player when the setting changes, and treats that like any
  * other decode/route change (position and play intent are restored).
  *
- * With [OutputPath.SYSTEM] the factory returns the stock sink, which is exactly the previous
- * behaviour; nothing about that path is reimplemented here.
+ * [OutputPath.SYSTEM] retains Media3's sink and clock. Video configures a shorter PCM queue and
+ * requests low-latency AudioTrack output; music keeps the stock buffering policy.
  *
  * Float output is disabled on both paths. Media3 requests float PCM when the device advertises it,
  * which means an extra conversion stage in front of the sink; the app's rule is that samples reach the
@@ -42,6 +45,7 @@ class OutputPathRenderersFactory(
     private val onSinkCreated: ((NativeOutputAudioSink) -> Unit)? = null,
     private val sharingRequest: () -> yy.daniel.yyplayerforandroid.audio.SharingRequest = { yy.daniel.yyplayerforandroid.audio.SharingRequest.SHARED },
     private val transparencyRequest: () -> yy.daniel.yyplayerforandroid.audio.TransparencyRequest = { yy.daniel.yyplayerforandroid.audio.TransparencyRequest.PREFER_UNPROCESSED },
+    private val videoPlayback: Boolean = false,
 ) : DefaultRenderersFactory(appContext) {
     override fun buildAudioRenderers(
         context: Context,
@@ -95,9 +99,8 @@ class OutputPathRenderersFactory(
         // add a conversion stage in front of the sink, and the app's rule is that samples reach the output
         // in an integer container or not at all.
         setEnableAudioFloatOutput(false)
-        // A speed change must not be folded into the samples by the platform track; when the user asks
-        // for a different speed the player is rebuilt through the documented path instead.
-        setEnableAudioTrackPlaybackParams(false)
+        // Keep Media3's full 0.1–8x Sonic range: Android's platform rate can reject high speeds.
+        setEnableAudioOutputPlaybackParameters(false)
     }
 
     override fun buildAudioSink(
@@ -106,7 +109,20 @@ class OutputPathRenderersFactory(
         enableAudioTrackPlaybackParams: Boolean,
     ): AudioSink = when (outputPath()) {
         // The stock factory always produces a sink; a null here would mean Media3 changed its contract.
-        OutputPath.SYSTEM -> super.buildAudioSink(context, enableFloatOutput, enableAudioTrackPlaybackParams)
+        OutputPath.SYSTEM -> if (videoPlayback) DefaultAudioSink.Builder(context)
+            .setEnableFloatOutput(false)
+            .setEnableAudioOutputPlaybackParameters(false)
+            // The 500ms default PCM queue delays Sonic's speed transition. Keep a short video-only
+            // queue; the stock provider still enforces AudioTrack's actual minimum buffer size.
+            .setAudioOutputProvider(AudioTrackAudioOutputProvider.Builder(context)
+                .setMaxPlaybackSpeed(1f) // Sonic changes PCM tempo; the platform stream stays at 1x.
+                .setAudioTrackBuilderModifier { builder, _ ->
+                    builder.setPerformanceMode(android.media.AudioTrack.PERFORMANCE_MODE_LOW_LATENCY)
+                }
+                .setAudioTrackBufferSizeProvider(DefaultAudioTrackBufferSizeProvider.Builder()
+                    .setTargetPcmBufferDurationUs(40_000).build()).build())
+            .build()
+        else super.buildAudioSink(context, enableFloatOutput, enableAudioTrackPlaybackParams)
             ?: throw IllegalStateException("系统输出通道未提供 AudioSink")
         OutputPath.NATIVE_EXACT -> NativeOutputAudioSink(
             context = appContext,

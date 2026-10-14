@@ -31,7 +31,8 @@ import java.io.File
 
 @androidx.annotation.OptIn(markerClass = [androidx.media3.common.util.UnstableApi::class])
 class VideoPlayerUiTest {
-    @get:Rule val compose = createComposeRule()
+    private val compose = createComposeRule()
+    @get:Rule val rules: org.junit.rules.RuleChain = org.junit.rules.RuleChain.outerRule(QaForegroundRule()).around(compose)
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
     private val base = instrumentation.targetContext
     private val context = object : ContextWrapper(base) {
@@ -43,6 +44,7 @@ class VideoPlayerUiTest {
     private var shortLandscape by mutableStateOf(false)
     private var animatedSettings by mutableStateOf(false)
     @Before fun setup() {
+
         val file = File(context.cacheDir, "v15-ui.mp4")
         instrumentation.context.assets.open("v15-video.mp4").use { input -> file.outputStream().use(input::copyTo) }
         compose.runOnUiThread {
@@ -67,6 +69,10 @@ class VideoPlayerUiTest {
         compose.waitForIdle()
     }
     @After fun teardown() { compose.runOnUiThread { backend.close() } }
+    private fun openTool(label: String) {
+        compose.onNodeWithContentDescription("播放工具").performClick()
+        compose.onNodeWithText(label).performScrollTo().performClick()
+    }
     private fun capture(name: String) {
         instrumentation.waitForIdleSync()
         Thread.sleep(300) // Wait for the hardware layer to submit the matrix to SurfaceFlinger.
@@ -103,8 +109,10 @@ class VideoPlayerUiTest {
         compose.onNodeWithText("完成").performClick()
         compose.onNodeWithText("7.4×").performClick()
         listOf("0.5×", "1×", "1.25×", "1.5×", "2×", "3×").forEach {
-            compose.onNodeWithText(it).assertExists()
+            compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText(it))
+            compose.onNodeWithText(it).assertIsDisplayed()
         }
+        compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("1.25×"))
         compose.onNodeWithText("1.25×").performClick()
         awaitSpeed(1.25f)
         compose.onNodeWithContentDescription("播放工具").performClick()
@@ -145,7 +153,7 @@ class VideoPlayerUiTest {
         assertTrue("抽屉只占右侧", drawer.left > player.center.x)
         compose.onNodeWithContentDescription("播放").assertDoesNotExist() // Modal accessibility.
         capture("v17-landscape-tools")
-        compose.onNodeWithText("字幕与音轨").performClick()
+        compose.onNodeWithText("字幕与音轨").performScrollTo().performClick()
         compose.onNodeWithTag("video-settings-drawer").assertIsDisplayed()
         compose.onNodeWithText("字幕兼容性").performScrollTo().assertIsDisplayed()
         capture("v17-landscape-tracks")
@@ -155,7 +163,7 @@ class VideoPlayerUiTest {
         compose.onNodeWithText("1.5×").performScrollTo().performClick()
         compose.runOnIdle { assertEquals(1.5f, backend.state.value.speed, .001f) }
         compose.onNodeWithTag("video-settings-drawer").assertDoesNotExist()
-        compose.onNodeWithText("画面").performClick()
+        openTool("画面与方向")
         compose.onNodeWithTag("video-settings-drawer").assertIsDisplayed()
         compose.waitForIdle()
         instrumentation.sendKeyDownUpSync(android.view.KeyEvent.KEYCODE_BACK)
@@ -215,7 +223,7 @@ class VideoPlayerUiTest {
     }
     @Test fun settingsAdaptBetweenPortraitAndShortLandscapeAtLargeText() {
         compose.runOnIdle { compactLargeText = true }
-        compose.onNodeWithText("字幕 / 音轨").performClick()
+        openTool("字幕与音轨")
         compose.onNodeWithTag("video-settings-drawer").assertDoesNotExist()
         compose.onNodeWithText("完成").assertIsDisplayed()
         capture("v17-portrait-dialog")
@@ -256,24 +264,22 @@ class VideoPlayerUiTest {
         compose.onNodeWithTag("video-reset").assertDoesNotExist()
         capture("v15-restored")
         assertTrue("还原后的画面保持原始比例", formerBarBrightness() < 35)
-        compose.onNodeWithText("锁定").performClick()
+        openTool("锁定屏幕")
         compose.onNodeWithText("解锁").assertIsDisplayed().performClick()
-        compose.onNodeWithText("字幕 / 音轨").assertIsDisplayed()
+        compose.onNodeWithContentDescription("播放工具").assertIsDisplayed()
     }
     @Test fun subtitleAndPicturePanelsHaveRealChoices() {
-        compose.onNodeWithText("字幕 / 音轨").performClick()
+        openTool("字幕与音轨")
         compose.onNodeWithText("导入字幕").assertExists()
         capture("v15-tracks")
         compose.onNodeWithText("完成").performClick()
-        compose.onNodeWithText("画面", useUnmergedTree = true).performClick()
+        openTool("画面与方向")
         compose.onNodeWithText("画面比例").assertExists()
         capture("v15-picture")
     }
     @Test fun compactViewportAtTwoHundredPercentKeepsActionsReachable() {
         compose.runOnIdle { compactLargeText = true }
-        compose.onNodeWithText("字幕 / 音轨").assertIsDisplayed()
-        compose.onNodeWithText("画面").assertIsDisplayed()
-        compose.onNodeWithText("锁定").assertIsDisplayed()
+        compose.onNodeWithContentDescription("播放工具").assertIsDisplayed()
         compose.onNodeWithContentDescription("播放").assertIsDisplayed()
         capture("v15-large-text")
     }

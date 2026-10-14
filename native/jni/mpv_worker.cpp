@@ -121,7 +121,14 @@ struct Engine {
             option("input-vo-keyboard", "no"); option("input-terminal", "no"); option("terminal", "no");
             option("tls-verify", "yes"); option("idle", "yes"); option("keep-open", "yes");
             option("keepaspect", "no"); option("hwdec", "mediacodec-copy");
-            option("ao", "audiotrack"); option("pause", "yes"); option("sub-ass", "yes");
+            option("ao", "aaudio,audiotrack"); option("pause", "yes"); option("sub-ass", "yes");
+            option("aaudio-performance-mode", "low-latency");
+            // Keep the extra software queue short for press/release rate changes. The Android AO
+            // still owns its driver-sized buffer; this does not replace mpv's clock or decoder.
+            option("audio-buffer", "0.03");
+            // Keep the pitch-preserving tempo filter alive at 1x as well: inserting/removing a
+            // new filter on every press/release otherwise drains the old chain first.
+            option("af", "scaletempo2=min-speed=0.1:max-speed=8");
             option("sub-fonts-dir", "/system/fonts");
             option("sub-ass-override", "no");
             option("vo", surface ? "gpu" : "null");
@@ -162,7 +169,7 @@ struct Engine {
                         std::string out = "{\"loaded\":" + std::string(loaded ? "true" : "false") + ",\"error\":" + quote(playbackError);
                         for (auto key : {"time-pos", "duration", "pause", "eof-reached", "speed", "video-params",
                              "track-list", "chapter-list", "chapter", "seeking", "hwdec-current", "video-codec", "audio-codec-name",
-                             "audio-params", "sub-delay", "audio-delay", "sub-text", "sub-font", "sub-ass-override", "deband", "mpv-version", "ffmpeg-version"}) {
+                              "audio-params", "current-ao", "sub-delay", "audio-delay", "sub-text", "sub-font", "sub-ass-override", "deband", "mpv-version", "ffmpeg-version"}) {
                             mpv_node node{};
                             int code = api->get_property(mpv, key, MPV_FORMAT_NODE, &node);
                             out += ',' + quote(key) + ':' + (code >= 0 ? json(node) : "null");

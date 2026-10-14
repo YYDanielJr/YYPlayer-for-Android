@@ -47,6 +47,7 @@ class AndroidMedia3PlaybackBackend(
     private var speed = 1f
     private var boostSequence = 0L
     private var activeBoost: Long? = null
+    private var playerForVideo = false
     private var appliedOutputPath = outputPath()
     private val orderStorage = appContext.getSharedPreferences("playback_order_v1", Context.MODE_PRIVATE)
     private var playOrder = PlayOrder.entries.firstOrNull { it.name == orderStorage.getString("music", null) } ?: PlayOrder.SEQUENTIAL
@@ -199,7 +200,7 @@ class AndroidMedia3PlaybackBackend(
         videoSize = VideoSize.UNKNOWN
         val desiredPath = if (queue[startIndex].kind == MediaKind.VIDEO || fallbackReason != null)
             yy.daniel.yyplayerforandroid.audio.OutputPath.SYSTEM else appliedOutputPath
-        if (desiredPath != playerOutputPath) {
+        if (desiredPath != playerOutputPath || playerForVideo != (queue[startIndex].kind == MediaKind.VIDEO)) {
             rebuildPlayer(0L)
         }
         player.setMediaItems(queue.map(::toMediaItem), startIndex, 0L)
@@ -580,6 +581,7 @@ class AndroidMedia3PlaybackBackend(
     }
 
     private fun newPlayer(mode: DecoderMode): ExoPlayer {
+        playerForVideo = queue.getOrNull(index)?.kind == MediaKind.VIDEO
         val configuringRevision = ++outputRevision
         expectedRoute = routeId()
         // The current AudioTrack backend cannot prove exclusive sharing. Prefer mode uses the
@@ -620,6 +622,7 @@ class AndroidMedia3PlaybackBackend(
             },
             sharingRequest = sharingRequest,
             transparencyRequest = transparencyRequest,
+            videoPlayback = playerForVideo,
         ).setMediaCodecSelector(selector)
             .setEnableDecoderFallback(mode != DecoderMode.STRICT_HARDWARE)
         val dataSource = DefaultDataSource.Factory(appContext, OnlineAudioDataSource.Factory(networkAllowed) { url ->

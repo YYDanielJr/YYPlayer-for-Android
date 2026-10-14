@@ -54,6 +54,8 @@ data class PlaybackSnapshot(
     val videoDecoderHardwareFlag: Boolean? = null,
     val videoDecoderSoftwareFlag: Boolean? = null,
     val audioDecoderName: String? = null,
+    /** Actual libmpv AO driver, not a latency or exclusive-output qualification. */
+    val videoAudioOutput: String? = null,
     val audioSampleRate: Int? = null,
     val audioChannels: Int? = null,
     /** Which output path the engine was built with; a switch rebuilds the player. */

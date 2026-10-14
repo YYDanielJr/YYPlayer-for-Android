@@ -1,5 +1,7 @@
 # 分阶段实施手册
 
+2026-10-14 U21：实体机 libmpv 输入改为授权 `fd://` 租约；视频控制器精简，新增可配置单指手势与后台有限预览。Media3 视频短缓冲／低延迟模式、mpv AAudio 共享输出决定与限制见 [ADR0009](adr/0009-video-rate-response.md)，实测见 [U21](validation/video-u21/README.md)。音乐路径未变；本轮未提交，不能将下面早期计划覆盖当前工作区。
+
 2026-10-14 U20：工具内视频倍速统一 0.1×–8×／步进 0.1×，外侧快捷档位保留。Media3 与 libmpv 范围一致，移除 U19 的超过 8× 自动切换和仅硬解专用范围。用户授权提交到 dev；见 [ADR0008](adr/0008-video-speed-range.md) 和 [U20 验证](validation/video-u20/README.md)。
 
 2026-10-14 U16 更新：用户授权继续桌面视频功能对齐，已接入可选 libmpv，补章节、逐帧、时间偏移、libass 与 deband；见 [U16 验证](validation/video-u16/README.md)。这不是完整 S02／native 默认切换完成，音乐 FFmpeg／Oboe 与物理设备资格仍按原计划待验。

@@ -1,11 +1,13 @@
 # YYPlayer for Android 执行规则
 
+当前工作区另含未提交 B01／U21：0.1.0 分架构构建、实体机 libmpv FD 输入修复、精简控制器与可配置手势、双后端变速响应。以 STATUS 顶部和 docs/validation/video-u21 为准；13 Ultra 已验证，17 Pro Max 未连接。原用户 release 保留，手机上的 YYPlayer QA 为共存调试入口。
+
 本文件适用于整个 Android 工程，面向后续人类与代码代理。用户明确指令优先。当前为实现阶段；最新功能基线为 2026-10-14 的 `dev` U15–U20（在 `607ceb3` 的 U11–U14 上继续实现；提交身份以 git log 为准），不要将历史计划写成已实现能力。
 
 ## 1. 接手顺序和当前任务
 
 1. 先读 README、docs/STATUS.md 顶部，再读 docs/UI_MUSIC_EXPERIENCE.md、docs/TECHNICAL_DESIGN.md 和 docs/IMPLEMENTATION_PLAN.md 的当前基线；音频工作另读 docs/HANDOFF_HIFI.md 与 ADR0006。带日期的早期记录为历史证据，不能覆盖最新用户要求。
-2. 检查 git status、分支与证据。**所有修改在 `dev`；不存在时创建 `dev`。master 只接受经授权的合入，禁止直接开发。** dev-hifi 的 H02–H05／U09–U10 已保存为 `c75b34d` 并合入 dev；U11–U14 已提交为 `607ceb3`；U15–U19 已提交为 `d551f38`，用户明确授权本轮 U20 统一 8× 及文档提交到 dev，未授权推送／合入 master。master 当前基线 `836a920`。不清理用户文件；没有新授权不自动提交／推送／合并。
+2. 检查 git status、分支与证据。**所有修改在 `dev`；不存在时创建 `dev`。master 只接受经授权的合入，禁止直接开发。** dev-hifi 的 H02–H05／U09–U10 已保存为 `c75b34d` 并合入 dev；U11–U14 已提交为 `607ceb3`；U15–U19 为 `d551f38`，U20 统一 8× 为 `f24008b`。B01 构建规则改动未获新的提交／推送／合入授权。master 当前基线 `836a920`。不清理用户文件；没有新授权不自动提交／推送／合并。
 3. 当前音乐能力：歌曲／歌手／专辑／歌单分类，收藏入口在“歌单 → 我的收藏”；库、歌单和播放队列独立。独立队列 Activity 支持单／多选移除、长按排序；顺序／单曲／随机播放由真实后端实现。主页底栏只留播放／暂停，不恢复下一首和“全部音乐／收藏”快捷卡片。双语歌词及自定义译文字号／字重／原译间距按 U11 保留。
 4. 音乐前端基线为 U14：封面展开和收回均保留轻微回弹，收回终点继续使用同一绘制层；不能以删除回弹规避闪现。透明详情退出后不可点击，快速重开不得误弹菜单。9° 角落按压是缓慢、无触底回弹的另一套效果。按钮／列表令牌见第 7 节。U08 固定页头与顶部 40dp TabRow、U04 弹窗反馈等已确认基线继续保留。
 5. 当前验收设备为**有线小米 13 Ultra `c9e352e3`／`2304FPN6DC`／API36／OS3.0.308.0.WMACNXM**；每次先枚举设备，不把旧无线地址当作当前连接。用户已说明有线占用 USB，本轮没有 USB DAC；历史 H05 DAC 证据不能套用到此设备。MuMu 可补专项，但不替代物理设备资格。
@@ -30,6 +32,9 @@
 
 ## 3. 版本与构建
 
+- B01 当前版本 `0.1.0`／versionCode `2`。debug／release 均只编译 `arm64-v8a`、`x86_64`，按 ABI 独立打包，不生成 universal。应用 APK 名称固定为 `YYPlayer_for_Android_<version>_<arch>_<debug/release>.apk`；version 取实际 variant versionName，arch 用上述 ABI 标识。测试 APK 保留 AGP 命名；脚本读取 output-metadata.json 按设备 ABI 选择，不硬编码旧 app-debug.apk。
+- Release 对全应用启用 R8 代码／资源优化，保留 native.keep 与 MpvNative @Keep 的 JNI 契约；native 库在 release APK 内压缩并由系统安装时解压，debug 保留未压缩。所有 ELF 仍须 16KB 对齐，未压缩 ZIP 条目也须 16KB 对齐；压缩库须确认 extractNativeLibs=true 并真实装载。不得因测试运行器依赖混淆前的 Kotlin 类就关闭优化或全包 keep。
+- 正式签名由 Android Studio／受控构建注入；未提供签名配置的 assembleRelease 产物未签名，不把 release 文件名当签名证明，不给 release 默认配置 debug 证书。QA 副本可用 Gradle signingReport 确认的现有调试证书验证并 install -r，不卸载数据；正式发布归档 mapping.txt。详细命令和安装空间权衡见 [编译与签名](docs/BUILD_AND_SIGNING.md)。
 - S00已按官方 Android 坐标接入 Miuix0.9.4；Kotlin2.4.20、Compose BOM2026.09.00、Media3 1.11.1 已锁 catalog，实际完整构建与 lint 仍以 STATUS 为准。不能混旧miuix坐标与新miuix-ui API。
 - AGP9内置Kotlin，禁止照旧教程重复添加kotlin-android；实际KGP与Compose compiler一致，升级有dependencyInsight证据。
 - 当前AGP9.4.1/Gradle9.6.0够用，不为了追新升级；BOM编号、KSP、Room等版本查官方/实际artifact后锁定，禁止编造“最新版本”。
@@ -71,6 +76,11 @@
 - USB Direct在S12做UAC/libusb等时传输，不用bulkTransfer占位；DoP/DSD未经专门验证不输出普通PCM设备。
 
 ## 6. 视频和手势
+
+- U21 实体机输入使用 `fd://N` 借用已授权 FD，禁止重新打开 `/proc/self/fd/N`；mpv 销毁后才释放租约。新预览独立打开 FD，后台有限抽帧与缓存，不共享播放 FD 的 offset，不作为主视频渲染。
+- U21 视频 Media3 使用 40ms PCM 目标缓冲与低延迟 AudioTrack，Sonic 负责完整 0.1×–8×，平台输出固定 1×；mpv 使用固定 AAR 内建 AAudio 共享低延迟输出、AudioTrack 初始化回退，实际 `current-ao` 才是驱动事实。音乐输出不随此改变，见 ADR0009；其他路由与 API26 未验证，不宣称所有组合零延迟。
+- U21 控制器保留顶部与底部单行操作＋进度条，其余进入工具；双击、左右拖动预览、左侧窗口亮度、右侧播放器音量、长按各有持久开关。保持单仲裁、暂停也能点击隐藏、退出动画与边缘返回保护。右侧手势不改系统音量。
+- 用户签名 release 与调试签名不同时，用显式 `-PdeviceQa=true` 构建 `.qa` 共存包（标签 YYPlayer QA），不卸载原包／清数据。默认构建仍是正式 applicationId。小米 17 Pro Max 仅为用户自测机，本轮未连接；13 Ultra 证据不能自动覆盖它。
 
 - Auto/PreferHardware/StrictHardware/Software与copy许可分开；实际hwdec-current为事实；严格硬解不能偷退soft。
 - 解码切换保存position/playIntent/轨道identity/baseSpeed/延迟/变换；重载Ack匹配generation，失败可恢复。

@@ -1,6 +1,6 @@
 """Audit the APK actually installed: SHA256, ELF/ZIP 16 KB alignment, SONAME and dependencies.
 
-Usage: python scripts/Verify-MpvArtifact.py app/build/outputs/apk/debug/app-debug.apk output.json
+Usage: python scripts/Verify-MpvArtifact.py path/to/YYPlayer_for_Android_VERSION_ABI_debug.apk output.json
 No extraction, downloads, shell execution, or changes to the APK.
 """
 import hashlib
@@ -18,7 +18,10 @@ required = {"libmpv.so", "libc++_shared.so", "libyy_mpv.so", "libyyplayer_jni.so
 with zipfile.ZipFile(apk) as archive, apk.open("rb") as stream:
     names = [entry.filename for entry in archive.infolist() if entry.filename.endswith(".so")]
     assert len(names) == len(set(names)), "Duplicate native library paths"
-    for abi in ("arm64-v8a", "x86_64"):
+    abis = sorted({name.split("/")[1] for name in names})
+    assert abis and set(abis) <= {"arm64-v8a", "x86_64"}, "Unexpected or missing ABI"
+    report["abis"] = abis
+    for abi in abis:
         assert required <= {Path(name).name for name in names if f"/{abi}/" in name}
     assert all(name.split("/")[1] in ("arm64-v8a", "x86_64") for name in names)
     for name in names:
@@ -44,9 +47,13 @@ with zipfile.ZipFile(apk) as archive, apk.open("rb") as stream:
         local = stream.read(30)
         filename_size, extra_size = struct.unpack_from("<HH", local, 26)
         zip_offset = entry.header_offset + 30 + filename_size + extra_size
-        assert entry.compress_type == zipfile.ZIP_STORED and zip_offset % 16384 == 0, f"ZIP alignment: {name}"
+        assert entry.compress_type in (zipfile.ZIP_STORED, zipfile.ZIP_DEFLATED), f"Unknown compression: {name}"
+        # Compressed release libraries are extracted by Android before loading; only stored libs mmap from ZIP.
+        if entry.compress_type == zipfile.ZIP_STORED:
+            assert zip_offset % 16384 == 0, f"ZIP alignment: {name}"
         report["libraries"].append({"path": name, "sha256": hashlib.sha256(data).hexdigest(),
                                     "soname": soname, "needed": needed,
-                                    "load_alignments": [header[7] for header in loads], "zip_offset": zip_offset})
+                                    "load_alignments": [header[7] for header in loads], "zip_offset": zip_offset,
+                                    "compressed": entry.compress_type != zipfile.ZIP_STORED})
 Path(sys.argv[2]).write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-print(f"PASS: {len(names)} native libraries; both ABIs; ELF and stored ZIP aligned to 16 KB")
+print(f"PASS: {len(names)} native libraries; {', '.join(abis)}; ELF and stored ZIP aligned to 16 KB")

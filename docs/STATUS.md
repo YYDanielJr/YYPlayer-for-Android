@@ -1,5 +1,23 @@
 # 进度与交接记录
 
+## 2026-10-14：U21 13 Ultra 视频加载、手势与响应修复
+
+- 任务／结果：修复 libmpv 在实体机重开 `/proc/self/fd` 被拒绝的问题，改授权 `fd://`；精简控制器并支持暂停时点击淡出；新增可开关双击／横拖目标时间与真实预览／左右侧亮度和播放器音量。保留双指旋转缩放、8×、字幕和抽屉等原功能。
+- 音频响应：Media3仅视频40ms目标PCM缓冲＋低延迟AudioTrack，保持Sonic完整0.1–8×；mpv共享AAudio＋30ms软件队列与常驻tempo，回读current-ao。平台AudioTrack变速候选因小米拒绝7.4×而未采用，见ADR0009；音乐路径未变。
+- 文件：VideoSurface／VideoPlayerPage／VideoGestures／VideoSeekPreview、三个播放后端／输出工厂、状态与媒体信息、mpv_worker；新增跨UIDprovider与真实触摸测试，更新既有UI测试、README、AGENTS、技术设计／实施计划／视频体验／签名文档。
+- 命令／证据：两ABI debug＋release／37项JVM／lint exit0（0error、2既有warning）；13 Ultra最终28项真实手势与音视频回归＋1080p专项1项＋R8 release启动／JNI／mpv解码3项通过。四APK各12so的ELF／适用ZIP16KB检查全通过，git diff --check exit0。完整命令、日志、hash与自制截图见 [U21验证](validation/video-u21/README.md)。
+- 设备／数据：先枚举有线 `c9e352e3`／2304FPN6DC／API36／4KB页；原用户签名release及数据保留，显式-PdeviceQa=true共存安装YYPlayer QA，全部install-r，未清数据／全局设置。1080p松手倍速回读Media3约32ms／mpv79ms；实际播放时钟亦检查，仍存在有限缓冲，不宣称零延迟。
+- 未验／下一动作：17 Pro Max未连接，API26–32／其他路由／16KB页真机／4K HDR重负载／release帧率／完整无障碍未验。本轮最新参考截图未附，视觉手感待用户复核；手机已恢复QA debug供直接试用，正式release需用户原密钥签名。B01和U21均留在dev未提交／推送，app/release用户产物保留。
+
+## 2026-10-14：B01 版本 0.1.0、双 ABI 独立 APK 与 release 体积优化
+
+按用户要求更新编译规则，初始 dev `f24008b` 工作区干净；本轮没有新的提交／推送授权，改动保留在 dev 工作区。
+
+- 文件／行为：`app/build.gradle.kts` 将版本设为 0.1.0／versionCode 2，仅编译 arm64-v8a、x86_64 并分别打包 debug／release，不生成 universal；用公开 Variant API 命名 `YYPlayer_for_Android_<version>_<arch>_<debug/release>.apk`。Release 全应用 R8 代码／资源压缩，native 库压缩安装时解压；`src/release/keepRules/native.keep` 精确保留 PCM JNI，已有 MpvNative @Keep 保留。工具链、媒体能力与正式签名身份不变。
+- 脚本／文档：MuMu 脚本从 metadata 选择设备 ABI，保留数据并禁用增量安装；原生审计适配单 ABI／压缩库，继续检查 ELF 和未压缩 ZIP 16KB。更新 README、AGENTS，新增 [编译与签名](BUILD_AND_SIGNING.md)，明确正式签名、文件名、安装空间与 mapping 归档。
+- 验证：最终 assembleDebug／assembleRelease／assembleDebugAndroidTest／37 项 JVM／lintRelease exit 0（0 error、2 既有 warning）；四个主 APK 的命名／版本／ABI／12 so／16KB 静态审计通过。未签名 release 为 arm64 13.62 MiB、x86_64 14.62 MiB。现有调试证书签署独立 x86_64 release QA，验签／zipalign exit 0；新增仅依赖 Android API 的 ReleasePackagingInstrumentation，非 debug 包启动／音频 JNI／mpv 解码 **3 项通过**。恢复正常 debug 后视频 UI＋libmpv **14 项通过**。命令、异常修正、hash、日志见 [B01 证据](validation/build-b01/README.md)。
+- 设备／未验／下一步：当前 adb 为空后启动用户 MuMu，读取实际端口连接 API35／x86_64；自制 v15／v16 素材，全部 install -r，最终恢复 debug 0.1.0。首次 QA 证书误选和 debug runner 不适配混淆包均已修正。实体 arm64／API26–32／16KB 页设备／完整 release 性能与正式私钥签名流程未验，未宣称视觉满意或发布 gate 关闭。下一步使用正式签名配置及目标 arm64 真机验证；不因本轮构建任务扩展媒体功能。
+
 ## 2026-10-14：U20 倍速上限统一 8×，删除特殊路由
 
 用户要求将最高倍速降至 8×，无需特殊适配，更新文档并提交。本轮在 dev `d551f38` 上实现，初始工作区干净，按授权提交到 dev，不推送／合入 master。

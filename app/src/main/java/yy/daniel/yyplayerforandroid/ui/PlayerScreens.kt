@@ -166,6 +166,8 @@ internal fun MediaInfoDialog(
         }
         HyperSettingRow("音频输入", listOfNotNull(snapshot.audioSampleRate?.let { "${it / 1000f} kHz" }, snapshot.audioChannels?.let { "$it 声道" }).joinToString(" · ").ifBlank { "未报告" })
         HyperSettingRow("音频解码器", snapshot.audioDecoderName ?: "未报告")
+        if (snapshot.videoEngine == yy.daniel.yyplayerforandroid.playback.VideoEngine.MPV)
+            HyperSettingRow("视频音频驱动", snapshot.videoAudioOutput ?: "未报告")
         // Only what the output controller observed is shown: an unreported value stays "未知"
         // instead of being filled in with the input format.
         val output = audioOutput

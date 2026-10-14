@@ -111,7 +111,7 @@ internal class MpvVideoBackend(private val context: Context, generation: Long, i
         }
         val retained = state.value
         val play = wantsPlay
-        val style = settings.toMap()
+        val style = settings.filterKeys { it != "speed" && it != "pause" }
         val subtitle = external
         val speed = baseSpeed
         boost = null; endHandled = false
@@ -129,7 +129,9 @@ internal class MpvVideoBackend(private val context: Context, generation: Long, i
             MpvNative.call(handle, arrayOf("set", "volume", (volume * 100).toString()))
             MpvNative.call(handle, arrayOf("set", "speed", speed.toString()))
             style.forEach { (name, value) -> MpvNative.call(handle, arrayOf("set", name, value)) }
-            MpvNative.call(handle, arrayOf("loadfile", "/proc/self/fd/${descriptor!!.fd}", "replace", "-1",
+            // fd:// borrows the authorized descriptor without reopening a /proc pathname (denied
+            // by real-device SAF/MediaProvider permissions). Destroy mpv before closing this lease.
+            MpvNative.call(handle, arrayOf("loadfile", "fd://${descriptor!!.fd}", "replace", "-1",
                 "start=${seconds(retained.positionMs)}"))
             // Wait on this IO thread for actual FILE_LOADED, not merely command acceptance.
             var loaded = false
@@ -324,6 +326,7 @@ internal class MpvVideoBackend(private val context: Context, generation: Long, i
             // hwdec-current is factual path evidence, not a MediaCodec hardware-acceleration certificate.
             videoDecoderHardwareFlag = null, videoDecoderSoftwareFlag = if (hw == null && loaded) true else null,
             audioDecoderName = data.optString("audio-codec-name"), error = error,
+            videoAudioOutput = data.optString("current-ao").takeUnless { it == "null" || it.isBlank() },
             audioSampleRate = data.optJSONObject("audio-params")?.optInt("samplerate")?.takeIf { it > 0 },
             audioChannels = data.optJSONObject("audio-params")?.optInt("channel-count")?.takeIf { it > 0 },
             subtitleFont = data.optString("sub-font", "sans-serif"), overrideAssStyle = data.optString("sub-ass-override") == "force",

@@ -1,6 +1,8 @@
 # YYPlayer for Android
 
-当前功能基线为 **2026-10-14 `dev` U15–U20**，在 `d551f38`（U15–U19）上统一倍速上限；本轮按用户要求提交视频功能和文档，不推送、不合入 master。具体提交身份请查看 `git log -1`。
+U21 当前工作区修复了实体机 libmpv 文件权限导致的 loading failed，并精简视频控制器，加入可开关的双击／拖动预览／亮度／音量手势。两套后端的长按变速响应已在 13 Ultra 测量；详情见 [视频体验](docs/UI_VIDEO_EXPERIENCE.md)、[U21 验证](docs/validation/video-u21/README.md)。本轮与 B01 构建规则变更均未提交，原签名 release 和数据保留。
+
+当前功能基线为 **2026-10-14 `dev` U15–U20**，已提交至 `f24008b`。B01 更新版本为 **0.1.0（versionCode 2）**，debug／release 均按 arm64-v8a、x86_64 分包，release 启用全应用代码／资源优化与原生库压缩；B01 尚未提交。命名、签名和验证说明见 [编译与签名](docs/BUILD_AND_SIGNING.md)。
 
 视频已有全窗口双指变换／还原、3× 触感、字幕与音轨、A–B、截图和可选 libmpv 的章节／逐帧／libass／音画同步。横屏设置使用半透明右侧抽屉，支持实际上下滑动和屏幕内逐级返回。新增「播放工具 → 播放倍速」0.1×–8×，每次 0.1×，外侧快捷档位不变。Media3 与 libmpv 统一最高 8×，调节倍速不切换后端。见 [视频体验](docs/UI_VIDEO_EXPERIENCE.md)、[U20 验证](docs/validation/video-u20/README.md)、[ADR0008](docs/adr/0008-video-speed-range.md)。
 
@@ -24,6 +26,7 @@
 | [实施计划](docs/IMPLEMENTATION_PLAN.md) | 当前 U11–U14 基线、待验事项及长期 S00–S14 计划 |
 | [AGENTS.md](AGENTS.md) | 后续代码代理必须遵循的执行规则与禁区 |
 | [进度记录](docs/STATUS.md) | 实际完成情况、证据和下一任务；接手先读 |
+| [编译与签名](docs/BUILD_AND_SIGNING.md) | 0.1.0、双 ABI 独立 APK、release 体积优化与正式签名 |
 | [U07 引导／库／控件](docs/UI_SETUP_AND_LIBRARY.md) | 首次设置、顶部标签、播放玻璃胶囊、歌词样式与长按批量管理 |
 | [音乐体验 U05–U14](docs/UI_MUSIC_EXPERIENCE.md) | 当前歌单／队列／双语歌词／按钮与封面动效，以及历轮证据 |
 | [ADR 0004](docs/adr/0004-inline-music-player.md) | 音乐使用主页内动画覆盖层，视频保留 Activity |
@@ -90,7 +93,7 @@ Set-Location E:\SourceFiles\androidstudio\YYPlayerforAndroid
 .\gradlew.bat :app:assembleDebug :app:testDebugUnitTest :app:lintDebug --no-daemon --max-workers=4
 adb devices -l
 # 确认枚举仍是本轮有线手机后执行；不清除应用数据。
-adb -s c9e352e3 install -r app\build\outputs\apk\debug\app-debug.apk
+adb -s c9e352e3 install -r app\build\outputs\apk\debug\YYPlayer_for_Android_0.1.0_arm64-v8a_debug.apk
 adb -s c9e352e3 shell am start -n yy.daniel.yyplayerforandroid/.MainActivity
 ```
 
