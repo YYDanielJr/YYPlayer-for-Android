@@ -82,7 +82,7 @@ class VideoPlayerUiTest {
         image.recycle()
         return android.graphics.Color.red(pixel) + android.graphics.Color.green(pixel) + android.graphics.Color.blue(pixel)
     }
-    @Test fun customSpeedUsesTenthsAndTenTimesWhilePreservingQuickChoices() {
+    @Test fun customSpeedUsesTenthsAndEightTimesWithoutChangingEngine() {
         fun awaitSpeed(expected: Float) {
             compose.waitUntil(15000) {
                 compose.runOnUiThread { backend.refreshPosition() }
@@ -113,19 +113,26 @@ class VideoPlayerUiTest {
         awaitSpeed(1.3f)
         // Actual pointer drag and release must apply the maximum, not just update its label.
         slider.performTouchInput { swipe(center, Offset(width - 1f, center.y), durationMillis = 500) }
-        awaitSpeed(10f)
+        awaitSpeed(8f)
         compose.runOnIdle {
-            assertEquals(VideoEngine.MPV, backend.state.value.videoEngine)
+            assertEquals(VideoEngine.MEDIA3, backend.state.value.videoEngine)
             assertFalse(backend.state.value.isPlaying)
             assertTrue(kotlin.math.abs(backend.state.value.positionMs - 1000L) < 200L)
         }
         compose.onNodeWithText("加 0.1×").assertIsNotEnabled()
-        capture("v19-custom-speed")
+        slider.performSemanticsAction(SemanticsActions.SetProgress) { it(10f) }
+        awaitSpeed(8f)
+        compose.runOnIdle {
+            backend.setSpeed(10f)
+            assertEquals(8f, backend.state.value.speed, .001f)
+            assertEquals(VideoEngine.MEDIA3, backend.state.value.videoEngine)
+        }
+        capture("v20-custom-speed")
         var token: Long? = null
         compose.runOnIdle { token = backend.beginSpeedBoost() }
         awaitSpeed(3f)
-        compose.runOnIdle { backend.endSpeedBoost(token!!, 10f) }
-        awaitSpeed(10f)
+        compose.runOnIdle { backend.endSpeedBoost(token!!, 8f) }
+        awaitSpeed(8f)
         compose.onNodeWithText("恢复正常速度").performScrollTo().performClick()
         awaitSpeed(1f)
     }

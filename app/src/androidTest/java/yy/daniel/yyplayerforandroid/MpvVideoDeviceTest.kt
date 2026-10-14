@@ -62,13 +62,15 @@ class MpvVideoDeviceTest {
     }
     @After fun finish() { if (::backend.isInitialized) compose.runOnUiThread { backend.close() } }
     @Test fun speedRangeSurvivesRebuildAndBoost() {
-        for (value in listOf(.1f, .2f, 1.25f, 8.1f, 10f)) {
-            compose.runOnIdle { backend.setVideoSpeed(value) }
+        for (value in listOf(.1f, .2f, 1.25f, 7.9f, 8f)) {
+            compose.runOnIdle { backend.setSpeed(value) }
             await("实际 mpv 倍速 $value") { kotlin.math.abs(it.speed - value) < .002f }
         }
+        compose.runOnIdle { backend.setSpeed(10f) }
+        await("超过范围被限制为 8x") { it.speed == 8f && it.videoEngine == VideoEngine.MPV }
         compose.runOnIdle { backend.setDecoderMode(DecoderMode.SOFTWARE) }
-        await("重建保留 10x") { it.phase == PlaybackPhase.READY && it.speed == 10f && !it.isPlaying }
-        compose.runOnIdle { backend.setVideoSpeed(.1f) }
+        await("重建保留 8x") { it.phase == PlaybackPhase.READY && it.speed == 8f && !it.isPlaying }
+        compose.runOnIdle { backend.setSpeed(.1f) }
         await("返回最低速度") { it.speed == .1f }
         var token: Long? = null
         compose.runOnIdle { token = backend.beginSpeedBoost() }

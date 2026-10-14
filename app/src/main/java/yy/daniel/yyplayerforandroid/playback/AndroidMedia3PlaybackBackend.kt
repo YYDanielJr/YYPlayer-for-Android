@@ -400,20 +400,10 @@ class AndroidMedia3PlaybackBackend(
         player.stop(); player.clearMediaItems(); mediaHeaderSnapshot.set(emptyMap()); error = null; publish()
     }
 
-    /** Media3's software AudioSink caps speed at 8x; use the optional mpv engine above that. */
-    fun setVideoSpeed(value: Float) {
-        if (!value.isFinite() || !state.value.isVideo || changingEngine) return
-        val requested = value.coerceIn(.1f, 10f)
-        if (mpv == null && requested > 8f && decoderMode != DecoderMode.STRICT_HARDWARE) switchVideoEngine(VideoEngine.MPV, requested)
-        else setSpeed(requested)
-    }
-
-    fun setVideoEngine(engine: VideoEngine) = switchVideoEngine(engine)
-
-    private fun switchVideoEngine(engine: VideoEngine, requestedSpeed: Float? = null) {
+    fun setVideoEngine(engine: VideoEngine) {
         if (closed || outputTestActive || engine == videoEngine || changingEngine) return
         videoEngine = engine; orderStorage.edit { putString("video_engine", engine.name) }
-        val retained = state.value.copy(speed = requestedSpeed ?: mpv?.normalSpeed ?: speed)
+        val retained = state.value.copy(speed = mpv?.normalSpeed ?: speed)
         if (retained.isVideo) {
             play(retained.queue, retained.queueIndex)
             restoreWhenReady(retained, engine)

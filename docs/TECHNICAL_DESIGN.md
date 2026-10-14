@@ -1,6 +1,6 @@
 # Android 技术设计与选型
 
-2026-10-14 U19：工具内视频倍速 0.1×–10×／步进 0.1×，外侧快捷档位保留；Media3 最高 8×，更高速度使用可选 libmpv，仅硬解不自动切换。横屏抽屉与逐级返回按 U17／U18；本轮按用户授权集中提交 U15–U19 到 dev。见 [ADR0008](adr/0008-video-speed-range.md) 和 [U19 验证](validation/video-u19/README.md)。
+2026-10-14 U20：工具内视频倍速统一 0.1×–8×／步进 0.1×，外侧快捷档位保留。Media3 与 libmpv 范围一致，移除 U19 的超过 8× 自动切换和仅硬解专用范围。用户授权提交到 dev；见 [ADR0008](adr/0008-video-speed-range.md) 和 [U20 验证](validation/video-u20/README.md)。
 
 2026-10-14 U16 更新：视频增加固定 libmpv-android AAR 的可选路径，使用独立 C++ worker／JNI／真实 SimpleBasePlayer 会话适配器；音乐仍走原有 Media3 与可选 native PCM sink。默认保持 Media3，最终供应链与物理资格仍未完成。具体决定见 [ADR0007](adr/0007-libmpv-video-adapter.md)，下文关于未引入 FFmpeg／libmpv 的早期纵切叙述属于历史基线。
 

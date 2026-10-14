@@ -1,10 +1,10 @@
 # YYPlayer for Android
 
-当前功能基线为 **2026-10-14 `dev` U15–U19**，在上一提交 `607ceb3`（U11–U14）上继续实现；本轮按用户要求提交视频功能和文档，不推送、不合入 master。具体提交身份请查看 `git log -1`。
+当前功能基线为 **2026-10-14 `dev` U15–U20**，在 `d551f38`（U15–U19）上统一倍速上限；本轮按用户要求提交视频功能和文档，不推送、不合入 master。具体提交身份请查看 `git log -1`。
 
-视频已有全窗口双指变换／还原、3× 触感、字幕与音轨、A–B、截图和可选 libmpv 的章节／逐帧／libass／音画同步。横屏设置使用半透明右侧抽屉，支持实际上下滑动和屏幕内逐级返回。新增「播放工具 → 播放倍速」0.1×–10×，每次 0.1×，外侧快捷档位不变。超过 Media3 的 8× 上限时使用 libmpv；仅硬解模式保留 8× 上限。见 [视频体验](docs/UI_VIDEO_EXPERIENCE.md)、[U19 验证](docs/validation/video-u19/README.md)、[ADR0008](docs/adr/0008-video-speed-range.md)。
+视频已有全窗口双指变换／还原、3× 触感、字幕与音轨、A–B、截图和可选 libmpv 的章节／逐帧／libass／音画同步。横屏设置使用半透明右侧抽屉，支持实际上下滑动和屏幕内逐级返回。新增「播放工具 → 播放倍速」0.1×–8×，每次 0.1×，外侧快捷档位不变。Media3 与 libmpv 统一最高 8×，调节倍速不切换后端。见 [视频体验](docs/UI_VIDEO_EXPERIENCE.md)、[U20 验证](docs/validation/video-u20/README.md)、[ADR0008](docs/adr/0008-video-speed-range.md)。
 
-基于 Kotlin、Jetpack Compose 和 Miuix 的 Android 本地音乐／视频播放器。HiFi 基线 `c75b34d` 已合入，`master` 保持 `836a920`；桌面 Rust 工程只读参考。U15–U18 文档的“未提交”描述当轮状态，本次集中收录。
+基于 Kotlin、Jetpack Compose 和 Miuix 的 Android 本地音乐／视频播放器。HiFi 基线 `c75b34d` 已合入，`master` 保持 `836a920`；桌面 Rust 工程只读参考。U15–U18 文档的“未提交”描述当轮状态，已在 `d551f38` 集中收录。
 
 当前音乐体验包括歌曲／歌手／专辑／歌单浏览，顺序／单曲／随机播放，独立队列页面的单选／多选移除与长按排序，以及双语歌词字号、字重和原译间距。主页保留固定页头、顶部标签和仅有播放／暂停的底栏；“全部音乐／收藏”快捷卡片已移除，收藏从“歌单 → 我的收藏”进入。
 

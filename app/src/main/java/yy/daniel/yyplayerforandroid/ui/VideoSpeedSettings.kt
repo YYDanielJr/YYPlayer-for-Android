@@ -10,15 +10,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import top.yukonga.miuix.kmp.basic.Slider
 import top.yukonga.miuix.kmp.basic.Text
-import yy.daniel.yyplayerforandroid.playback.VideoEngine
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.roundToInt
 
 @Composable
-internal fun VideoSpeedSettings(speed: Float, engine: VideoEngine, onSpeed: (Float) -> Unit,
-    show: Boolean, strictHardware: Boolean, onDismiss: () -> Unit) {
-    val maximum = if (engine == VideoEngine.MEDIA3 && strictHardware) 8f else 10f
+internal fun VideoSpeedSettings(speed: Float, onSpeed: (Float) -> Unit,
+    show: Boolean, onDismiss: () -> Unit) {
+    val maximum = 8f
     var draft by remember(speed, show) { mutableFloatStateOf(speed.coerceIn(.1f, maximum)) }
     fun apply(value: Float) {
         draft = (value * 10).roundToInt().coerceIn(1, (maximum * 10).toInt()) / 10f
@@ -49,8 +48,5 @@ internal fun VideoSpeedSettings(speed: Float, engine: VideoEngine, onSpeed: (Flo
         }
         HyperSettingRow("恢复正常速度", "1×", onClick = { apply(1f) })
         HyperSettingRow("调节方式", "拖动后松手生效，也可使用加减按钮精调；外侧快捷档位保持不变。")
-        if (engine == VideoEngine.MEDIA3) HyperSettingRow("高速播放", if (strictHardware)
-            "仅硬解模式下最高 8×；如需更高速度，请先在画面设置中切换解码方式。"
-            else "超过 8× 将切换到 libmpv；保留播放位置和暂停状态。")
     }
 }

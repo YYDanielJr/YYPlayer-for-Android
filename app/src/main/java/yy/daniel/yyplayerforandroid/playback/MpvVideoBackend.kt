@@ -205,7 +205,7 @@ internal class MpvVideoBackend(private val context: Context, generation: Long, i
     override fun seekBy(deltaMs: Long) = seekTo(state.value.positionMs + deltaMs)
     override fun setSpeed(speed: Float) {
         if (!speed.isFinite()) return
-        baseSpeed = speed.coerceIn(.1f, 10f); boost = null; property("speed", baseSpeed.toString())
+        baseSpeed = speed.coerceIn(.1f, 8f); boost = null; property("speed", baseSpeed.toString())
     }
     override fun beginSpeedBoost(): Long? {
         if (closed || state.value.phase != PlaybackPhase.READY) return null

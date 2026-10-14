@@ -181,8 +181,8 @@ internal fun VideoPlayerPage(backend: AndroidMedia3PlaybackBackend, snapshot: Pl
     }
     VideoSettingsHost(panel, reduced, onDismiss = { panel = null }, onNavigateBack = navigateBack) { shownPanel ->
         SpeedDialog(snapshot.speed, backend::setSpeed, shownPanel == VideoPanel.SPEED) { panel = null }
-        VideoSpeedSettings(snapshot.speed, snapshot.videoEngine, backend::setVideoSpeed,
-            shownPanel == VideoPanel.CUSTOM_SPEED, snapshot.decoderMode == DecoderMode.STRICT_HARDWARE) { panel = null }
+        VideoSpeedSettings(snapshot.speed, backend::setSpeed,
+            shownPanel == VideoPanel.CUSTOM_SPEED) { panel = null }
         MediaInfoDialog(snapshot, shownPanel == VideoPanel.INFO, audioOutput) { panel = null }
         SelectionDialog("播放队列 · ${snapshot.queue.size}", shownPanel == VideoPanel.QUEUE,
             snapshot.queue.map { DropdownItem(displayTitle(it.title)) }, snapshot.queueIndex,
@@ -190,7 +190,7 @@ internal fun VideoPlayerPage(backend: AndroidMedia3PlaybackBackend, snapshot: Pl
         HyperDialog("播放工具", { panel = null }, show = shownPanel == VideoPanel.TOOLS, buttonText = "完成") {
             HyperSpinnerPreference("视频后端", items = VideoEngine.entries.map { DropdownItem(it.label) },
                 selectedIndex = snapshot.videoEngine.ordinal, onSelectedIndexChange = { backend.setVideoEngine(VideoEngine.entries[it]) })
-            HyperSettingRow("播放倍速", "0.1×–10× · 每次调节 0.1×", value = speedLabel(snapshot.speed),
+            HyperSettingRow("播放倍速", "0.1×–8× · 每次调节 0.1×", value = speedLabel(snapshot.speed),
                 onClick = { openPanel(VideoPanel.CUSTOM_SPEED) })
             HyperSettingRow("字幕与音轨", onClick = { openPanel(VideoPanel.TRACKS) })
             if (extended) {

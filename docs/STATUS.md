@@ -1,5 +1,14 @@
 # 进度与交接记录
 
+## 2026-10-14：U20 倍速上限统一 8×，删除特殊路由
+
+用户要求将最高倍速降至 8×，无需特殊适配，更新文档并提交。本轮在 dev `d551f38` 上实现，初始工作区干净，按授权提交到 dev，不推送／合入 master。
+
+- 文件／行为：`VideoSpeedSettings.kt`、`VideoPlayerPage.kt`、`AndroidMedia3PlaybackBackend.kt`、`MpvVideoBackend.kt`；UI 和两个后端统一 0.1×–8×／步进 0.1×，外侧快捷不变。删除超过 8× 自动换后端、requestedSpeed 参数和仅硬解专用范围／文案，调用原 setSpeed；手动后端选择保留。
+- 验证：assembleDebug／assembleDebugAndroidTest／37 项 JVM／lint exit 0（0 error、2 既有 warning）；MuMu 视频 UI 8＋libmpv 6 共 **14 项通过**。验证拖到 8仍是 Media3、越界限制8、MPV回读与重建、0.1步进／1.25快捷、3×恢复、抽屉真实滑动及返回。测试文件随之更新，详见 [U20 命令、APK hash 和证据](validation/video-u20/README.md)。
+- 文档：README、AGENTS、技术设计、实施计划、视频体验和 ADR0008 更新；U19 10× 和自动路由仅作为历史保留。
+- 设备／限制／下一步：先枚举 MuMu `127.0.0.1:16384`／API35／x86_64，自制 U15／U16 素材与独立偏好，全部 install -r。实体设备／API26–32／高速帧率听感／完整无障碍待验；未改 native 库／音频输出，不重复无关资格测试。用户下一步复核 8× 统一范围。
+
 ## 2026-10-14：U19 自由倍速、文档及 dev 提交
 
 用户要求设置内新增 0.1×–10×／步进 0.1×、外侧档位不变，并更新文档和 AGENTS 后提交 dev。本轮按授权集中收录累计 U15–U19 视频实现、验证素材及当前／历史基线文档；不推送、不合入 master。具体提交身份以 git log 为准，以下旧章节“未提交”为当时记录。

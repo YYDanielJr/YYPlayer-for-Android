@@ -1,6 +1,6 @@
 # 分阶段实施手册
 
-2026-10-14 U19：工具内视频倍速 0.1×–10×／步进 0.1×，外侧快捷档位保留；Media3 最高 8×，更高速度使用可选 libmpv，仅硬解不自动切换。横屏抽屉与逐级返回按 U17／U18；本轮按用户授权集中提交 U15–U19 到 dev。见 [ADR0008](adr/0008-video-speed-range.md) 和 [U19 验证](validation/video-u19/README.md)。
+2026-10-14 U20：工具内视频倍速统一 0.1×–8×／步进 0.1×，外侧快捷档位保留。Media3 与 libmpv 范围一致，移除 U19 的超过 8× 自动切换和仅硬解专用范围。用户授权提交到 dev；见 [ADR0008](adr/0008-video-speed-range.md) 和 [U20 验证](validation/video-u20/README.md)。
 
 2026-10-14 U16 更新：用户授权继续桌面视频功能对齐，已接入可选 libmpv，补章节、逐帧、时间偏移、libass 与 deband；见 [U16 验证](validation/video-u16/README.md)。这不是完整 S02／native 默认切换完成，音乐 FFmpeg／Oboe 与物理设备资格仍按原计划待验。
 
