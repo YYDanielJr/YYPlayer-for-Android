@@ -1,9 +1,6 @@
 package yy.daniel.yyplayerforandroid.ui
 
-import android.graphics.Matrix
-import android.view.LayoutInflater
-import android.widget.FrameLayout
-import android.view.TextureView
+import android.view.HapticFeedbackConstants
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -19,6 +16,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -26,19 +25,10 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.media3.ui.PlayerView
-import yy.daniel.yyplayerforandroid.R
 import yy.daniel.yyplayerforandroid.playback.PlaybackBackend
 import yy.daniel.yyplayerforandroid.playback.PlaybackSnapshot
 import kotlin.math.cos
 import kotlin.math.sin
-
-private data class VideoTransform(
-    val scale: Float = 1f,
-    val rotation: Float = 0f,
-    val panX: Float = 0f,
-    val panY: Float = 0f,
-)
 
 @Composable
 @androidx.annotation.OptIn(markerClass = [androidx.media3.common.util.UnstableApi::class])
@@ -51,13 +41,22 @@ fun VideoSurface(
     onTap: () -> Unit = {},
     onBoostChanged: (Boolean) -> Unit = {},
     surfaceActive: Boolean = true,
+    gesturesEnabled: Boolean = true,
+    fit: VideoFit = VideoFit.FIT,
+    subtitleSize: Float = 20f,
+    subtitleBottomPadding: Float = .08f,
+    onTransformChanged: (Boolean) -> Unit = {},
+    onViewReady: (VideoViewport?) -> Unit = {},
 ) {
     var transform by remember(snapshot.current?.uri, resetTransformKey) { mutableStateOf(VideoTransform()) }
-    var viewport by remember(player, surfaceActive) { mutableStateOf(IntSize.Zero) }
+    var viewport by remember { mutableStateOf(IntSize.Zero) }
     val latestSpeed by rememberUpdatedState(snapshot.speed)
     val latestUri by rememberUpdatedState(snapshot.current?.uri)
     val latestTap by rememberUpdatedState(onTap)
     val latestBoost by rememberUpdatedState(onBoostChanged)
+    val latestGeneration by rememberUpdatedState(snapshot.mediaGeneration)
+    val hapticView = LocalView.current
+    LaunchedEffect(transform.changed) { onTransformChanged(transform.changed) }
 
     Box(
         modifier = modifier
@@ -68,14 +67,18 @@ fun VideoSurface(
             modifier = Modifier
                 .fillMaxSize()
                 .onSizeChanged { viewport = it }
-                .pointerInput(player, viewport, snapshot.current?.uri) {
+                .pointerInput(player, viewport, snapshot.mediaGeneration, gesturesEnabled, resetTransformKey, fit,
+                    snapshot.phase == yy.daniel.yyplayerforandroid.playback.PlaybackPhase.ENDED || snapshot.error != null) {
                     val longPressTimeout = viewConfiguration.longPressTimeoutMillis
                     val touchSlop = viewConfiguration.touchSlop
                     awaitEachGesture {
-                        val firstDown = awaitFirstDown(requireUnconsumed = false)
+                        val firstDown = awaitFirstDown()
+                        if (!gesturesEnabled) return@awaitEachGesture
                         val baseSpeed = latestSpeed
                         val mediaUri = latestUri
+                        val generation = latestGeneration
                         var temporaryBoost = false
+                        var boostToken: Long? = null
                         var hadMultiplePointers = false
                         var moved = false
                         var elapsed = 0L
@@ -87,9 +90,12 @@ fun VideoSurface(
                                     withTimeoutOrNull((longPressTimeout - elapsed).coerceAtLeast(1L)) { awaitPointerEvent() }
                                 } else awaitPointerEvent()
                                 if (event == null) {
-                                    temporaryBoost = true
-                                    backend.setSpeed(3f)
-                                    latestBoost(true)
+                                    boostToken = backend.beginSpeedBoost()
+                                    temporaryBoost = boostToken != null
+                                    if (temporaryBoost) {
+                                        hapticView.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+                                        latestBoost(true)
+                                    } else moved = true
                                     continue
                                 }
                                 elapsed = event.changes.maxOf { it.uptimeMillis } - firstDown.uptimeMillis
@@ -98,7 +104,7 @@ fun VideoSurface(
                                 if (pressedPointers >= 2) {
                                     hadMultiplePointers = true
                                     if (temporaryBoost) {
-                                        backend.setSpeed(baseSpeed)
+                                        boostToken?.let { backend.endSpeedBoost(it, baseSpeed) }
                                         latestBoost(false)
                                         temporaryBoost = false
                                     }
@@ -132,30 +138,19 @@ fun VideoSurface(
                                 }
                             } while (true)
                         } finally {
-                            if (temporaryBoost && latestUri == mediaUri) backend.setSpeed(baseSpeed)
+                            if (temporaryBoost && latestUri == mediaUri && latestGeneration == generation) boostToken?.let { backend.endSpeedBoost(it, baseSpeed) }
                             latestBoost(false)
                         }
                     }
                 },
             factory = { context ->
-                val parent = FrameLayout(context)
-                (LayoutInflater.from(context).inflate(R.layout.view_player_texture, parent, false) as PlayerView)
-                    .apply { this.player = player }
+                VideoViewport(context).also { it.bind(player); onViewReady(it) }
             },
             update = { view ->
-                view.player = player
-                (view.videoSurfaceView as? TextureView)?.apply {
-                    val centerX = width / 2f
-                    val centerY = height / 2f
-                    val matrix = Matrix().apply {
-                        setScale(transform.scale, transform.scale, centerX, centerY)
-                        postRotate(transform.rotation, centerX, centerY)
-                        postTranslate(transform.panX * viewport.width, transform.panY * viewport.height)
-                    }
-                    setTransform(matrix)
-                }
+                view.bind(player)
+                view.updateTransform(transform, fit, subtitleSize, subtitleBottomPadding)
             },
-            onRelease = { it.player = null },
+            onRelease = { it.bind(null); onViewReady(null) },
         )
     }
 }

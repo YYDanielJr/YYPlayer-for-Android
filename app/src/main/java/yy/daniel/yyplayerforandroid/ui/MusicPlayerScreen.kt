@@ -454,7 +454,7 @@ private fun MusicControls(snapshot: PlaybackSnapshot, backend: PlaybackBackend, 
                 Text(subtitle, fontSize = 12.sp, color = foreground.copy(alpha = .58f), maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
         }
-        MusicSeekBar(snapshot, backend, foreground, reduced, progress, dragging, { value = it; dragging = true }, { dragging = false })
+        PlaybackSeekBar(snapshot, backend, foreground, reduced, progress, dragging, { value = it; dragging = true }, { dragging = false })
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Text(formatTime(if (dragging) (value * snapshot.durationMs).toLong() else snapshot.positionMs), fontSize = 11.sp, color = foreground.copy(alpha = .5f))
             Text(if (snapshot.durationMs > 0) formatTime(snapshot.durationMs) else "—:—", fontSize = 11.sp, color = foreground.copy(alpha = .5f))
@@ -478,8 +478,8 @@ private fun MusicControls(snapshot: PlaybackSnapshot, backend: PlaybackBackend, 
 }
 
 @Composable
-private fun MusicSeekBar(snapshot: PlaybackSnapshot, backend: PlaybackBackend, color: Color, reduced: Boolean,
-    progress: Float, dragging: Boolean, onPreview: (Float) -> Unit, onEnd: () -> Unit) {
+internal fun PlaybackSeekBar(snapshot: PlaybackSnapshot, backend: PlaybackBackend, color: Color, reduced: Boolean,
+    progress: Float, dragging: Boolean, onPreview: (Float) -> Unit, onEnd: () -> Unit, onBegin: () -> Unit = {}) {
     val latest by rememberUpdatedState(snapshot)
     val height by animateFloatAsState(if (dragging) 6f else 3f, if (reduced) snap() else spring(stiffness = 500f, dampingRatio = .8f), label = "seek track spring")
     val radius by animateFloatAsState(if (dragging) 8f else 4f, if (reduced) snap() else spring(stiffness = 500f, dampingRatio = .8f), label = "seek thumb spring")
@@ -493,6 +493,7 @@ private fun MusicSeekBar(snapshot: PlaybackSnapshot, backend: PlaybackBackend, c
         if (snapshot.durationMs <= 0) return@pointerInput
         awaitEachGesture {
             val down = awaitFirstDown(requireUnconsumed = true)
+            onBegin()
             var moved = false; var cancelled = false; var position = down.position
             try {
                 while (true) {

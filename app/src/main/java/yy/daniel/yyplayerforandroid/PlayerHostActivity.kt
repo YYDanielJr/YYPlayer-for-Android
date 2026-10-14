@@ -134,6 +134,8 @@ class LyricStyleActivity : PlayerHostActivity() {
 
 @androidx.annotation.OptIn(markerClass = [androidx.media3.common.util.UnstableApi::class])
 class PlayerActivity : PlayerHostActivity() {
+    private var windowFocused by mutableStateOf(true)
+    override fun onWindowFocusChanged(hasFocus: Boolean) { super.onWindowFocusChanged(hasFocus); windowFocused = hasFocus }
     @android.annotation.SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -159,10 +161,24 @@ class PlayerActivity : PlayerHostActivity() {
                 }
             }
             AppTheme(snapshot.isVideo) {
+                DisposableEffect(snapshot.isVideo) {
+                    val controller = WindowCompat.getInsetsController(window, window.decorView)
+                    if (snapshot.isVideo) {
+                        controller.systemBarsBehavior = androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                        controller.hide(androidx.core.view.WindowInsetsCompat.Type.systemBars())
+                    }
+                    onDispose { controller.show(androidx.core.view.WindowInsetsCompat.Type.systemBars()) }
+                }
+                DisposableEffect(snapshot.isVideo, snapshot.isPlaying) {
+                    if (snapshot.isVideo && snapshot.isPlaying) window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                    else window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                    onDispose { window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON) }
+                }
                 PlayerScreen(runtime.playback, snapshot, preferences.reduceMotion,
                     onOpenOrientation = ::openOrientation, favorite = snapshot.current?.uri.toString() in preferences.favorites,
                     onFavorite = { snapshot.current?.let { runtime.toggleFavorite(it.uri.toString()) } },
                     onBack = ::closePage, surfaceActive = lifecycleState.isAtLeast(Lifecycle.State.STARTED),
+                    inputActive = windowFocused && lifecycleState.isAtLeast(Lifecycle.State.RESUMED),
                     audioOutput = audioOutput)
             }
         }

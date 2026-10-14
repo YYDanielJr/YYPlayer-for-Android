@@ -1,8 +1,20 @@
-# dev-hifi 交接说明（新窗口从这里接手）
+# HiFi 输出交接说明
 
-日期：2026-10-08　　分支：`dev-hifi`　　H01 提交：`5dc5928`（H02/H03/H04/H05 改动**全部未提交**，见第 2 节）
+## 当前接续点（2026-10-14）
 
-## 接续点（H05 2026-10-08）
+当前在 **`dev`，功能提交 `607ceb3`（U11–U14）**。原 dev-hifi 的 H02–H05／U09–U10 已提交为 `c75b34d` 并合入 dev，不再是未提交工作区；master 保持 `836a920`。后续在 dev 修改，提交／推送／合并需对应用户授权。
+
+实际链路仍为 Media3／MediaCodec 解码 → SYSTEM 或自研 AudioTrack AudioSink；C++ 核心负责 PCM 等可移植逻辑，不是 FFmpeg 解码器。真实 MediaSessionService 持有 runtime 唯一播放器生命周期引用。U11 增加同一输出仍连接时的非严格失败单次 SYSTEM 回退，保留队列／位置／播放意图；不能证明独占时 PreferExclusive 选 SYSTEM，严格模式仍拒绝。native gapless 的既有限制没有被宣布修复，恢复播放不等于原生路径通过。
+
+当前用于 U11–U14 验收的是**有线小米 13 Ultra `c9e352e3`／2304FPN6DC／API36／OS3.0.308.0.WMACNXM**，USB 被调试占用，没有 DAC。下方 H05 的 Android17／API37 手机、无线地址、USB DAC 和蓝牙是历史设备组合，不能用于当前连接或音频资格判断。
+
+最近结果：U14 最终构建／34 项 JVM／lint 通过；U13 `MusicUpgradeDeviceTest` 5 项真实播放回归通过，见 [验收](validation/ui-u13/README.md)。H05 的 29 项测试和 USB 整曲记录仅适用于其当时 APK／设备；本轮没有重跑全部 HiFi 硬件专项。API26–32、物理拔插／焦点／锁屏专项、独占／BIT_PERFECT 正面硬件、数字捕获和高采样率仍需各自证据。
+
+接手先执行 `adb devices -l`，设备更新始终 `install -r`，直接 instrumentation 保留数据；不用旧无线地址或旧 pinnedDeviceId。最新 UI 规范和实际状态以 [音乐体验](UI_MUSIC_EXPERIENCE.md)、[STATUS](STATUS.md) 为准。
+
+## 历史接续点（H05 2026-10-08）
+
+以下保留当时测试链路、命令与设备事实，不作为当前任务授权或当前连接指令。
 
 用户追加“完全核验所有未提交输出代码”和“把输出方式／设备切换做到歌曲详情”，已完成源码修复和详情页同页弹窗，详细发现见 [HIFI_CODE_AUDIT](HIFI_CODE_AUDIT.md)，最新结果以 STATUS 顶部 H05 和 validation README 为准。当前设备地址 **`192.168.1.246:33103`**，旧 `192.168.114.116:33077` 只属于下方历史记录。USB 与 OPPO 蓝牙都在线，DAC 仍无 BIT_PERFECT。
 
@@ -51,48 +63,39 @@ $serial='192.168.114.116:33077'
 
 实体机 Compose Activity instrumentation 启动仍挂起，service 测试直接调用生产 UI 生命周期引用钩子并连接真实 service/controller，不能写成 UI 自动化通过。下一独立任务为物理拔插／焦点与锁屏长期播放；Oboe、合格 BIT_PERFECT DAC、数字捕获、高采样率、API26 实机仍未验。下方 H01–H03 记录保留为历史；遇到阶段描述不一致，优先本段和最新 STATUS。
 
-## 0. 给新窗口的启动指令（可直接粘贴）
+## 0. 给新窗口的启动指令
 
-> 项目：`E:\SourceFiles\androidstudio\YYPlayerforAndroid`（Android 音乐/视频播放器，Kotlin + Compose + Miuix + 可移植 C++17 核心）。
-> 先读 `AGENTS.md`（执行规则）与 `docs/HANDOFF_HIFI.md`（本文件），再读 `docs/STATUS.md` 顶部 H05 记录。
-> 当前任务：继续 `dev-hifi` 分支的 HiFi 输出工作。**H05 全量审计与歌曲详情输出控制见本文件顶部**；第 7 节为历史建议。
-> 设备：小米 2509FPN0BC（**Wi-Fi adb `192.168.1.246:33103`**，Android 17／SDK 37，HyperOS OS4.0.0.44），
-> **已接入 USB DAC「Synaptics lifeme HiFi Audio Pro」与蓝牙「OPPO Enco Free4」**。
-> 关键硬件事实：**该 USB DAC 没有任何 BIT_PERFECT 组合**（42 个组合全是 `MIXER_BEHAVIOR_DEFAULT`），
-> 因此 `system_reported` 级位完美在本机无法取证；端到端位准确也没有数字捕获条件——不要写成已达成。
-> 平台能接受 `s24_3` 与 `s32` 容器，**没有 24-in-32（`s24_in32`）容器**。
-> 用户已授权：本会话 DSH 文件策略为完全访问；不自动提交/推送新改动，不清理用户文件。
+> 项目：Android YYPlayer（Kotlin + Compose + Miuix + C++17 PCM 核心）。先读根目录 AGENTS.md、README 和 docs/STATUS.md 顶部，再读本文件当前接续点及 ADR0006。
+> 当前功能提交为 dev 的 607ceb3。先核对 git status；所有新改动在 dev，master 仅接受授权合入，不自动提交／推送。
+> 当前设备是有线小米 13 Ultra c9e352e3／API36，先枚举确认；本轮没有 USB DAC。下方历史设备与测试资格不可照搬。
+> 下一具体任务按最新用户指令，不因旧建议自动开展 native 替换；保留唯一真实播放器和现有数据。
 
 ## 1. 必读文档（按顺序）
 
 | 顺序 | 文件 | 为什么读 |
 | --- | --- | --- |
-| 1 | [AGENTS.md](AGENTS.md)（114 行） | 执行规则、架构与线程硬规则、音频真实性红线（焦点≠独占≠未处理≠位准确） |
+| 1 | [AGENTS.md](../AGENTS.md) | 执行规则、架构与线程硬规则、音频真实性红线（焦点≠独占≠未处理≠位准确） |
 | 2 | 本文件 | 交接状态、命令、已知坑 |
-| 3 | [docs/STATUS.md](docs/STATUS.md)（顶部 H03 一节 + H02/H01 各一节） | 各轮做了什么、证据、未验事项、下一步 |
-| 4 | [docs/validation/hifi-v1/README.md](docs/validation/hifi-v1/README.md) | **H01+H02+H03 全部实测证据**（含截图、instrumentation 输出、logcat 原文摘要、四个已修缺陷） |
-| 5 | [docs/adr/0006-hifi-output-core-android-split.md](docs/adr/0006-hifi-output-core-android-split.md) | C++ 核心与 Android 平台层的分工决策（H02/H03 已补充实测结论） |
-| 6 | [docs/research/USB_DAC_BITPERFECT_API_FACTS.md](docs/research/USB_DAC_BITPERFECT_API_FACTS.md)（476 行） | API 34+ 位完美与独占的**官方事实核查**——写代码前必读 |
-| 7 | [native/README.md](native/README.md)（55 行） | 核心目录结构、主机与 NDK 交叉编译命令 |
-| 参考 | [docs/TECHNICAL_DESIGN.md](docs/TECHNICAL_DESIGN.md) §7 | HiFi 目标、判定矩阵、系统 USB 七步、Oboe 与失联规则 |
-| 参考 | [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md) S06–S08 | 阶段任务与验收口径 |
-| 参考 | [docs/adr/0001-android-media3-vertical-slice.md](docs/adr/0001-android-media3-vertical-slice.md) | 当前临时播放后端（Media3）与退出条件 |
+| 3 | [docs/STATUS.md](STATUS.md)（先读顶部最新记录；H01–H05 为音频历史证据） | 各轮做了什么、证据、未验事项、下一步 |
+| 4 | [docs/validation/hifi-v1/README.md](validation/hifi-v1/README.md) | **H01–H05 历史实测证据**（含截图、instrumentation 输出、logcat 原文摘要、四个已修缺陷） |
+| 5 | [docs/adr/0006-hifi-output-core-android-split.md](adr/0006-hifi-output-core-android-split.md) | C++ 核心与 Android 平台层的分工决策（H02/H03 已补充实测结论） |
+| 6 | [docs/research/USB_DAC_BITPERFECT_API_FACTS.md](research/USB_DAC_BITPERFECT_API_FACTS.md) | API 34+ 位完美与独占的**官方事实核查**——写代码前必读 |
+| 7 | [native/README.md](../native/README.md) | 核心目录结构、主机与 NDK 交叉编译命令 |
+| 参考 | [docs/TECHNICAL_DESIGN.md](TECHNICAL_DESIGN.md) §7 | HiFi 目标、判定矩阵、系统 USB 七步、Oboe 与失联规则 |
+| 参考 | [docs/IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) S06–S08 | 阶段任务与验收口径 |
+| 参考 | [docs/adr/0001-android-media3-vertical-slice.md](adr/0001-android-media3-vertical-slice.md) | 当前临时播放后端（Media3）与退出条件 |
 
-## 2. Git 状态
+## 2. Git 状态（2026-10-14）
 
-```
-dev-hifi  1daef67  docs: H01 交接说明                                    ← 当前 HEAD（H01 最后一个提交）
-          5dc5928  feat(hifi): 可移植 C++ 音频核心 + 输出策略与设备选择 (H01)
-          4fff9f1  feat: 在线音乐、首次引导、媒体库分页与音乐控件 (U05-U08)
-dev-api   4fff9f1
+```text
+dev       607ceb3  feat: upgrade Android music library, playback and UI (U11-U14)
+dev-hifi  c75b34d  feat: save HiFi output, media session and music UI upgrades (H02-H05 U09-U10)
 master    836a920  merge: U05-U08 并入 master
 ```
 
-- **H02/H03/H04 的全部改动仍是未提交的工作区改动**（用户未要求提交，不要自动提交/推送）。动手前先 `git status --short`。
-- H03 改动的文件：`native/core/src/pcm.cpp`、`native/core/include/yy/core/pcm.h`、`native/core/tests/pcm_test.cpp`、`audio/PcmSink.kt`、`audio/AudioTrackPcmSink.kt`、`audio/OutputSelfTest.kt`、`audio/AudioVerificationTone.kt`、`ui/AudioOutputScreen.kt`、`app/src/androidTest/.../AudioOutputSinkDeviceTest.kt`、`docs/validation/hifi-v1/`（`h03_*` 证据）、`docs/STATUS.md`、`docs/adr/0006-*.md`、本文件。
-- `native/build*`、`docs/validation/acl-recovery/` 已在 `.gitignore` 中。
+`c75b34d` 是 `607ceb3` 的基线；H02–H05 已提交，不再作为遗漏改动处理。文档维护可能形成新的工作区修改，接手仍需检查 git status；本表不是清理工作区的授权。
 
-## 3. 设备
+## 3. 历史设备（H01–H05）
 
 - 小米 2509FPN0BC，**Wi-Fi adb `192.168.114.116:33077`**（`adb connect 192.168.114.116:33077`），Android 17／SDK 37，HyperOS OS4.0.0.44.XPBCNXM，ABI 仅 `arm64-v8a`。
 - 外接：USB DAC「Synaptics lifeme HiFi Audio Pro」（VID 1739／PID 5525，`/dev/bus/usb/001/002`，ALSA card 1，支持 16k/32k/44.1k/48k/96k/192k/384k × s16/s24_3/s32），蓝牙「OPPO Enco Free4」（A2DP 44.1k + SCO 8k/16k）。
@@ -102,7 +105,7 @@ master    836a920  merge: U05-U08 并入 master
 - 坑：**小米会把应用自身的 `android.util.Log` 从 logcat 过滤掉**（同一次运行里系统日志正常）。所以应用侧证据要看界面回读与 instrumentation 输出，不要因为 `logcat -s YYPlayerAudio:*` 为空就以为功能没跑；不过 instrumentation 进程（`androidx.test.runner`）里的同名 `Log.i` **能**正常输出，这是主要取证通道。
 - 坑：UI 自动化点击建议先 `uiautomator dump` 拿真实 bounds（页面滚动后坐标会变），`input tap` 的坐标是屏幕像素。
 
-## 4. 可复现命令
+## 4. 历史复现命令（设备参数须重新核实）
 
 ```powershell
 Set-Location E:\SourceFiles\androidstudio\YYPlayerforAndroid
@@ -156,7 +159,7 @@ $adb='E:\DeveloperTools\AndroidSDK\platform-tools\adb.exe'; $s='192.168.114.116:
 9. **实体机上 Compose UI instrumentation（如 `LyricStyleUiTest`）会长时间挂起**，这是 U08 已记录的既有问题；音频的 18 项可正常通过。
 10. **不要在测试里用高采样率反复渲染大缓冲**：H03 在 96 kHz 上跑三个加宽用例时，测试进程陷入持续 sticky GC（无 ANR）而挂住。用例固定在 48 kHz；需要高采样率取证时按需生成、用完释放。
 
-## 6. 当前实现边界（不要越界声明）
+## 6. H03 时期实现边界（最新补充见顶部）
 
 - **播放本身仍走 Media3 ExoPlayer 共享输出**（ADR 0001 的临时后端）。H02/H03 接好的是**核心 PCM 环 → AudioTrack sink** 这条新通路，它目前由显式“输出自检”驱动，**还没有替换 Media3 的播放**（那是 S06）。
 - 位完美状态只有 `unknown/unavailable/requested/system_reported/capture_verified` 五档；应用最高只标 `system_reported`，`capture_verified` 只能来自数字捕获，代码不会自行设置。
@@ -168,7 +171,7 @@ $adb='E:\DeveloperTools\AndroidSDK\platform-tools\adb.exe'; $s='192.168.114.116:
 - `s24_in32` 无平台容器，sink 明确拒绝；核心能把它无损加宽到 `s32`，但策略层尚未接入。
 - `OutputSelfTest.digestHex` 是**进入环的字节**的 SHA-256（目标编码、小端交织），只是可复现的送出版本，不是端到端证明。
 
-## 7. 下一步（H04 建议顺序）
+## 7. 历史后续建议（不作为当前任务指令）
 
 1. **高采样率取证**：在 96 kHz（以及 192 kHz）上跑同一自检，确认平台与 HAL 的实际采样率路径与投递计数；注意第 5 节第 10 条的 GC 坑。
 2. **`s24_in32` 源接入**：解码器若产出 24-in-32，由策略显式决定加宽到 `s32` 再打开（核心已支持无损加宽）。

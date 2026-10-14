@@ -1,5 +1,69 @@
 # 进度与交接记录
 
+## 2026-10-14：U19 自由倍速、文档及 dev 提交
+
+用户要求设置内新增 0.1×–10×／步进 0.1×、外侧档位不变，并更新文档和 AGENTS 后提交 dev。本轮按授权集中收录累计 U15–U19 视频实现、验证素材及当前／历史基线文档；不推送、不合入 master。具体提交身份以 git log 为准，以下旧章节“未提交”为当时记录。
+
+- 文件／行为：新增 `VideoSpeedSettings.kt`，修改 `VideoPlayerPage.kt`、`AndroidMedia3PlaybackBackend.kt`、`MpvVideoBackend.kt`；工具中滑杆松手生效、加减 0.1×／恢复 1×，快捷 0.5／1／1.25／1.5／2／3 保留。查锁定 Media3 字节码确认实际软件音频上限 8×，更高速度使用已有 libmpv；仅硬解保留 8×，不静默放弃严格策略。见 ADR0008。
+- 验证：assembleDebug／assembleDebugAndroidTest／37 项 JVM／lint exit 0，0 error／2 既有 warning；MuMu **28 项全部通过**（视频 UI 8、libmpv 6、视频后端 5、手势 4、音乐 5）。包含真实滑到 10、0.1 步进、1.25 快捷、重建保留、3× 恢复上下边界、真实抽屉滑动和返回。原生审计两 ABI 全部 24 so ELF／ZIP 16KB 通过。首次既有短屏点击因菜单增加需滚入目标，修正测试定位后全量通过；未删除断言。命令／exit／APK hash／日志／截图见 [U19 验证](validation/video-u19/README.md)。
+- 文档：README、AGENTS、视频体验、技术设计、实施计划及 ADR0008 同步；纠正“mpv 未集成”与 U17 仅语义滚动证据边界，保留历史记录。
+- 设备／限制／下一步：先枚举 MuMu `127.0.0.1:16384`／API35／x86_64，测试用自制素材和独立偏好，全部 install -r。实体小米／API26–32／高速帧率听感／完整无障碍与原生发布资格待验，未重复无关 DAC／主机测试。用户下一步复核新倍速体验。
+
+## 2026-10-14：U18 修复抽屉无法拖动、补子菜单返回
+
+用户在 MuMu 反馈设置列表不能滚动、子菜单没有返回上一级的画面按钮。已在 dev 修复并 install -r 更新模拟器，保留用户数据，未提交／推送。
+
+- 根因／文件：`VideoSettingsDrawer.kt` 原 Final pass 无条件消费触摸，取消了子级拖动；现仅退出动画期间拦截，正常打开时保留滚动事件。`VideoPlayerPage.kt` 增加父级历史，子菜单标题左侧提供 Miuix 返回按钮，系统返回逐级回退；完成／取消／遮罩直接关闭。保留横屏半透明外观与竖屏弹窗。
+- 检查：assembleDebug／assembleDebugAndroidTest／lintDebug exit 0，0 error、2 既有 warning。MuMu 直接 instrumentation **8 项通过**：真实 swipeUp／swipeDown 并断言滚动位移、短横屏／200% 字体滑动到底、画面内返回、字幕同步三级返回，兼顾原有动画／关闭／真实后端菜单。`VideoPlayerUiTest.kt`／`MpvVideoDeviceTest.kt` 更新；日志、APK hash、命令和截图见 [U18 验证](validation/video-u18/README.md)。
+- U17 证据更正：当时 performScrollTo 为语义滚动，绕过触摸流程，不能证明手指拖动可用；本轮补上真实注入事件测试。
+- 设备／边界：先枚举 MuMu `127.0.0.1:16384`、API35／x86_64，沿用自制 U15／U16 素材与独立偏好。实体小米、完整 TalkBack、API26–32、release 性能待验。下一步请用户在 MuMu 复核滚动与返回手感，未记视觉最终确认。
+
+## 2026-10-14：U17 横屏视频设置右侧半透明抽屉
+
+用户要求横屏视频设置从右侧抽屉弹出、背景略透明。已在 dev 完成并 install -r 更新 MuMu，未提交／推送；原 D01／U15／U16 改动保留。
+
+- 文件／行为：新增 `VideoSettingsDrawer.kt`，修改 `VideoPlayerPage.kt`、`HyperDesign.kt`、`PlayerScreens.kt`；按实际视口宽高选择布局，横屏设置统一右侧 320–420dp 抽屉，260ms 滑入／滑出、90% 不透明 Miuix 背景、22% 黑色遮罩。标题和完成／取消固定，内容可滚动；竖屏和音乐保留原弹窗。设置打开时隐藏底层播放按钮，退出动画期间禁止误触；支持返回键／点击空白关闭。
+- 验证：assembleDebug／assembleDebugAndroidTest／lintDebug exit 0（0 error、2 既有 warning），直接 instrumentation **7 项通过**（视频 UI 6＋libmpv 真实菜单 1）。新增 `VideoPlayerUiTest` 用例覆盖抽屉右侧几何、真实倍速选择、返回／遮罩关闭、布局宽高变化、360dp 高／200% 字体、滑入位置和退出屏蔽。首次返回测试缺少 Compose 同步已修正并复测通过；详见 [U17 命令、日志与截图](validation/video-u17/README.md)。
+- 设备／素材：先枚举 MuMu `127.0.0.1:16384`／API35／x86_64、1920×1080 横屏，自制 U15／U16 素材和独立偏好。APK 和测试 APK 均 install -r，保留用户数据；主页面启动 Status ok。截图只含测试素材。
+- 未验／下一步：实体小米、完整 TalkBack、API26–32、release 帧率待验；不因 UI 修改重复无关 native／音频硬件测试。下一步由用户复核横屏宽度、透明度和手感；未写视觉已满意。
+
+## 2026-10-14：U16 可选 libmpv 与第四项视频差异补齐
+
+用户要求继续未完成的第四项，并允许参考 libmpv-android、更换视频后端。已在 dev 加入可选 `dev.jdtech.mpv:libmpv:1.0.0` 原生路径，保留 Media3 默认及回退入口，没有提交／推送／发布。接手已有 D01／U15 改动保留；Rust 项目只读且状态干净。
+
+- 功能／UI：`VideoPlayerPage.kt`、`PlaybackBackend.kt` 增加后端选择、真实章节、双向逐帧、音频／字幕偏移、libass 样式与三种字体预设／覆盖、deband。已有 A–B、轨道、3×、比例／双指变换与截图继续可用；libmpv 截图带字幕。入口为「播放工具 → 视频后端 → libmpv · 扩展功能」。
+- 播放／生命周期：新 `MpvVideoBackend.kt`、`MpvNative.kt`、`native/jni/mpv_worker.cpp`；C++ worker 统一 mpv API，有界队列、合并 seek／poll、UTF-8、generation 与句柄注册表、白名单。Surface 和 FD 在 worker 销毁确认后释放，清空队列／退出也走同一保护。真实 SimpleBasePlayer 驱动 MediaSession，含 stop／prepare。`AndroidMedia3PlaybackBackend.kt`／`PlayerApplication.kt` 先停止释放视频再恢复音乐或启动音频自检，保留音量与播放意图。
+- 构建：`app/build.gradle.kts`、`native/CMakeLists.txt` 固定 AAR／SHA256，提取两 ABI。发现 NDK28 libc++ 缺浮点 from_chars，改为显式共用上游固定 NDK29 libc++；编译器和公开接口保持 NDK28。没有复制未知 APK 库、运行上游自动安装脚本或修改全局环境。原生 header、脚本及库 hash 与架构决定见 ADR0007／U16 audit。
+- 验证：assembleDebug／assembleDebugAndroidTest／37 项 JVM／lint exit 0（0 error、2 既有 warning）；MuMu 全量 **22 项**（libmpv 5＋U15 视频／手势／UI 12＋音乐 5）通过。之后补 stop／prepare 与清空队列销毁边界，再构建／单测／lint 并复测 5 项 libmpv。真实验证了单帧时间差、章节、偏移／样式实际属性、ASS 开关像素、Surface 重建、双后端往返、同一 MediaController 转 native PCM 音乐、A–B／3× 和菜单点击。`Verify-MpvArtifact.py` exit 0：全部 24 个 so、两 ABI ELF／ZIP 16 KB 对齐，单一 libc++。命令、exit、APK／素材 hash、日志／自制截图见 [U16 验证](validation/video-u16/README.md)。
+- 设备／素材：先枚举 `127.0.0.1:16384` MuMu API35，实际 app x86_64；不是实体小米。自制三章节 4:3 H.264／双 AAC／ASS 动画 MKV 与低幅 PCM WAV，独立偏好；所有安装 install -r，未动用户库或全局系统设置。
+- 限制／下一步：默认仍 Media3；物理 arm64 装载／硬解、API26–32、HDR、实体多指／触感、release 性能及完整 SAF 流程待验。libmpv 严格硬解不开放，字体仅三种预设；没有迁入全部桌面 shader／窗口功能。上游 FFmpeg 含 GPLv3+ 配置，完整依赖源码／许可证交付与可复现构建 gate 未关闭，所以本轮不发布、不称最终 native 迁移完成。下一步是用户从扩展入口复核体验与真实设备资格验证；未写视觉已满意。
+
+
+## 2026-10-14：U15 视频页面、全窗口变换与桌面视频功能补齐
+
+用户本轮要求优化小米风格的视频页、双指操作后提供还原、放大覆盖原黑边、3× 单次系统触感，并参考 Rust 桌面补视频功能。在 dev 上实现，未提交／推送；接手已有 D01 文档修改完整保留，Rust 工程只读（本轮参考 HEAD `e6a8456`）。
+
+- 前端：`VideoPlayerPage.kt`、`PlayerScreens.kt`、`VideoSurface.kt`、新 `VideoViewport.kt`／`VideoGeometry.kt`、`PlayerHostActivity.kt`；黑色沉浸画布、统一白色操作、细进度条、工具／字幕／画面分组窗口、锁定／还原、±10 秒、系统栏和保持亮屏。`MusicPlayerScreen.kt` 仅把既有进度条开放为共用组件，音乐外观不变。旧比例限制 PlayerView XML 已移除。
+- 变换：TextureView 布局铺满窗口，比例适应并入矩阵；0.5–5×、重心锚点、任意旋转与归一化平移保留。变换后独立显示还原。真实 4:3 样片的像素检查发现暂停画面未重绘，已通过同时 invalidate TextureView 与宿主修复；最终验证放大覆盖原黑边、还原恢复比例，不只检查矩阵。
+- 后端：`PlaybackBackend.kt`／`AndroidMedia3PlaybackBackend.kt` 增加真实轨道投影／选择、重建保留参数、视频独立顺序／单项循环／随机、后端 PlayerMessage A–B、带 token 的临时 3×。进入成功才调用 KEYBOARD_TAP，一次短触感；失焦、第二指、媒体切换、重建、结束和取消恢复基础速度。
+- 字幕与截图：新 `VideoSubtitle.kt` 后台限量导入 SAF SRT／VTT／ASS／SSA（4 MB／20000 条），Media3 预解析后才重建，拒绝旧 URI／generation；支持内外字幕、音轨开关和字幕字号。SubtitleView 跟随视频变换，控制层显示时提高默认字幕位置。截图单次读取，最长边 1920，系统选择保存位置，不含字幕／控制层。
+- 验证：`assembleDebug`、`assembleDebugAndroidTest`、`testDebugUnitTest`、`lintDebug` exit 0；37 项 JVM 无失败。MuMu 直接 instrumentation **17 项通过**（视频后端 5、手势 4、视频 UI 3、既有音乐回归 5），含真实字幕 cue、双音轨、解码重建、A–B 多次回绕、旧 boost 拒绝、黑边像素、还原／锁定、360dp／200% 字体约束布局。最终清理未使用资源后再打包／lint。具体命令、APK／样片 hash 和自制画面截图见 [U15 验证](validation/video-u15/README.md)。
+- 设备：先枚举为空；从正在运行的 MuMuManager info 获取并连接 `127.0.0.1:16384`，Android15／API35／报告型号 2304FPN6DC。所有安装 install -r，无卸载／清数据。样片为自制 testsrc2＋低幅双 AAC＋mov_text，测试偏好独立，不操作用户媒体或全局设置。
+- 限制：本轮不是 Rust 全功能对等。精确双向逐帧、通用容器章节、音频／字幕延迟、自选字幕字体／完整 libass 特效和 deband 未迁入；对照与原因见 [视频体验](UI_VIDEO_EXPERIENCE.md)。截图保存器的真实 SAF 写入完整流程、API26–32、实体多指／触感、TalkBack、release 性能／HDR仍待专项。MuMu 上的大字体约束测试不等于全系统无障碍验收，未写“视觉已满意”。
+
+下一动作：用户复核小米风格与物理手感；若继续推进桌面对等，按缺口表先建立章节／时间偏移／精确逐帧的后端契约与素材 gate，不能伪装为已实现或用估算 seek 冒充逐帧。
+
+## 2026-10-14：D01 文档与 AGENTS 接手基线同步
+
+用户要求更新文档和 AGENTS.md。功能代码基线为 `dev` 提交 **`607ceb3`**；HiFi 基线 `c75b34d` 已合入，master 保持 `836a920`。本轮仅修改文档，尚未提交／推送。
+
+- `AGENTS.md`：替换旧 U08／MuMu 接手入口，明确 dev 开发与 master 仅接受授权合入、最新 U11–U14 功能、真实 service／唯一引擎、最终按钮与动效规则，以及有线小米 13 Ultra／无 DAC 的验收条件。保留架构、线程、音频真实性、数据和兼容性约束；不把待验内容写成已通过。
+- `README.md`、`IMPLEMENTATION_PLAN.md`、`TECHNICAL_DESIGN.md`：更新当前实现与提交状态、设备命令和验收入口，区分已有 Media3／C++ PCM／JNI／AudioTrack 与后续 FFmpeg／libmpv／Oboe、Room／DataStore 规划；版本表核对实际 catalog，清除过时坐标与“无需 ExoPlayer”描述。
+- `HANDOFF_HIFI.md`：修正 H02–H05 已提交状态和当前启动指令，标记旧设备／无线地址／测试命令为历史范围，修复相对链接。`UI_SETUP_AND_LIBRARY.md`、`UI_MUSIC_EXPERIENCE.md` 同步底栏单按钮、收藏入口、52dp／50dp 按钮、双语样式 v2 和 U14 保留回弹；移除未收录原图的失效链接。
+- 验证：核对 `git log`／分支、catalog 和 service／歌词源码；文档入口本地链接检查及 `git diff --check` 通过（exit 0）。只改 Markdown，没有新增功能或重跑构建／设备测试，继续引用 U14／U13 已记录证据。
+
+下一动作：按用户后续任务在 dev 继续；本轮文档改动待提交。Compose suite、低版本／无障碍／性能与音频硬件资格的既有未验事项不变。
+
 ## 2026-10-14：提交 U11–U14 到 dev
 
 用户明确授权提交。本次提交收录 U11 音乐库／歌单／队列／输出回退／双语歌词，以及 U12–U14 按钮、列表与封面动效修复，包含对应测试和实机验收记录。下方各轮“未提交”描述为当时状态，本条覆盖当前提交状态；不推送远端，不合入 master，不修改 Rust 参考工程。

@@ -1,18 +1,28 @@
 # 分阶段实施手册
 
-2026-10-05 最新优先任务为 **U08 媒体库分页与页头视觉**：页头（标题／图标／TabRow）固定在 HorizontalPager 之外，只有 TabRow 下方的内容左右切换；标题与图标透明度跟随 pager 偏移量，滚动时大标题收成栏内小标题；TabRow 40dp、收藏卡片竖向内边距 13dp。**用户已复核满意。** 设计见 [UI_SETUP_AND_LIBRARY](UI_SETUP_AND_LIBRARY.md) 与 STATUS 的 U08 记录，证据在 `docs/validation/ui-v8/`；下面 U07／U06／U05 为已实现基线。
+2026-10-14 U19：工具内视频倍速 0.1×–10×／步进 0.1×，外侧快捷档位保留；Media3 最高 8×，更高速度使用可选 libmpv，仅硬解不自动切换。横屏抽屉与逐级返回按 U17／U18；本轮按用户授权集中提交 U15–U19 到 dev。见 [ADR0008](adr/0008-video-speed-range.md) 和 [U19 验证](validation/video-u19/README.md)。
 
-2026-10-05 前一轮优先任务为 **U07 首次安装引导、顶部音视频 TabRow、玻璃播放胶囊／环形进度／Sink、稳定封面阴影／Tilt与500ms歌词跳转、歌词样式设置、本地音乐批量管理**。设计见 [UI_SETUP_AND_LIBRARY](UI_SETUP_AND_LIBRARY.md)，执行与实际证据见 STATUS；U06服务与U05播放保持。
+2026-10-14 U16 更新：用户授权继续桌面视频功能对齐，已接入可选 libmpv，补章节、逐帧、时间偏移、libass 与 deband；见 [U16 验证](validation/video-u16/README.md)。这不是完整 S02／native 默认切换完成，音乐 FFmpeg／Oboe 与物理设备资格仍按原计划待验。
 
-2026-10-05 当前优先变更为 **U06 可配置在线音乐与歌词**，以用户新指令、[ONLINE_API](ONLINE_API.md)、[ADR0005](adr/0005-configurable-online-music.md) 和最新 STATUS 为准。按 U06.0 master 基线／dev-api，U06.1 JSON与HTTPS，U06.2在线搜索／音质／下载，U06.3独立开关，U06.4歌词候选与离线缓存，U06.5 MuMu自有HTTPS及UI验收执行。下面U05及S02–S14作为已有基线与后续计划。
+## 当前基线与接续（2026-10-14）
 
-当前用户优先任务为 **U05 音乐标签、主页内详情与歌词**，以 [UI_MUSIC_EXPERIENCE](UI_MUSIC_EXPERIENCE.md)、[ADR0004](adr/0004-inline-music-player.md) 和 [STATUS](STATUS.md) 为准。U04按压铺满/纯图标回退、U03设置/字重继续保留；视频/设置仍用U02原生Activity。不能凭历史依赖顺序跳过用户UI反馈推进S02。新版保留E00真实播放适配器，媒体核心/硬件阶段仍独立验收。设备测试用scripts/Test-MumuUi.ps1保留数据，避免默认UTP收尾卸载。
+本轮新增未提交 U15 视频体验：全窗口变换／还原、3× token 与触感、轨道／外置字幕、比例／截图、A–B／视频播放顺序。37 项 JVM 与 MuMu 17 项专项及音乐回归已通过；仍有桌面后端能力与物理设备待验，见 [视频体验与差异](UI_VIDEO_EXPERIENCE.md)。这不代表 S02／S09 整体完成。
 
-日期：2026-10-04。此手册先作为规划基线；用户已授权开始实现，并将当前验收指定为 MuMu Android 模拟器上的真实前后端闭环与 UI。native/硬件阶段仍未开始，必须另记设备证据。先读 [技术设计](TECHNICAL_DESIGN.md) 与 [ADR 0001](adr/0001-android-media3-vertical-slice.md)；每项 Done 必须有实际代码和这里要求的证据，模拟器/真机/数字捕获分别记录。
+当前分支 `dev`，功能提交 `607ceb3`（U11–U14）；此前 HiFi 升级 `c75b34d` 已合入。所有新修改留在 dev，master 仅接受授权合入。先读 [STATUS](STATUS.md) 最新记录和 [AGENTS](../AGENTS.md)，不能直接从旧 S02 建议开始下一轮。
 
-2026-10-05 继续 U06.6–U06.9：扩展 GD 五档及参数配置、Music 默认与自选目录、自动专辑图、文件头格式与确定命名；实际结果以 STATUS 最新记录为准。
+| 范围 | 已实现／证据 | 后续边界 |
+| --- | --- | --- |
+| H01–H05 | C++ PCM 核心、JNI、自研 AudioTrack sink、真实 MediaSessionService；[交接](HANDOFF_HIFI.md) | Media3／MediaCodec 仍为解码后端，FFmpeg／libmpv／Oboe 未接入；独占／位准确仍需资格验证 |
+| U11 | 分类与歌单、三种队列模式、同路由宽松回退、双语歌词样式；[验收](validation/music-u11/README.md) | 严格模式不能静默回退，断连不能转扬声器 |
+| U12–U13 | 独立队列、多选／拖动、整组圆角、52dp／50dp 按钮、精简首页、透明控件误触修复；[验收](validation/ui-u13/README.md) | 保留固定页头、唯一播放器与既有数据 |
+| U14 | 收回弹簧、共享层停留底栏、快速重开；[验收](validation/ui-u14/README.md) | 覆盖 U13 无回弹曲线；录屏不代替 release 帧率，手感待用户复核 |
 
-## 当前实现覆盖：E00 模拟器纵切
+最近验收：有线小米 13 Ultra `c9e352e3`／API36／OS3.0.308.0.WMACNXM。U14 构建、34 项 JVM、lint 通过（2 既有警告），U13 5 项真实播放 instrumentation 通过；本轮 USB 被有线调试占用，无 DAC。Compose Activity suite 在该 ROM 上未完成，API26–32、物理多指、横屏／大字体／TalkBack／深色与 release 性能仍待专项。
+
+下一动作以用户新指令为准。设备测试先枚举连接、install -r 保留数据，用直接 instrumentation，不使用会卸载应用数据的 connectedDebugAndroidTest；MuMu 仅在相应专项中补验。下方 E00、S00–S14 是早期纵切记录和长期计划，完成状态以本节和 STATUS 为准，不能重建第二套 service 或把旧 UI 恢复回来。
+
+## 历史实现覆盖：E00 模拟器纵切（2026-10-04）
+
 
 E00 跨接 S00/S01 与部分 S03/S04/S06/S09，只用来达到本轮真实播放和 UI 验收：
 

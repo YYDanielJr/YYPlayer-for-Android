@@ -19,6 +19,9 @@ import yy.daniel.yyplayerforandroid.online.OnlineAudioDataSource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /** Real local Media3 playback for the emulator-first vertical slice; no UI-owned player state. */
 @UnstableApi
@@ -42,9 +45,18 @@ class AndroidMedia3PlaybackBackend(
     // which reads both `speed` and `appliedOutputPath`, so those must be declared before it. Leaving
     // `appliedOutputPath` after `player` made the renderers factory read a null enum.
     private var speed = 1f
+    private var boostSequence = 0L
+    private var activeBoost: Long? = null
     private var appliedOutputPath = outputPath()
     private val orderStorage = appContext.getSharedPreferences("playback_order_v1", Context.MODE_PRIVATE)
     private var playOrder = PlayOrder.entries.firstOrNull { it.name == orderStorage.getString("music", null) } ?: PlayOrder.SEQUENTIAL
+    private var videoOrder = PlayOrder.SEQUENTIAL
+    private var loopStart: Long? = null
+    private var loopEnd: Long? = null
+    private var loopMessage: androidx.media3.exoplayer.PlayerMessage? = null
+    private var videoIdentity: String? = null
+    private val externalSubtitles = mutableMapOf<String, VideoSubtitle>()
+    private val subtitleCopies = mutableSetOf<android.net.Uri>()
     private var fallbackReason: String? = null
     private var expectedRoute: Int? = null
     private var fallbackRoute: Int? = null
@@ -57,6 +69,13 @@ class AndroidMedia3PlaybackBackend(
     private var playerOutputPath = yy.daniel.yyplayerforandroid.audio.OutputPath.SYSTEM
     private val playerHandler = android.os.Handler(android.os.Looper.getMainLooper())
     private var outputRevision = 0L
+    private var mpv: MpvVideoBackend? = null
+    private var changingEngine = false
+    private var closed = false
+    private var playRequest = 0L
+    private var outputTestVideo: PlaybackSnapshot? = null
+    private var pendingPlay: Pair<List<LocalMedia>, Int>? = null
+    private var videoEngine = VideoEngine.entries.firstOrNull { it.name == orderStorage.getString("video_engine", null) } ?: VideoEngine.MEDIA3
     private var player: ExoPlayer = newPlayer(DecoderMode.AUTO)
     private var mediaGeneration = 0L
     private var decoderMode = DecoderMode.AUTO
@@ -92,20 +111,25 @@ class AndroidMedia3PlaybackBackend(
         negotiated = null
         rebuildPlayer()
     }
-    internal var onPlayerReplaced: ((ExoPlayer) -> Unit)? = null
+    internal var onPlayerReplaced: ((Player) -> Unit)? = null
     internal fun reconfigureOutput() { negotiated = null; fallbackReason = null; fallbackRoute = null; rebuildPlayer() }
 
     private fun rebuildPlayer(positionOverride: Long? = null) {
+        if (mpv != null || changingEngine) return
         if (outputTestActive) return
+        cancelSpeedBoost()
         val old = player
         val position = positionOverride ?: old.currentPosition.coerceAtLeast(0L)
         val wantsPlay = old.playWhenReady
         val retainedVolume = old.volume
+        val retainedTracks = old.trackSelectionParameters
+        loopMessage?.cancel(); loopMessage = null
         old.pause()
         val replacement = newPlayer(decoderMode)
         attachListeners(replacement)
         player = replacement
         replacement.volume = retainedVolume
+        replacement.trackSelectionParameters = retainedTracks
         onPlayerReplaced?.invoke(replacement)
         // Release the previous output before preparing a replacement stream.
         old.release()
@@ -116,11 +140,47 @@ class AndroidMedia3PlaybackBackend(
             replacement.setMediaItems(queue.map(::toMediaItem), index, position)
             replacement.prepare()
             replacement.playWhenReady = wantsPlay
+            armLoop()
         }
         publish()
     }
 
     override fun play(queue: List<LocalMedia>, startIndex: Int) {
+        playRequest++
+        startPlayback(queue, startIndex)
+    }
+    private fun startPlayback(queue: List<LocalMedia>, startIndex: Int) {
+        if (closed || outputTestActive) return
+        if (queue.isEmpty() || startIndex !in queue.indices) return
+        if (changingEngine) { pendingPlay = queue.toList() to startIndex; return }
+        if (queue[startIndex].kind == MediaKind.VIDEO && videoEngine == VideoEngine.MPV) {
+            if (queue.any { it.kind != MediaKind.VIDEO || it.isOnline }) return
+            if (mpv == null) {
+                loopMessage?.cancel(); loopMessage = null
+                val retainedVolume = player.volume
+                player.release() // Real output teardown before native playback may start.
+                mpv = MpvVideoBackend(appContext, mediaGeneration + 1, retainedVolume) { snapshot ->
+                    this.queue = snapshot.queue; index = snapshot.queueIndex
+                    mediaGeneration = snapshot.mediaGeneration; _state.value = snapshot
+                }
+                onPlayerReplaced?.invoke(mpv!!.player)
+            }
+            mpv!!.play(queue, startIndex); return
+        }
+        val native = mpv
+        if (native != null) {
+            val retainedVolume = native.player.volume
+            changingEngine = true; pendingPlay = queue.toList() to startIndex
+            native.closeAsync {
+                if (closed) { mpv = null; return@closeAsync }
+                mpv = null; changingEngine = false
+                player = newPlayer(decoderMode); player.volume = retainedVolume
+                attachListeners(player); onPlayerReplaced?.invoke(player)
+                val pending = pendingPlay; pendingPlay = null
+                if (pending != null) startPlayback(pending.first, pending.second)
+            }
+            return
+        }
         if (outputTestActive) return
         if (!selectedDevicePresent()) { error = "所选输出设备已断开"; publish(); return }
         if (queue.isEmpty() || startIndex !in queue.indices) return
@@ -128,6 +188,8 @@ class AndroidMedia3PlaybackBackend(
             error = "音频和视频需使用独立播放队列"; publish(); return
         }
         if (queue[startIndex].isOnline && !networkAllowed()) { error = "联网音乐已关闭"; publish(); return }
+        clearLoop()
+        player.trackSelectionParameters = player.trackSelectionParameters.buildUpon().clearOverrides().build()
         this.queue = queue.toList()
         mediaHeaderSnapshot.set(queue.associate { it.uri.toString() to it.mediaHeaders })
         index = startIndex
@@ -148,6 +210,8 @@ class AndroidMedia3PlaybackBackend(
     }
 
     override fun togglePlayPause() {
+        if (changingEngine) return
+        mpv?.let { it.togglePlayPause(); return }
         if (outputTestActive) return
         if (!selectedDevicePresent()) { error = "所选输出设备已断开"; publish(); return }
         if (_state.value.current?.isOnline == true && !networkAllowed()) { error = "联网音乐已关闭"; publish(); return }
@@ -161,24 +225,56 @@ class AndroidMedia3PlaybackBackend(
     }
 
     override fun seekTo(positionMs: Long) {
+        if (changingEngine) return
+        mpv?.let { it.seekTo(positionMs); return }
         val duration = player.duration.takeIf { it != C.TIME_UNSET } ?: Long.MAX_VALUE
+        if (loopEnd != null && positionMs !in loopStart!!..loopEnd!!) clearLoop()
         player.seekTo(positionMs.coerceIn(0L, duration))
         publish()
     }
 
-    override fun seekBy(deltaMs: Long) = seekTo((player.currentPosition + deltaMs).coerceAtLeast(0L))
+    override fun seekBy(deltaMs: Long) = seekTo((_state.value.positionMs + deltaMs).coerceAtLeast(0L))
 
     override fun setSpeed(speed: Float) {
+        if (changingEngine || !speed.isFinite()) return
+        mpv?.let { it.setSpeed(speed); return }
+        activeBoost = null
         if (playerOutputPath == yy.daniel.yyplayerforandroid.audio.OutputPath.NATIVE_EXACT) {
             player.playbackParameters = PlaybackParameters.DEFAULT
             publish(); return
         }
-        this.speed = speed.coerceIn(0.25f, 3f)
+        this.speed = if (state.value.isVideo) speed.coerceIn(.1f, 8f) else speed.coerceIn(.25f, 3f)
         player.playbackParameters = PlaybackParameters(this.speed)
         publish()
     }
 
+    override fun beginSpeedBoost(): Long? {
+        if (changingEngine) return null
+        mpv?.let { return it.beginSpeedBoost() }
+        if (!_state.value.isVideo || playerOutputPath == yy.daniel.yyplayerforandroid.audio.OutputPath.NATIVE_EXACT ||
+            player.playbackState == Player.STATE_ENDED || error != null) return null
+        val token = ++boostSequence
+        activeBoost = token
+        player.playbackParameters = PlaybackParameters(3f)
+        publish()
+        return token
+    }
+    override fun endSpeedBoost(token: Long, baseSpeed: Float) {
+        if (changingEngine) return
+        mpv?.let { it.endSpeedBoost(token, baseSpeed); return }
+        if (activeBoost != token) return
+        cancelSpeedBoost(); publish()
+    }
+    private fun cancelSpeedBoost() {
+        if (activeBoost != null) {
+            activeBoost = null
+            player.playbackParameters = PlaybackParameters(speed)
+        }
+    }
+
     override fun setDecoderMode(mode: DecoderMode) {
+        if (changingEngine) return
+        mpv?.let { it.setDecoderMode(mode); return }
         if (mode == decoderMode) return
         val videoMime = player.currentTracks.groups
             .firstOrNull { it.type == C.TRACK_TYPE_VIDEO && it.length > 0 }
@@ -221,24 +317,33 @@ class AndroidMedia3PlaybackBackend(
         publish()
     }
 
-    override fun next() { if (!outputTestActive && selectedDevicePresent()) { player.seekToNextMediaItem(); publish() } }
+    override fun next() { if (changingEngine) return; mpv?.let { it.next(); return }; if (!outputTestActive && selectedDevicePresent()) { player.seekToNextMediaItem(); publish() } }
 
     override fun previous() {
+        if (changingEngine) return
+        mpv?.let { it.previous(); return }
         if (outputTestActive || !selectedDevicePresent()) return
         if (player.currentPosition > 3_000L) seekTo(0) else { player.seekToPreviousMediaItem(); publish() }
     }
 
     override fun setPlayOrder(order: PlayOrder) {
+        if (changingEngine) return
+        mpv?.let { it.setPlayOrder(order); return }
+        if (queue.getOrNull(index)?.kind == MediaKind.VIDEO) {
+            videoOrder = order; applyOrder(player); publish(); return
+        }
         playOrder = order
         orderStorage.edit { putString("music", order.name) }
         applyOrder(player); publish()
     }
     private fun applyOrder(target: ExoPlayer) {
-        val order = if (queue.getOrNull(index)?.kind == MediaKind.VIDEO) PlayOrder.SEQUENTIAL else playOrder
+        val order = if (queue.getOrNull(index)?.kind == MediaKind.VIDEO) videoOrder else playOrder
         target.repeatMode = when (order) { PlayOrder.SEQUENTIAL -> Player.REPEAT_MODE_OFF; PlayOrder.SINGLE -> Player.REPEAT_MODE_ONE; PlayOrder.RANDOM -> Player.REPEAT_MODE_ALL }
         target.shuffleModeEnabled = order == PlayOrder.RANDOM
     }
     override fun jumpTo(index: Int) {
+        if (changingEngine) return
+        mpv?.let { it.jumpTo(index); return }
         if (outputTestActive || index !in queue.indices || !selectedDevicePresent()) return
         if (queue[index].isOnline && !networkAllowed()) return
         error = null
@@ -247,6 +352,8 @@ class AndroidMedia3PlaybackBackend(
         player.play(); publish()
     }
     override fun enqueue(items: List<LocalMedia>, next: Boolean) {
+        if (changingEngine) return
+        mpv?.let { it.enqueue(items, next); return }
         if (outputTestActive || items.isEmpty()) return
         if (queue.isEmpty()) { play(items, 0); return }
         val requested = items.filter { it.kind == queue.first().kind && (!it.isOnline || networkAllowed()) }.distinctBy { it.identity }
@@ -269,6 +376,8 @@ class AndroidMedia3PlaybackBackend(
         publish()
     }
     override fun removeQueueItem(index: Int) {
+        if (changingEngine) return
+        mpv?.let { it.removeQueueItem(index); return }
         if (outputTestActive || index !in queue.indices) return
         queue = queue.toMutableList().apply { removeAt(index) }
         mediaHeaderSnapshot.set(queue.associate { it.uri.toString() to it.mediaHeaders })
@@ -277,31 +386,162 @@ class AndroidMedia3PlaybackBackend(
         publish()
     }
     override fun moveQueueItem(from: Int, to: Int) {
+        if (changingEngine) return
+        mpv?.let { it.moveQueueItem(from, to); return }
         if (outputTestActive || from !in queue.indices || to !in queue.indices || from == to) return
         queue = queue.toMutableList().apply { add(to, removeAt(from)) }
         player.moveMediaItem(from, to); index = player.currentMediaItemIndex; publish()
     }
     override fun clearQueue() {
+        if (changingEngine) return
+        mpv?.let { it.clearQueue(); return }
         if (outputTestActive) return
         queue = emptyList(); index = -1
         player.stop(); player.clearMediaItems(); mediaHeaderSnapshot.set(emptyMap()); error = null; publish()
     }
 
+    /** Media3's software AudioSink caps speed at 8x; use the optional mpv engine above that. */
+    fun setVideoSpeed(value: Float) {
+        if (!value.isFinite() || !state.value.isVideo || changingEngine) return
+        val requested = value.coerceIn(.1f, 10f)
+        if (mpv == null && requested > 8f && decoderMode != DecoderMode.STRICT_HARDWARE) switchVideoEngine(VideoEngine.MPV, requested)
+        else setSpeed(requested)
+    }
+
+    fun setVideoEngine(engine: VideoEngine) = switchVideoEngine(engine)
+
+    private fun switchVideoEngine(engine: VideoEngine, requestedSpeed: Float? = null) {
+        if (closed || outputTestActive || engine == videoEngine || changingEngine) return
+        videoEngine = engine; orderStorage.edit { putString("video_engine", engine.name) }
+        val retained = state.value.copy(speed = requestedSpeed ?: mpv?.normalSpeed ?: speed)
+        if (retained.isVideo) {
+            play(retained.queue, retained.queueIndex)
+            restoreWhenReady(retained, engine)
+        }
+    }
+    private fun restoreWhenReady(retained: PlaybackSnapshot, engine: VideoEngine) {
+        val request = playRequest
+        playerHandler.post(object : Runnable {
+            var attempts = 0
+            override fun run() {
+                if (closed || request != playRequest || state.value.current?.uri != retained.current?.uri || attempts++ > 100) return
+                if (!changingEngine && state.value.phase == PlaybackPhase.READY && state.value.videoEngine == engine) {
+                    seekTo(retained.positionMs); setSpeed(retained.speed)
+                    if (!retained.isPlaying) exoPlayer().pause()
+                } else playerHandler.postDelayed(this, 50)
+            }
+        })
+    }
+    fun stepFrame(forward: Boolean) { mpv?.step(forward) }
+    fun setVideoDelay(subtitle: Boolean, ms: Long) { mpv?.setDelay(subtitle, ms) }
+    fun setVideoSubtitleFont(font: String, overrideAss: Boolean) { mpv?.setFont(font, overrideAss) }
+    fun setVideoDeband(enabled: Boolean) { mpv?.setDeband(enabled) }
+    fun setVideoSubtitleAppearance(size: Float, padding: Float) { mpv?.setSubtitleAppearance(size, padding) }
+
     fun refreshPosition() = publish()
+
+    override fun selectTrack(type: Int, group: Int?, track: Int, generation: Long) {
+        if (changingEngine) return
+        mpv?.let { it.selectTrack(type, group, track, generation); return }
+        if (generation != mediaGeneration || type !in listOf(C.TRACK_TYPE_AUDIO, C.TRACK_TYPE_TEXT)) return
+        val builder = player.trackSelectionParameters.buildUpon().clearOverridesOfType(type)
+        if (group == null) builder.setTrackTypeDisabled(type, true)
+        else {
+            val item = player.currentTracks.groups.getOrNull(group) ?: return
+            if (item.type != type || track !in 0 until item.length || !item.isTrackSupported(track)) return
+            builder.setTrackTypeDisabled(type, false)
+                .setOverrideForType(androidx.media3.common.TrackSelectionOverride(item.mediaTrackGroup, track))
+        }
+        player.trackSelectionParameters = builder.build()
+        publish()
+    }
+
+    /** The subtitle copy/validation happens on IO before this application-looper command. */
+    fun attachSubtitle(subtitle: VideoSubtitle, expectedUri: android.net.Uri, generation: Long): Boolean {
+        mpv?.let { return it.attachSubtitle(subtitle, expectedUri, generation) }
+        if (generation != mediaGeneration || queue.getOrNull(index)?.uri != expectedUri || !_state.value.isVideo) return false
+        externalSubtitles[expectedUri.toString()] = subtitle
+        subtitleCopies.add(subtitle.uri)
+        player.trackSelectionParameters = player.trackSelectionParameters.buildUpon()
+            .clearOverridesOfType(C.TRACK_TYPE_TEXT).setTrackTypeDisabled(C.TRACK_TYPE_TEXT, false)
+            .setPreferredTextLanguage("und").setSelectUndeterminedTextLanguage(true).build()
+        rebuildPlayer()
+        return true
+    }
+
+    fun removeExternalSubtitle() {
+        if (changingEngine) return
+        mpv?.let { it.removeExternalSubtitle(); return }
+        val key = queue.getOrNull(index)?.uri?.toString() ?: return
+        if (externalSubtitles.remove(key) != null) rebuildPlayer()
+    }
+
+    override fun markLoop() {
+        if (changingEngine) return
+        mpv?.let { it.markLoop(); return }
+        if (!_state.value.isVideo || player.duration <= 0 || !player.isCurrentMediaItemSeekable) return
+        val position = player.currentPosition.coerceAtLeast(0)
+        if (loopEnd != null) { clearLoop(); return }
+        if (loopStart == null) loopStart = position
+        else if (position - loopStart!! >= 500) {
+            loopEnd = position; armLoop(); player.seekTo(loopStart!!)
+        }
+        publish()
+    }
+
+    override fun clearLoop() {
+        if (changingEngine) return
+        mpv?.let { it.clearLoop(); return }
+        loopMessage?.cancel(); loopMessage = null; loopStart = null; loopEnd = null
+        publish()
+    }
+
+    private fun armLoop() {
+        loopMessage?.cancel(); loopMessage = null
+        val start = loopStart ?: return
+        val end = loopEnd ?: return
+        if (index !in queue.indices) return
+        val target = player
+        val uri = queue[index].uri
+        loopMessage = target.createMessage { _, _ ->
+            if (player === target && queue.getOrNull(index)?.uri == uri && loopStart == start && loopEnd == end) {
+                target.seekTo(start)
+            }
+        }.setLooper(target.applicationLooper).setPosition(index, end).setDeleteAfterDelivery(false).send()
+    }
 
     fun stopOnline() { if (queue.getOrNull(index)?.isOnline == true) { player.stop(); publish() } }
 
-    fun exoPlayer(): ExoPlayer = player
+    fun exoPlayer(): Player = mpv?.player ?: player
 
     internal fun stopForOutputLoss() {
+        if (changingEngine) return
+        mpv?.let { it.pause(); return }
         player.pause()
         player.stop()
         error = "输出已停止，请选择设备后重新播放"
         publish()
     }
 
-    internal fun setOutputTestActive(active: Boolean) {
+    internal fun setOutputTestActive(active: Boolean, ready: () -> Unit = {}) {
+        if (closed) return
+        if (active && mpv != null) {
+            outputTestActive = true
+            outputTestVideo = state.value.copy(isPlaying = false)
+            changingEngine = true
+            mpv!!.closeAsync {
+                if (closed) return@closeAsync
+                mpv = null; changingEngine = false
+                player = newPlayer(decoderMode); attachListeners(player); onPlayerReplaced?.invoke(player)
+                setOutputTestActive(true, ready)
+            }
+            return
+        }
         outputTestActive = active
+        if (!active && outputTestVideo != null) {
+            val saved = outputTestVideo!!; outputTestVideo = null
+            play(saved.queue, saved.queueIndex); restoreWhenReady(saved, videoEngine); ready(); return
+        }
         if (active) {
             // release() acknowledges renderer/track teardown before the fixture opens its track.
             val old = player
@@ -321,12 +561,28 @@ class AndroidMedia3PlaybackBackend(
             player.prepare()
             player.playWhenReady = false
         }
-        publish()
+        publish(); ready()
     }
 
     override fun close() {
+        if (closed) return
+        closed = true; playRequest++
+        mpv?.close(); mpv = null; pendingPlay = null
+        loopMessage?.cancel(); loopMessage = null
         outputRevision++
         player.release()
+        val copies = subtitleCopies.toList()
+        subtitleCopies.clear(); externalSubtitles.clear()
+        // The engine has released its file readers. Delete only this feature's app-owned cache.
+        CoroutineScope(Dispatchers.IO).launch {
+            val directory = java.io.File(appContext.cacheDir, "video-subtitles").canonicalFile
+            copies.forEach { uri ->
+                if (uri.scheme == "file") runCatching {
+                    val file = java.io.File(uri.path!!).canonicalFile
+                    if (file.parentFile == directory) file.delete()
+                }
+            }
+        }
         mediaHeaderSnapshot.set(emptyMap())
         queue = emptyList()
         index = -1
@@ -399,12 +655,21 @@ class AndroidMedia3PlaybackBackend(
         target.addListener(object : Player.Listener {
             override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
                 if (target !== this@AndroidMedia3PlaybackBackend.player) return
+                cancelSpeedBoost()
                 index = target.currentMediaItemIndex.takeIf { it in queue.indices } ?: -1
+                val nextIdentity = queue.getOrNull(index)?.uri?.toString()
+                if (videoIdentity != nextIdentity) {
+                    loopMessage?.cancel(); loopMessage = null; loopStart = null; loopEnd = null
+                    videoIdentity = nextIdentity
+                    target.trackSelectionParameters = target.trackSelectionParameters.buildUpon().clearOverrides()
+                        .setTrackTypeDisabled(C.TRACK_TYPE_AUDIO, false).build()
+                }
                 mediaGeneration++
                 publish()
             }
             override fun onEvents(player: Player, events: Player.Events) {
                 if (target === this@AndroidMedia3PlaybackBackend.player) {
+                    if (player.playbackState == Player.STATE_ENDED || player.playerError != null) cancelSpeedBoost()
                     if (queue.getOrNull(index)?.kind == MediaKind.AUDIO &&
                         (events.contains(Player.EVENT_REPEAT_MODE_CHANGED) || events.contains(Player.EVENT_SHUFFLE_MODE_ENABLED_CHANGED))) {
                         playOrder = when { player.shuffleModeEnabled -> PlayOrder.RANDOM; player.repeatMode == Player.REPEAT_MODE_ONE -> PlayOrder.SINGLE; else -> PlayOrder.SEQUENTIAL }
@@ -447,8 +712,9 @@ class AndroidMedia3PlaybackBackend(
             }
             override fun onTracksChanged(tracks: androidx.media3.common.Tracks) {
                 if (target !== this@AndroidMedia3PlaybackBackend.player) return
-                val audio = tracks.groups.firstOrNull { it.type == C.TRACK_TYPE_AUDIO && it.length > 0 }
-                    ?.getTrackFormat(0)
+                val audio = tracks.groups.filter { it.type == C.TRACK_TYPE_AUDIO }.firstNotNullOfOrNull { group ->
+                    (0 until group.length).firstOrNull { group.isTrackSelected(it) }?.let(group::getTrackFormat)
+                }
                 audioSampleRate = audio?.sampleRate?.takeIf { it > 0 }
                 audioChannels = audio?.channelCount?.takeIf { it > 0 }
                 publish()
@@ -483,9 +749,17 @@ class AndroidMedia3PlaybackBackend(
         .setMediaMetadata(MediaMetadata.Builder().setTitle(if (media.kind == MediaKind.AUDIO) media.musicTitle else media.title)
             .setArtist(media.artist).setAlbumTitle(media.album).build())
         .apply { media.mimeType?.let(::setMimeType) }
+        .apply { externalSubtitles[media.uri.toString()]?.let { sub ->
+            setSubtitleConfigurations(listOf(MediaItem.SubtitleConfiguration.Builder(sub.uri)
+                .setMimeType(sub.mimeType).setLabel(sub.name).setLanguage("und")
+                .setSelectionFlags(C.SELECTION_FLAG_DEFAULT).build()))
+        } }
         .build()
 
     private fun publish() {
+        if (closed) return
+        if (changingEngine) return
+        mpv?.let { _state.value = it.state.value; return }
         val duration = player.duration.takeIf { it != C.TIME_UNSET && it >= 0L } ?: 0L
         val activeVideoMime = player.currentTracks.groups.firstOrNull { it.type == C.TRACK_TYPE_VIDEO && it.length > 0 }
             ?.getTrackFormat(0)?.sampleMimeType
@@ -528,8 +802,21 @@ class AndroidMedia3PlaybackBackend(
             videoPixelRatio = videoSize.pixelWidthHeightRatio,
             videoRotationDegrees = videoSize.unappliedRotationDegrees,
             error = error,
-            playOrder = if (queue.getOrNull(index)?.kind == MediaKind.VIDEO) PlayOrder.SEQUENTIAL else playOrder,
+            playOrder = if (queue.getOrNull(index)?.kind == MediaKind.VIDEO) videoOrder else playOrder,
             outputFallback = fallbackReason.takeIf { queue.getOrNull(index)?.kind == MediaKind.AUDIO },
+            tracks = player.currentTracks.groups.flatMapIndexed { groupIndex, group ->
+                if (group.type !in listOf(C.TRACK_TYPE_AUDIO, C.TRACK_TYPE_TEXT)) emptyList()
+                else (0 until group.length).map { track ->
+                    val format = group.getTrackFormat(track)
+                    val language = format.language?.takeUnless { it == "und" }?.let { java.util.Locale.forLanguageTag(it).displayLanguage }
+                    val label = listOfNotNull(format.label, language,
+                        format.channelCount.takeIf { it > 0 }?.let { "$it 声道" }).distinct().joinToString(" · ")
+                        .ifBlank { "${if (group.type == C.TRACK_TYPE_AUDIO) "音轨" else "字幕"} ${groupIndex + 1}.${track + 1}" }
+                    PlaybackTrack(groupIndex, track, group.type, label, group.isTrackSelected(track), group.isTrackSupported(track))
+                }
+            },
+            subtitleName = queue.getOrNull(index)?.let { externalSubtitles[it.uri.toString()]?.name },
+            loopStartMs = loopStart, loopEndMs = loopEnd,
         )
     }
 }

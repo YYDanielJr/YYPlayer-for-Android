@@ -1,7 +1,24 @@
+import java.security.MessageDigest
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
 }
+
+// Upstream Linux CI artifact; one verified FFmpeg and its pinned libc++ for both JNI bridges.
+val mpvArchive = configurations.create("mpvArchive") { isTransitive = false }
+dependencies { add(mpvArchive.name, "dev.jdtech.mpv:libmpv:1.0.0@aar") }
+val extractMpv = tasks.register<Copy>("extractMpv") {
+    val archive = mpvArchive.singleFile
+    from(zipTree(archive)); into(layout.buildDirectory.dir("generated/mpv"))
+    include("jni/arm64-v8a/*.so", "jni/x86_64/*.so")
+    exclude("**/libplayer.so")
+    doFirst {
+        val digest = MessageDigest.getInstance("SHA-256").digest(archive.readBytes()).joinToString("") { "%02x".format(it) }
+        check(digest == "df146592480fc8418415a06b1f1a1d6318b0088e21f52254b0e9a82b61ca8fa2") { "libmpv artifact checksum mismatch" }
+    }
+}
+tasks.matching { it.name == "preBuild" }.configureEach { dependsOn(extractMpv) }
 
 android {
     namespace = "yy.daniel.yyplayerforandroid"
@@ -25,7 +42,7 @@ android {
         externalNativeBuild {
             cmake {
                 // The portable core is C++17 and shares one libc++ with the JNI bridge.
-                arguments += listOf("-DCMAKE_BUILD_TYPE=Release", "-DANDROID_STL=c++_shared")
+                arguments += listOf("-DCMAKE_BUILD_TYPE=Release", "-DANDROID_STL=none")
             }
         }
     }
@@ -56,6 +73,7 @@ android {
     buildFeatures {
         compose = true
     }
+    sourceSets.getByName("main").jniLibs.srcDir(layout.buildDirectory.dir("generated/mpv/jni").get().asFile)
     // Explicit QA build only: trust a freshly generated localhost certificate for self-owned fixtures.
     // Normal debug/release builds retain the platform trust store and contain no QA endpoints/certificates.
     if (providers.gradleProperty("onlineQa").orNull == "true") {
@@ -63,6 +81,9 @@ android {
         sourceSets.getByName("debug").res.srcDir("build/online-qa/res")
     }
 }
+
+// CMake imports the very same libc++ file as jniLibs; no arbitrary pickFirst between NDK versions.
+tasks.matching { it.name.startsWith("configureCMake") }.configureEach { dependsOn(extractMpv) }
 
 dependencies {
     implementation(platform(libs.androidx.compose.bom))

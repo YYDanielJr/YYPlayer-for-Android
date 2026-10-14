@@ -1,31 +1,31 @@
 # YYPlayer for Android
 
-2026-10-14 U14：根据用户反馈恢复封面收回的轻微弹簧回弹；封面抵达底栏后继续使用同一绘制层，取消终点换图，并保留透明控件误触修复。实机回弹／快速重开证据见 [U14 验收](docs/validation/ui-u14/README.md)。
+当前功能基线为 **2026-10-14 `dev` U15–U19**，在上一提交 `607ceb3`（U11–U14）上继续实现；本轮按用户要求提交视频功能和文档，不推送、不合入 master。具体提交身份请查看 `git log -1`。
 
-2026-10-14 U13：按小米第一方截图统一页面 52dp／弹窗 50dp 操作按钮与中等字重；修正封面收回交接和透明详情控件误触弹窗，按压深度增至 9°。首页移除“全部音乐／收藏”卡片，收藏入口移至歌单页。已保留数据安装到有线小米 13 Ultra，见 [U13 验收](docs/validation/ui-u13/README.md)。
+视频已有全窗口双指变换／还原、3× 触感、字幕与音轨、A–B、截图和可选 libmpv 的章节／逐帧／libass／音画同步。横屏设置使用半透明右侧抽屉，支持实际上下滑动和屏幕内逐级返回。新增「播放工具 → 播放倍速」0.1×–10×，每次 0.1×，外侧快捷档位不变。超过 Media3 的 8× 上限时使用 libmpv；仅硬解模式保留 8× 上限。见 [视频体验](docs/UI_VIDEO_EXPERIENCE.md)、[U19 验证](docs/validation/video-u19/README.md)、[ADR0008](docs/adr/0008-video-speed-range.md)。
 
-2026-10-13 U12：封面阴影与圆角全程参与展开／收回，歌词小封面连续移回首页；播放页底部统一四项操作。队列改为独立 Activity，支持多选移除与长按排序；歌曲列表采用整组外圆角，设置／向导操作统一大按钮。已在有线小米 13 Ultra 验证，见 [U12 验收](docs/validation/ui-u12/README.md)。
+基于 Kotlin、Jetpack Compose 和 Miuix 的 Android 本地音乐／视频播放器。HiFi 基线 `c75b34d` 已合入，`master` 保持 `836a920`；桌面 Rust 工程只读参考。U15–U18 文档的“未提交”描述当轮状态，本次集中收录。
 
-2026-10-13：`dev-hifi` 的 H02–H05／U09／U10 已提交为 `c75b34d` 并合入 `dev`。本轮 `dev` 新增歌单／歌手／专辑浏览、顺序／单曲／随机队列、系统输出兼容回退、左下角封面转场及双语歌词样式；底部播放胶囊只留播放／暂停。功能细节见 [音乐体验](docs/UI_MUSIC_EXPERIENCE.md)，实际验收与限制见 [STATUS](docs/STATUS.md)。以下较早阶段说明作为基线保留。
+当前音乐体验包括歌曲／歌手／专辑／歌单浏览，顺序／单曲／随机播放，独立队列页面的单选／多选移除与长按排序，以及双语歌词字号、字重和原译间距。主页保留固定页头、顶部标签和仅有播放／暂停的底栏；“全部音乐／收藏”快捷卡片已移除，收藏从“歌单 → 我的收藏”进入。
 
-面向本地音视频的 Android HiFi 播放器。产品方向是：尽可能保留音频源信息、可核实的设备输出、接近哔哩哔哩的播放交互，以及使用 Jetpack Compose + Miuix 构建的 HyperOS 风格界面。
+页面操作按钮统一 52dp／18sp，弹窗 50dp／17sp、中等字重；歌曲列表仅整组外侧圆角。封面从左下角展开／收回，均保留轻微回弹；收回后共享绘制层继续显示底栏封面，避免终点换图。9° 角落按压缓慢跟随且无触底回弹，透明详情不再误触弹窗。最新行为见 [音乐体验](docs/UI_MUSIC_EXPERIENCE.md)，录屏见 [U14 验收](docs/validation/ui-u14/README.md)。
 
-**当前界面已接入 U07 七项新需求，并按 U08 完成媒体库分页与页头收尾（用户已复核满意）。** 首次安装引导通过 SAF 文件选择、两个独立联网选项、JSON导入和主题设置完成配置；竖屏库的页头（大标题、右侧图标、40dp 轮廓 TabRow）固定在分页之外——切换时只有 TabRow 下方的内容左右滑动，标题与图标按 pager 偏移量跟手渐隐渐显并在两页交界换字，滚动时大标题收成栏内小标题；底部只放玻璃播放胶囊、环形真实进度与Sink反馈。音乐详情保留圆角阴影切歌、Tilt封面点按和约500ms歌词切换；设置支持选中／非选中歌词样式，本地歌曲支持长按批量管理。行为与验证见 [U07/U08说明](docs/UI_SETUP_AND_LIBRARY.md)、[STATUS](docs/STATUS.md)。U05标签、封面取色与同步歌词及U04弹窗缩进规则继续保留；音乐仍在MainActivity内展开，视频／设置使用原生Activity。当前 Media3 是真实播放适配器；当前 dev-hifi 的 H01–H04 已接入可移植 C++ PCM 核心、系统／自研 AudioSink 输出选择及真实 MediaSessionService，24-bit FLAC 已在 USB DAC 上整曲输出；FFmpeg/libmpv/Oboe、实际独占和端到端位准确仍待实现／取证，API26–32 与物理拔插／焦点专项待验，见 [HiFi 接手说明](docs/HANDOFF_HIFI.md)。
+播放仍使用 Media3／MediaCodec，已有真实 MediaSessionService、可移植 C++ PCM 核心、系统与自研 AudioTrack 输出路径。非严格自研输出故障可在同一设备仍连接时回退 SYSTEM；严格模式拒绝静默降级，断连不回退扬声器。视频可选 libmpv／FFmpeg／libass 按 ADR0007 实现；音乐 FFmpeg PCM／Oboe 和端到端位准确仍未完成，见 [HiFi 交接](docs/HANDOFF_HIFI.md) 与 [ADR0006](docs/adr/0006-hifi-output-core-android-split.md)。
+
+最近验收设备为**有线小米 13 Ultra `c9e352e3`／API36／OS3.0.308.0.WMACNXM**。U14 构建、34 项 JVM 和 lint 通过（0 error／2 既有 warning）；U13 的 5 项真实播放回归通过。Compose Activity suite 在此 ROM 上尚未完成；API26–32、无障碍／大字体等专项、release 帧率和音频硬件资格仍待验。本轮没有 USB DAC，历史 DAC 结果不代表此设备通过。最新进展和具体限制见 [STATUS](docs/STATUS.md)。
 
 ## 文档入口
 
-H05 已全面审计并修正 H02–H04 未提交输出代码，歌曲详情右上“音频输出”可在同页切换输出方式和设备，与设置页共用唯一播放器。当前自研 AudioTrack 路径不证明流独占；设备路由、JNI 并发、PCM、自检互斥与媒体会话回归见 [审计报告](docs/HIFI_CODE_AUDIT.md) 和 [验收证据](docs/validation/hifi-v1/README.md)。用户当前小米设备 adb 为 `192.168.1.246:33103`，更早地址属于历史记录。
-
-`master` 已保存 U05 基线（`80538db`）；当前 `dev-api` 增加在线音乐／歌词服务，设计与使用见 [在线 API](docs/ONLINE_API.md)。联网歌曲与联网歌词开关独立、默认关闭；GD 示例按用户提供文档包含五档音质和专辑图；默认 Music、自选目录、实际格式命名与可用音质检查已实现，具体验证结果见 STATUS。
+在线音乐／歌词服务沿用两个默认关闭的独立开关，包含配置、搜索、歌词候选和下载路径，见 [在线 API](docs/ONLINE_API.md)。历史 U01–U10 文档保留背景与证据，若和最新行为冲突，以 STATUS、AGENTS 和音乐体验最新章节为准。
 
 | 文档 | 用途 |
 | --- | --- |
 | [技术设计](docs/TECHNICAL_DESIGN.md) | 选型理由、可行性边界、模块接口、音视频算法、UI 与平台适配 |
-| [实施计划](docs/IMPLEMENTATION_PLAN.md) | S00–S14 的具体文件、操作顺序、前置条件和验收方法 |
+| [实施计划](docs/IMPLEMENTATION_PLAN.md) | 当前 U11–U14 基线、待验事项及长期 S00–S14 计划 |
 | [AGENTS.md](AGENTS.md) | 后续代码代理必须遵循的执行规则与禁区 |
 | [进度记录](docs/STATUS.md) | 实际完成情况、证据和下一任务；接手先读 |
 | [U07 引导／库／控件](docs/UI_SETUP_AND_LIBRARY.md) | 首次设置、顶部标签、播放玻璃胶囊、歌词样式与长按批量管理 |
-| [U05 音乐展示／歌词／动画](docs/UI_MUSIC_EXPERIENCE.md) | 曲目标签、同页详情、歌词规则、取色与 MuMu 实际证据 |
+| [音乐体验 U05–U14](docs/UI_MUSIC_EXPERIENCE.md) | 当前歌单／队列／双语歌词／按钮与封面动效，以及历轮证据 |
 | [ADR 0004](docs/adr/0004-inline-music-player.md) | 音乐使用主页内动画覆盖层，视频保留 Activity |
 | [U04 按压反馈/导航回退](docs/UI_DIALOG_FEEDBACK.md) | 反馈宽度规则、纯图标回退与真机证据 |
 | [U03 真机界面修正](docs/UI_REAL_DEVICE_REFINEMENTS.md) | 实际设置缩进、方向字重、图文导航与真机证据 |
@@ -38,18 +38,18 @@ H05 已全面审计并修正 H02–H04 未提交输出代码，歌曲详情右�
 
 建议接手顺序：本文件 → STATUS → AGENTS → 技术设计 → 当前阶段的实施计划。每次只完成一个阶段或一个明确子步骤，持续更新 STATUS。
 
-## 已决定的技术路线
+## 当前实现与长期技术路线
 
 | 层 | 选择 | 职责 |
 | --- | --- | --- |
 | Android 界面 | Kotlin + Jetpack Compose + Miuix | HyperOS 风格、动画、主题、播放手势、无障碍 |
-| 系统集成 | Media3 Session + 自定义 Player 适配器 | 前台播放服务、通知、锁屏、耳机按键、媒体控制 |
+| 系统集成（已实现） | Media3 Session + 共享 ExoPlayer | 前台播放服务、通知、锁屏、耳机按键、媒体控制 |
 | 当前可运行适配器 | `PlaybackBackend` + Media3 ExoPlayer | 本地文件真实播放、状态投影、MediaCodec 解码策略；临时纵切，详见 ADR 0001 |
 | 可移植核心 | C++17 + 稳定 C ABI + JNI 薄桥 | 播放状态、命令队列、后端协调、PCM、质量策略 |
-| 视频 | libmpv + FFmpeg + MediaCodec + libass | 硬件/软件解码、同步、字幕、倍速和渲染 |
-| HiFi 音乐 | FFmpeg 解码 + 可旁路的 PCM 处理链 | 控制源格式，避免多余处理；与视频后端互斥运行 |
+| 视频（长期目标） | libmpv + FFmpeg + MediaCodec + libass | 硬件/软件解码、同步、字幕、倍速和渲染 |
+| HiFi 音乐（长期目标） | FFmpeg 解码 + 可旁路的 PCM 处理链 | 控制源格式，避免多余处理；与视频后端互斥运行 |
 | Android 音频输出 | AudioTrack；Oboe/AAudio；后续 USB Direct | 系统 USB 位完美、共享兼容、尽力申请独占 |
-| 本地数据 | Room + DataStore + SAF/MediaStore | 媒体库、历史、设置、合法的 URI 文件访问 |
+| 本地数据 | 当前仓储＋版本化 JSON／偏好＋SAF/MediaStore；Room/DataStore 为长期规划 | 媒体库、歌单、设置、合法的 URI 文件访问 |
 
 选择 C++ 是为了直接接入现有媒体库，首版不新增 Rust/JNI/C++ 三语言边界。未来可以把纯策略模块换成 Rust staticlib，前端与 C ABI 不需要改变。桌面版的 Rust 并不是自研解码器，它实际封装了 libmpv；Android 会参考它的状态机和策略，重写平台部分。具体复用范围见技术设计第 2 节。
 
@@ -61,7 +61,7 @@ H05 已全面审计并修正 H02–H04 未提交输出代码，歌曲详情右�
 
 需要分清四件事：音频焦点、输出流独占、PCM 未处理、端到端位准确。它们不能互相替代。AAudio 独占是可拒绝的请求；Android 14 的 USB BIT_PERFECT 依赖设备/厂商支持，不能保证所有手机内置 DAC 或蓝牙输出位准确。[Android AAudio](https://developer.android.com/ndk/guides/audio/aaudio/aaudio)、[Android USB 混音器属性](https://source.android.com/docs/core/audio/preferred-mixer-attr)。
 
-计划提供兼容播放、优先独占、严格独占、优先原样输出、严格原样输出等可组合策略。严格模式不静默降级；USB/耳机失联默认暂停，禁止突然从扬声器出声。系统请求成功显示“系统报告位完美”，只有数字捕获验证过的设备组合才能显示“位准确已验证”。
+当前已提供兼容播放、优先／严格独占、优先／严格原样等策略判定与输出选择，但选择策略不代表硬件满足要求。严格模式不静默降级；USB/耳机失联默认暂停，禁止突然从扬声器出声。系统请求成功显示“系统报告位完美”，只有数字捕获验证过的设备组合才能显示“位准确已验证”。
 
 USB Direct 是针对系统路径不支持时的进阶工程，需原生等时传输和 UAC 驱动；不能用几行 bulkTransfer 冒充。首版先完成系统 USB 和 Oboe 的能力探测，完整产品阶段再实施有白名单和真机证据的 USB Direct。DSD/DoP、MQA、蓝牙无损和原生 HDR 均不是默认保证。
 
@@ -75,33 +75,35 @@ USB Direct 是针对系统路径不支持时的进阶工程，需原生等时传
 
 “参考哔哩哔哩”默认指播放器交互，并不意味着接入其内容服务。双指连续旋转是必需功能：默认 SDR 呈现采用可变换的 TextureView；原生 SurfaceView 保留为功耗/HDR 专项路径，不能依靠未经验证的 SurfaceView graphicsLayer 实现旋转。
 
-已由用户确认：普通小米/红米手机配 USB DAC、本地音视频优先。Android 8.0/API 26 起，arm64-v8a 首发，x86_64 用于模拟器；具体手机、ROM 和 DAC 型号尚未给出，没有真机不能宣称通过硬件验收。UI 不使用小米私有系统 API，也不复制其商标或受限字体。
+已由用户确认：普通小米/红米手机配 USB DAC、本地音视频优先。Android 8.0/API 26 起，arm64-v8a 首发，x86_64 用于模拟器；当前 UI 真机和历史 DAC 组合分别记录于 STATUS／HiFi 交接，不跨设备继承资格。UI 不使用小米私有系统 API，也不复制其商标或受限字体。
 
 ## 当前工程与构建
 
 当前包名与 applicationId 均为 `yy.daniel.yyplayerforandroid`，不因重构随意更改。当前只包含 `:app`，使用 AGP 9.4.1、Gradle 9.6.0、Kotlin/Compose compiler 2.4.20、Compose BOM 2026.09.00、Miuix 0.9.4、Media3 1.11.1，minSdk 26、compileSdk/targetSdk 37。源码目标 Java 11；本机运行 Gradle 的 Java 为 25.0.3，二者不是同一概念。
 
-这些版本已从候选落到当前 Android 纵切依赖；MuMu 实际安装/运行与可视验收结果写入 STATUS。它们不代表最终 native 依赖、设备兼容性或 HiFi 资格通过。Miuix 官方 Android artifact 使用 `miuix-ui-android`，Compose BOM 选稳定 2026.09.00；Gradle 9.6.0 保持不变。
+这些版本已从候选落到当前 Android 纵切依赖；小米真机与历史 MuMu 安装／运行结果写入 STATUS。它们不代表最终 native 依赖、设备兼容性或 HiFi 资格通过。Miuix 官方 Android artifact 使用 `miuix-ui-android`，Compose BOM 选稳定 2026.09.00；Gradle 9.6.0 保持不变。
 
 当前构建与检查命令：
 
 ```powershell
 Set-Location E:\SourceFiles\androidstudio\YYPlayerforAndroid
 .\gradlew.bat :app:assembleDebug :app:testDebugUnitTest :app:lintDebug --no-daemon --max-workers=4
-adb -s emulator-5554 install -r app\build\outputs\apk\debug\app-debug.apk
-adb -s emulator-5554 shell monkey -p yy.daniel.yyplayerforandroid 1
+adb devices -l
+# 确认枚举仍是本轮有线手机后执行；不清除应用数据。
+adb -s c9e352e3 install -r app\build\outputs\apk\debug\app-debug.apk
+adb -s c9e352e3 shell am start -n yy.daniel.yyplayerforandroid/.MainActivity
 ```
 
 本机 `local.properties` 指向 `E:\DeveloperTools\AndroidSDK`，不要把机器路径提交为公共配置。已发现 NDK 28.2.13676358 与 CMake 3.22.1；规划以它们为候选锁定。引入 native 后，全部依赖必须支持 16 KB 页面，不能只重编 JNI 外壳。[Android 16 KB 页面要求](https://developer.android.com/guide/practices/page-sizes)。
 
-后续 native 库由受控 Linux CI 构建，Windows 下载并校验本项目 runtime 包，再使用 Android Studio/Gradle 编译应用。mpv-android 上游明确不提供可直接依赖的 AAR，而且其原生脚本不支持 Windows/WSL；不能让接手者照抄一个不存在的 Maven 坐标。[上游集成说明](https://github.com/mpv-android/mpv-android/blob/master/README.md)、[原生构建说明](https://github.com/mpv-android/mpv-android/blob/master/buildscripts/README.md)。本项目构建脚本目前尚未实现，不把计划命令写成可用入口。
+后续 native 库由受控 Linux CI 构建，Windows 下载并校验本项目 runtime 包，再使用 Android Studio/Gradle 编译应用。mpv-android 上游明确不提供可直接依赖的 AAR，而且其原生脚本不支持 Windows/WSL；不能让接手者照抄一个不存在的 Maven 坐标。[上游集成说明](https://github.com/mpv-android/mpv-android/blob/master/README.md)、[原生构建说明](https://github.com/mpv-android/mpv-android/blob/master/buildscripts/README.md)。第三方完整媒体 runtime 构建仍未实现；已有自研 C++ PCM／JNI 构建入口见 native/README.md，不把两者混为一谈。
 
 MuMu 验收样片由 scripts/Generate-MumuFixtures.ps1 生成；执行命令为 powershell -ExecutionPolicy Bypass -File .\scripts\Generate-MumuFixtures.ps1 -PushToEmulator。脚本需要 PATH 中支持 lavfi、libx264 和 AAC encoder 的 FFmpeg，以及已连接的 adb。默认将文件写入 %TEMP%\yyplayer-mumu-fixtures，并推到 /sdcard/Movies/YYPlayerQA/；系统选择器中打开 MuMu 内部卷 V2364A > Movies > YYPlayerQA。脚本只操作这个测试目录，不扫描用户媒体。
 
-新版 UI 证据：[音乐库](docs/validation/ui-v2/music-light.png)、[视频库](docs/validation/ui-v2/video-library.png)、[浅色设置](docs/validation/ui-v2/settings-light.png)、[深色设置](docs/validation/ui-v2/settings-dark.png)。其余实测证据与操作结果见 STATUS。E00 截图保留为历史播放证据，不代表新版布局。
+U02 历史 UI 证据：[音乐库](docs/validation/ui-v2/music-light.png)、[视频库](docs/validation/ui-v2/video-library.png)、[浅色设置](docs/validation/ui-v2/settings-light.png)、[深色设置](docs/validation/ui-v2/settings-dark.png)。其余实测证据与操作结果见 STATUS。E00 截图保留为历史播放证据，不代表新版布局。
 
 ## 交付与许可证方向
 
 桌面参考项目位于 `E:\SourceFiles\rust\yyplayer`，调研时是 `dev` / `ec55789`，采用 GPL-3.0-only。Android 首版建议沿用 GPL-3.0-only，便于复用相关逻辑和选择 libmpv 的 GPL 构建；这是规划建议，Android 当前尚未添加正式 LICENSE。若未来改变发行方式，先审查实际代码和 native 依赖许可证，再作决定。
 
-正式 APK/AAB 交付必须包含可复现构建记录、第三方 notices、对应源码安排、原生依赖闭包和真机结果。源码编译成功、UI 截图、DAC 屏幕上的采样率，都不能代替位准确或 HDR 证明。当前实现仅在本地工作区与 MuMu 验证，不自动提交或发布。
+正式 APK/AAB 交付必须包含可复现构建记录、第三方 notices、对应源码安排、原生依赖闭包和真机结果。源码编译成功、UI 截图、DAC 屏幕上的采样率，都不能代替位准确或 HDR 证明。当前功能已本地提交到 dev，并有小米真机及历史 MuMu 证据；没有因此自动推送或发布。

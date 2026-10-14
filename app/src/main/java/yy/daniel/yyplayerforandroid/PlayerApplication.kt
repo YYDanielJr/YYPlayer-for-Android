@@ -243,7 +243,10 @@ internal class PlayerRuntime(context: Context) {
     fun runAudioOutputSelfTest() {
         if (audioOutput.state.value.selfTestRunning) return
         val retainedVolume = engine?.exoPlayer()?.volume ?: 1f
-        engine?.setOutputTestActive(true)
-        audioOutput.runOutputSelfTest(retainedVolume) { engine?.setOutputTestActive(false) }
+        val playback = engine
+        if (playback == null) audioOutput.runOutputSelfTest(retainedVolume) { }
+        else playback.setOutputTestActive(true) {
+            audioOutput.runOutputSelfTest(retainedVolume) { playback.setOutputTestActive(false) }
+        }
     }
 }

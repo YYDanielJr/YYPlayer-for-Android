@@ -51,8 +51,8 @@ internal val PreferenceInset = 16.dp
 internal val PageTextInset = PageGutter + PreferenceInset
 internal val DialogContentInset = 24.dp
 // Insets belong inside interactive rows so press feedback spans the container.
-private val LocalPreferenceInset = compositionLocalOf { PreferenceInset }
-private val LocalDialogAction = compositionLocalOf { false }
+internal val LocalPreferenceInset = compositionLocalOf { PreferenceInset }
+internal val LocalDialogAction = compositionLocalOf { false }
 internal val CardShape = RoundedCornerShape(24.dp)
 internal val Muted: Color @Composable get() = MiuixTheme.colorScheme.onSurfaceVariantSummary
 
@@ -169,6 +169,10 @@ internal fun HyperChoice(label: String, selected: Boolean, onClick: () -> Unit, 
 @Composable
 internal fun HyperDialog(title: String, onDismiss: () -> Unit, show: Boolean = true,
     buttonText: String = "取消", content: @Composable ColumnScope.() -> Unit) {
+    if (LocalVideoSettingsInDrawer.current) {
+        if (show) VideoDrawerPage(title, onDismiss, buttonText, content = content)
+        return
+    }
     val maxHeight = with(LocalDensity.current) { LocalWindowInfo.current.containerSize.height.toDp() } * .65f
     // Keep this node composed while show becomes false so Miuix completes its exit animation.
     WindowDialog(show = show, title = title, onDismissRequest = onDismiss, backgroundColor = MiuixTheme.colorScheme.surface,

@@ -100,7 +100,7 @@ class OutputAuditDeviceTest {
                     }
                     await("$path → ${device.productName}") {
                         assertNull("切换不能产生播放错误", backend!!.state.value.error)
-                        val active = backend!!.exoPlayer()
+                        val active = backend!!.exoPlayer() as androidx.media3.exoplayer.ExoPlayer
                         val routed = if (path == OutputPath.NATIVE_EXACT)
                             backend!!.state.value.negotiatedOutput?.route?.routedDeviceIds.orEmpty()
                         else {

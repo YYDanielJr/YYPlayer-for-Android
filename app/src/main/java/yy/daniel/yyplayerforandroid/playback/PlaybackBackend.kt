@@ -35,6 +35,10 @@ enum class DecoderMode(val title: String) {
 
 enum class PlaybackPhase { IDLE, BUFFERING, READY, ENDED, ERROR }
 enum class PlayOrder(val label: String) { SEQUENTIAL("顺序播放"), SINGLE("单曲循环"), RANDOM("随机播放") }
+enum class VideoEngine(val label: String) { MEDIA3("Media3 · 兼容"), MPV("libmpv · 扩展功能") }
+data class VideoChapter(val title: String, val positionMs: Long)
+
+data class PlaybackTrack(val group: Int, val track: Int, val type: Int, val label: String, val selected: Boolean, val supported: Boolean)
 
 data class PlaybackSnapshot(
     val mediaGeneration: Long = 0,
@@ -66,6 +70,18 @@ data class PlaybackSnapshot(
     val error: String? = null,
     val playOrder: PlayOrder = PlayOrder.SEQUENTIAL,
     val outputFallback: String? = null,
+    val tracks: List<PlaybackTrack> = emptyList(),
+    val subtitleName: String? = null,
+    val loopStartMs: Long? = null,
+    val loopEndMs: Long? = null,
+    val videoEngine: VideoEngine = VideoEngine.MEDIA3,
+    val chapters: List<VideoChapter> = emptyList(),
+    val chapterIndex: Int = -1,
+    val subtitleDelayMs: Long = 0,
+    val audioDelayMs: Long = 0,
+    val subtitleFont: String = "sans-serif",
+    val overrideAssStyle: Boolean = false,
+    val deband: Boolean = false,
 ) {
     val current: LocalMedia? get() = queue.getOrNull(queueIndex)
     val isVideo: Boolean get() = current?.kind == MediaKind.VIDEO
@@ -80,6 +96,8 @@ interface PlaybackBackend : AutoCloseable {
     fun seekTo(positionMs: Long)
     fun seekBy(deltaMs: Long)
     fun setSpeed(speed: Float)
+    fun beginSpeedBoost(): Long? { setSpeed(3f); return 0L }
+    fun endSpeedBoost(token: Long, baseSpeed: Float) { setSpeed(baseSpeed) }
     fun setDecoderMode(mode: DecoderMode)
     fun next()
     fun previous()
@@ -89,4 +107,7 @@ interface PlaybackBackend : AutoCloseable {
     fun removeQueueItem(index: Int)
     fun moveQueueItem(from: Int, to: Int)
     fun clearQueue()
+    fun selectTrack(type: Int, group: Int?, track: Int = 0, generation: Long) {}
+    fun markLoop() {}
+    fun clearLoop() {}
 }

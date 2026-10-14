@@ -1,0 +1,27 @@
+{
+  "repository": "https://github.com/jarnedemeulemeester/libmpv-android",
+  "commit": "fcf6745703dc1265bca88f12fee8fc355ddf251e",
+  "aar_sha256": "df146592480fc8418415a06b1f1a1d6318b0088e21f52254b0e9a82b61ca8fa2",
+  "files": [
+    {
+      "path": ".github/workflows/publish.yaml",
+      "sha256": "147af0fc05728c9051badfeb6f74849bcb6b5085884294d40d922776d4f68c61"
+    },
+    {
+      "path": "buildscripts/include/depinfo.sh",
+      "sha256": "ca79890844402bd3c7ab2688c04ae9aebd73a118a021a7d211226289dabb7546"
+    },
+    {
+      "path": "buildscripts/scripts/mpv.sh",
+      "sha256": "6619d5143ca2e054fcb0066365ab81f068450c7b6f5789cfbbfbba6ec54e0007"
+    },
+    {
+      "path": "buildscripts/scripts/ffmpeg.sh",
+      "sha256": "2a779ba8c78ea74009558803d1ce485e615e705ebfd46c2e7f0c892b7525e6f2"
+    },
+    {
+      "path": "buildscripts/scripts/libass.sh",
+      "sha256": "57e742329a9599e3b3d08cbf185e1fdfc2e6b8d274df2548343d4a161b19d5aa"
+    }
+  ]
+}

@@ -1,22 +1,18 @@
 # YYPlayer for Android 执行规则
 
-本文件适用于整个Android工程，面向后续人类与代码代理。用户明确指令优先。用户已将任务从规划切换为实现，并指定本轮用 MuMu Android 模拟器验收“真实前后端跑通 + UI”；随 STATUS 更新实际进展，不能把未实现的目标写成现有能力。
+本文件适用于整个 Android 工程，面向后续人类与代码代理。用户明确指令优先。当前为实现阶段；最新功能基线为 2026-10-14 的 `dev` U15–U19（在 `607ceb3` 的 U11–U14 上继续实现；提交身份以 git log 为准），不要将历史计划写成已实现能力。
 
 ## 1. 接手顺序和当前任务
 
-2026-10-05 最新用户任务为 U08，按 docs/UI_SETUP_AND_LIBRARY.md 和 STATUS 接手：媒体库分页与页头视觉——页头（大标题、右侧图标、40dp 轮廓 TabRow）固定在 HorizontalPager 之外，只有 TabRow 下方内容左右切换；标题与图标透明度跟随 pager 偏移量渐隐渐显并在两页交界换字；滚动时大标题收成栏内小标题；库页自持 scroll behavior。**用户已复核满意，本轮无待改视觉项。** 下述 U07／U06／U05 为已实现基线。
+1. 先读 README、docs/STATUS.md 顶部，再读 docs/UI_MUSIC_EXPERIENCE.md、docs/TECHNICAL_DESIGN.md 和 docs/IMPLEMENTATION_PLAN.md 的当前基线；音频工作另读 docs/HANDOFF_HIFI.md 与 ADR0006。带日期的早期记录为历史证据，不能覆盖最新用户要求。
+2. 检查 git status、分支与证据。**所有修改在 `dev`；不存在时创建 `dev`。master 只接受经授权的合入，禁止直接开发。** dev-hifi 的 H02–H05／U09–U10 已保存为 `c75b34d` 并合入 dev；U11–U14 已提交为 `607ceb3`；用户已明确授权本轮 U15–U19 视频功能及文档提交到 dev，未授权推送／合入 master。master 当前基线 `836a920`。不清理用户文件；没有新授权不自动提交／推送／合并。
+3. 当前音乐能力：歌曲／歌手／专辑／歌单分类，收藏入口在“歌单 → 我的收藏”；库、歌单和播放队列独立。独立队列 Activity 支持单／多选移除、长按排序；顺序／单曲／随机播放由真实后端实现。主页底栏只留播放／暂停，不恢复下一首和“全部音乐／收藏”快捷卡片。双语歌词及自定义译文字号／字重／原译间距按 U11 保留。
+4. 音乐前端基线为 U14：封面展开和收回均保留轻微回弹，收回终点继续使用同一绘制层；不能以删除回弹规避闪现。透明详情退出后不可点击，快速重开不得误弹菜单。9° 角落按压是缓慢、无触底回弹的另一套效果。按钮／列表令牌见第 7 节。U08 固定页头与顶部 40dp TabRow、U04 弹窗反馈等已确认基线继续保留。
+5. 当前验收设备为**有线小米 13 Ultra `c9e352e3`／`2304FPN6DC`／API36／OS3.0.308.0.WMACNXM**；每次先枚举设备，不把旧无线地址当作当前连接。用户已说明有线占用 USB，本轮没有 USB DAC；历史 H05 DAC 证据不能套用到此设备。MuMu 可补专项，但不替代物理设备资格。
+6. 视频最新基线为 U19：可选 libmpv、字幕／章节／同步／逐帧，横屏半透明右侧抽屉、真实滚动与逐级返回；工具内倍速 0.1×–10×／步进 0.1×，外侧仍为 0.5／1／1.25／1.5／2／3。默认 Media3 的软件变速最高 8×，更高速度经已说明的路径切到 libmpv；仅硬解最高 8×，不自动放弃严格策略。见视频体验与 ADR0007／0008。
+7. 每轮写清任务／文件／命令与 exit 结果／设备素材／证据／未验条件和下一动作，更新 STATUS，最后中文说明实现、验证与限制。设备阻塞时继续不依赖设备的工作；没有用户最终确认时不写“视觉已满意”。
 
-2026-10-05 前轮用户任务为 U07，按 docs/UI_SETUP_AND_LIBRARY.md 和 STATUS 接手：首次引导／顶部轮廓TabRow／仅播放玻璃底栏及Sink与环形进度／封面阴影与Tilt／500ms歌词切换／歌词样式／长按多选。该轮要求覆盖旧底部纯图标导航规则，其他弹窗／生命周期规则保留。
-
-2026-10-05 前轮用户任务：在 dev-api 继续 U06.6–U06.9 下载体验，丰富 JSON 参数与 GD 五档音质、默认 Music／自选 SAF 目录、自动专辑图、文件签名与准确命名。原 U06 两个独立默认关闭的联网开关、在线搜索和歌词候选保留。设计见 docs/ONLINE_API.md 与 ADR0005；U05/U04 规则继续保留，native gate不抢先。按 STATUS 实际证据接手。
-
-1. 阅读 README、docs/STATUS.md、docs/TECHNICAL_DESIGN.md，再读 docs/IMPLEMENTATION_PLAN.md 的当前阶段。
-2. 查看git status、实际目录与上次证据；用户已授权将 U05 基线提交到 master（80538db），并创建 dev-api。后续不清理用户文件，不自动提交／推送新改动。
-3. U05音乐前端作为基线保留：标签歌曲名/歌手/专辑/独立时长、MainActivity内音乐详情、封面色背景/渐变/分层弹簧、同目录/手动/内嵌歌词与同步控制；规则/证据见docs/UI_MUSIC_EXPERIENCE.md和ADR0004。U04弹窗按压铺满、U02纯图标栏回退规则继续保留，见docs/UI_DIALOG_FEEDBACK.md；U03设置边距与方向字重保留。视频/设置/方向的U02原生Activity基线见docs/UI_COMPONENTS_AND_MOTION.md与ADR0003，音乐例外以ADR0004为准。U01截图仍为参考，不代表用户最终认可。E00真实Media3/SAF链路保留；USB DAC、API26、HiFi/native仍待验，不用假快照或mock代替播放。
-4. 每轮写清任务ID/子步骤、文件、验收，完成具体可审查结果。被设备/工具阻塞时继续不依赖它的工作，记录未验条件。
-5. 更新STATUS的实际结果和下一具体动作，最后中文说明实现/验证/限制。
-
-常规实现、可逆修改和检查不需要本文件额外批准；不要以“请确认是否继续”停止已授权工作。用户只要求规划时，不安装工具、不新增功能、不提交/发布。没有明确请求不创建其他用户聊天；本项目没有要求多代理委派。
+常规实现、可逆修改和检查不需要本文件额外批准；不要以“请确认是否继续”停止已授权工作。用户只要求规划时，不安装工具、不新增功能、不提交／发布。没有明确请求不创建其他用户聊天；本项目没有要求多代理委派。
 
 ## 2. 架构已锁定
 
@@ -24,7 +20,8 @@
 - 长期可移植媒体核心仍是C++17 + C ABI、JNI薄桥；首版不引入Rust工具链。桌面Rust项目只读参考，不直接依赖绝对path，不修改其源码。
 - 长期后端仍是视频libmpv/FFmpeg/MediaCodec/libass、音乐FFmpeg PCM + AudioTrack/Oboe；两个后端互斥，不能并发占同一输出。
 - **当前安卓纵切按 [ADR 0001](docs/adr/0001-android-media3-vertical-slice.md) 临时用 Media3 ExoPlayer 播放本地音视频。** 它实现真实播放和可选 MediaCodec 解码器，不是最终 HiFi/native 后端。`PlaybackBackend` 是当前 UI 命令/状态边界，后续保持该意图接口并逐步替换实现。
-- 不创建空Player冒充通知；本轮尚未实现 MediaSession/后台 service。
+- 已实现 `PlayerSessionService : MediaSessionService` 和真实 MediaSession；service 持有 runtime 唯一引擎的生命周期引用，重建 Player 时同步 session。禁止创建空 Player 冒充通知或在 Activity／队列页面另建播放器。
+- H01–H05 已接入 C++ PCM 核心／C ABI／JNI 与可选自研 AudioTrack AudioSink，音乐普通解码仍为 MediaCodec／Media3，FFmpeg PCM／Oboe 仍是后续目标；U16 视频已接可选 libmpv／FFmpeg／libass，默认仍 Media3，见 ADR0006／0007；不能把自研 AudioSink 说成自研解码器或已实现独占。
 - 不自写视频时钟/解码器/字幕引擎，不从libmpv公开client API编造PCM回调。
 - Android app继续使用 `yy.daniel.yyplayerforandroid`、minSdk26、compile/target37。native首发arm64-v8a，x86_64做模拟器。
 - 默认SDR TextureView保证双指任意角旋转；SurfaceView是独立功耗/HDR资格路径。不能删掉连续旋转来换实现容易。
@@ -38,7 +35,7 @@
 - 当前AGP9.4.1/Gradle9.6.0够用，不为了追新升级；BOM编号、KSP、Room等版本查官方/实际artifact后锁定，禁止编造“最新版本”。
 - native候选NDK28.2.13676358/CMake3.22.1、mpv0.41.0、FFmpeg8.1.3、Oboe1.11.0；必须过S02兼容gate，冻结完整SHA/hash/patch/options/headers/SONAME/许可。
 - 同进程只用一套FFmpeg和libc++；不从WindowsDLL、用户PATH、其他APK取得未知so。
-- native受控LinuxCI构建。mpv-android不是AAR，其上游脚本不支持Windows/WSL；不能添加不存在的Maven坐标或直接执行自动安装脚本。
+- native受控LinuxCI构建。mpv-android 应用不是 AAR；本工程 U16 使用不同项目 libmpv-android 的真实坐标 `dev.jdtech.mpv:libmpv:1.0.0`，哈希、ABI、共用 libc++ 与许可限制按 ADR0007 冻结。不能添加不存在的坐标或执行上游自动安装脚本；完整源码／许可证和可复现发布 gate 仍未关闭。
 - 所有so均做16KB ELF/ZIP检查和真实装载，不仅JNI壳。runtime下载先校验再解压、路径校验、原子替换。
 - 不改全局环境/系统配置，不把local.properties、keystore、token、下载native包提交为公共源码。
 
@@ -49,7 +46,7 @@
 - Kotlin Player适配器全部调用在规定applicationLooper；Accepted不是完成，匹配Ack后再完成future。
 - Oboe realtime callback没有alloc/JNI/IO/log/mutex，不关闭重开stream；错误交worker。
 - 普通命令队列有界64，Stop保留路径、Shutdown可唤醒；高频seek/transform合并；不能随意丢设置命令。
-- service拥有唯一controller/session；Activity/Composable不创建第二套引擎；当前U02前台Media3适配器按ADR0003暂由PlayerApplication共享，S05迁入service后不能保留双引擎；队列自动next只有native controller执行。
+- runtime 提供唯一引擎，service 持有生命周期引用和 session；Activity／Composable 不创建第二套引擎。当前自动切歌／单曲循环／随机序列由 Media3 timeline 管理，UI 不另写 EOF 自动 next；未来迁入 native controller 时也只能有一个自动推进者。
 - mediaGeneration、surfaceGeneration、queueRevision、requestId分开；旧open/EOF/路由/封面/松手事件不能覆盖新媒体。
 - Surface按冻结mpv Androidcontext使用Java GlobalRef，不盲转ANativeWindow或纹理ID；VO确认不再使用后才能releaseSurface/GlobalRef。
 - surface detach不能在主线程等待；持lease直到Ack，超时走受控销毁，不提前释放让mpv用旧指针。
@@ -84,6 +81,8 @@
 - 禁止CPU逐帧RGBA回读/上传、视频逐帧PixelCopy模糊、普通Bitmap循环充当生产视频。
 - 字幕轨能力与ASS/SRT行为说清，首版libass随画面变换。素材HDR/SDR映射/原生HDR输出三种资格分开。
 - 控件覆盖视频并自动隐藏，seek/长按/菜单时保持可操作；隐藏不改变surface尺寸。
+- 横屏抽屉正常打开时不得在 Final pass 消费子级触摸；只在退出时 Initial pass 拦截。滚动必须有真实 swipeUp／swipeDown 证据，performScrollTo 不能代替手指测试。子菜单提供屏幕内返回箭头与真实父级历史，完成／遮罩关闭整个抽屉。
+- 视频自定义倍速滑杆松手生效、加减 0.1×；快捷 1.25× 不被全局量化。真实后端限速必须查证，不能只改标签；绝对 3× 松手恢复基础速度，含 0.1×／10×。音乐原有快捷范围与精确输出拒绝变速规则保留。
 
 ## 7. 文件、数据与UI
 
@@ -95,7 +94,11 @@
 - Miuix依赖包装在designsystem，主题令牌集中；不要把所有页面又换Material3。小米风格不使用受限字体/商标/私有API。
 - U01 视觉以用户 references 为准：滚动大标题、灰白/暗色分组、磨砂悬浮音乐/视频双分页、独立搜索、真实媒体封面，播放/设置是子页；不恢复 E00 的宣传渐变 Hero 与常驻四项底栏。Raidian 只读参考，不修改其文件。
 - U02界面图标必须来自MiuixIcons；窗口用WindowDialog/WindowSpinnerPreference，show=false时保留Composition直到退出动画完成。视频/设置/方向二级页真实Activity入栈，正常路径不自定义覆盖ROM转场；音乐按用户U05授权在主Activity内自行绘制转场，见ADR0004。参考仓库只读。
-- 当前U04卡片外12dp/行内16dp，文字总左边距28dp；HyperDialog WindowDialog水平insideMargin=0，交互行内部24dp，统一使用HyperSettingRow/HyperSpinnerPreference令牌。clickable/indication放在文字padding之前，让反馈铺满弹窗；取消/文件标题单独24dp。不要恢复整个内容区水平24dp导致两条白边。方向三选项17sp/SemiBold保留；用户否定U03相册效果并授权回退。U07已用顶部TabRow替换旧的FloatingNavigationBar纯图标底栏（U08把页头固定在分页之外），不要恢复图文底栏或常驻四项导航，也不要声称已达完美相册效果。库页当前：轮廓TabRow 40dp、“全部音乐／收藏”卡片横向内边距16dp、竖向13dp。
+- 当前U04卡片外12dp/行内16dp，文字总左边距28dp；HyperDialog WindowDialog水平insideMargin=0，交互行内部24dp，统一使用HyperSettingRow/HyperSpinnerPreference令牌。clickable/indication放在文字padding之前，让反馈铺满弹窗；取消/文件标题单独24dp。不要恢复整个内容区水平24dp导致两条白边。方向三选项17sp/SemiBold保留；用户否定U03相册效果并授权回退。U07已用顶部TabRow替换旧的FloatingNavigationBar纯图标底栏（U08把页头固定在分页之外），不要恢复图文底栏或常驻四项导航，也不要声称已达完美相册效果。库页当前轮廓 TabRow 40dp；U13 已移除“全部音乐／收藏”卡片，不恢复旧卡片。
+- U12–U14 音乐 UI：整组歌曲只有首行顶部／末行底部圆角；封面／歌词页底部统一倍速、收藏、播放顺序、队列四项。队列使用独立 MusicQueueActivity 与 ROM 转场，音乐详情仍在 MainActivity 内；操作不要退回分散小胶囊。
+- 操作按钮统一 HyperActionButton：页面最小 52dp、18sp／24sp 行高，弹窗最小 50dp、17sp／22sp 行高，Medium 500、16dp 圆角；并排等宽、间隔 12dp，取消／次要灰底、确认主题色，放大字体允许增高。图标保持 48dp 触控；截图不能证明第一方精确字重，不复制受限字体。
+- 封面转场：展开 spring 180／0.86，收回 230／0.8，阈值 0.0001；几何保留带符号位移，透明度单独限幅。收回后共享层持续画底栏封面，避免终点换图；保留 Initial pass 输入拦截和快速反向锚点处理。按压单独使用临界阻尼 1／刚度 95、最大 9°，不可混入转场回弹。
+- 音频回退：PreferExclusive 在现有不能证明独占的 AudioTrack 后端选择 SYSTEM；非严格 native sink 配置／初始化／写入失败，仅在同一输出仍连接时单次回退并保留播放意图。StrictExclusive／StrictUnprocessed 拒绝静默降级；拔线不能触发扬声器回退。
 - miuix-blur0.9.4 的 minSdk33 冲突按 ADR 0002 处理：普通 UI 不暴露 blur 类型；只在 API33+进入 Api33MiuixBlur，API26–32不透明回退。不得把 manifest override 当兼容已验证，不提高 minSdk，也不能把高版本调用移回通用文件。
 - 明暗/设计/强调色/reduceMotion独立；系统scale0和后台停止持续动画，封面色只按revision更新；日常播放页不堆implementation参数。
 - 48dp触控、中文/200%字体/TalkBack/暗色对比度；手势有按钮替代。亮度仅window，不申请WRITE_SETTINGS。
@@ -111,4 +114,8 @@
 
 每次STATUS至少写：任务/子步骤、文件、运行命令与exit结果、设备/素材/证据、未执行检查、已知问题、下一动作。只有代码+要求证据齐备才Done，硬件不足记Partial/待验；不把Luna不能完成当验收标准变宽。
 
-当前优先验收U08媒体库分页/页头（已获用户确认）并保留U07引导／导航／控件／歌词样式／多选与U05音乐前端，保留U04反馈/导航规则；不能因为旧计划的“下一步S02”跳过新要求。若用户之后继续完整产品核心实现，再进入S02 native依赖和JNI/Surface gate。保留Media3适配器作为对照，先证明原生runtime可构建/装载再替换。U08遗留：实体机上`LibraryTabsUiTest`／`LibraryManagementUiTest`尚未跑通（`am instrument`崩溃或无输出，需换MuMu或先查崩溃）；API26–32磨砂隔离、物理多指、DAC仍需后续验收；debug qa_portrait仅是截图辅助，正常启动没有该行为。任何已有数据的设备更新用install -r，不清除导入/偏好；默认connectedDebugAndroidTest本轮曾卸载MuMu应用，之后用scripts/Test-MumuUi.ps1的直接instrumentation保留数据。UI取材仅保留必要局部，不保存个人视频帧。
+当前视频基线为 U15–U19，音乐保留 U11–U14；具体下一任务由最新用户指令决定，不因旧计划“下一步 S02”自行扩展到完整 native 替换。已通过：U14 最终 assembleDebug／assembleDebugAndroidTest／34 项 JVM／lint（0 error、2 既有 warning）；U13 MusicUpgradeDeviceTest 5 项真实播放回归；小米普通 UI 与录屏复核。细节与 APK hash 见 docs/validation/ui-u14 和 ui-u13。U19 最新构建／37 项 JVM／lint 和 MuMu 视频、libmpv、手势、音乐回归结果以 docs/validation/video-u19 为准；实体视频高速解码／听感、API26–32 与原生发布资格仍待验。
+
+仍待验：该 ROM 上 Compose Activity suite 挂起／崩溃或无输出（LibraryTabsUiTest、LibraryManagementUiTest 等不能计作通过）；API26–32、横屏／大字体／TalkBack／深色专项、物理多指、release 帧率，以及独占／位准确硬件资格。U14 录屏能证明回弹和无可见换图，不证明帧率达标；用户手感反馈仍是后续依据。
+
+已有数据的设备一律 install -r，不清除导入／偏好；避免会卸载数据的 connectedDebugAndroidTest，采用直接 instrumentation（MuMu 可用 scripts/Test-MumuUi.ps1）。测试使用独立偏好与自制素材，默认不动用户媒体／全局设置。debug qa_portrait 仅为截图辅助，正常启动没有该行为。UI 证据只保留必要局部，不保存个人视频帧；原参考截图和临时抽帧留在忽略的 build 目录。

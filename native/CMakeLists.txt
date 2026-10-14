@@ -5,6 +5,16 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+if(ANDROID)
+    # libmpv 1.0.0 needs NDK 29 floating-point from_chars exports. Use its pinned shared runtime
+    # for both bridges; do not silently package the older NDK 28 runtime or two copies.
+    add_library(yy_libcxx SHARED IMPORTED GLOBAL)
+    set_target_properties(yy_libcxx PROPERTIES IMPORTED_LOCATION
+        "${CMAKE_CURRENT_SOURCE_DIR}/../app/build/generated/mpv/jni/${ANDROID_ABI}/libc++_shared.so")
+    include_directories(SYSTEM "${CMAKE_SYSROOT}/usr/include/c++/v1")
+    link_libraries(yy_libcxx)
+endif()
+
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     set(CMAKE_BUILD_TYPE Release CACHE STRING "" FORCE)
 endif()
@@ -52,6 +62,9 @@ if(YY_BUILD_TESTS)
 endif()
 
 if(YY_BUILD_JNI)
+    add_library(yy_mpv SHARED jni/mpv_worker.cpp)
+    target_include_directories(yy_mpv PRIVATE third_party)
+    target_link_libraries(yy_mpv PRIVATE dl log)
     add_library(yyplayer_jni SHARED jni/yy_jni.cpp)
     target_link_libraries(yyplayer_jni PRIVATE yy_core)
     # The bridge runs on the control and writer threads, never on a realtime callback, but it still
