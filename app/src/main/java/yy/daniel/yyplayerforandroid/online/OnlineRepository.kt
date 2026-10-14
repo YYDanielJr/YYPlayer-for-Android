@@ -3,11 +3,15 @@ package yy.daniel.yyplayerforandroid.online
 import android.content.Context
 import android.net.Uri
 import android.graphics.BitmapFactory
+import android.graphics.Bitmap
+import android.util.LruCache
 import androidx.core.net.toUri
 import androidx.core.content.edit
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import org.json.JSONArray
 import org.json.JSONObject
 import org.json.JSONTokener
@@ -28,6 +32,11 @@ data class DownloadResult(val media: LocalMedia, val lyricSaved: Boolean, val wa
 /** API operations are independent of Compose and the playback engine; gates also cover direct callers. */
 class OnlineRepository(private val context: Context, private val musicAllowed: () -> Boolean,
     private val lyricsAllowed: () -> Boolean) {
+    internal val searchHistory = OnlineSearchHistory(context)
+    private val thumbnailWorkers = Semaphore(2)
+    private val thumbnails = object : LruCache<String, Bitmap>(4 * 1024 * 1024) {
+        override fun sizeOf(key: String, value: Bitmap) = value.allocationByteCount
+    }
     private val directory = File(context.noBackupFilesDir, "online-api")
     private val configFile = File(directory, "providers.json")
     private val _config = MutableStateFlow<ApiConfig?>(null)
@@ -44,6 +53,7 @@ class OnlineRepository(private val context: Context, private val musicAllowed: (
     suspend fun load() = withContext(Dispatchers.IO) {
         try {
             synchronized(resolvedCache) { resolvedCache.clear() }
+            thumbnails.evictAll()
             _config.value = ApiConfig.parse(if (configFile.exists()) configFile.inputStream().use { it.readBytesLimited(ApiConfig.MAX_BYTES).toString(Charsets.UTF_8) }
                 else context.assets.open("online-providers.json").bufferedReader().use { it.readText() })
         } catch (e: CancellationException) { throw e }
@@ -59,6 +69,7 @@ class OnlineRepository(private val context: Context, private val musicAllowed: (
             java.nio.file.Files.move(temporary.toPath(), configFile.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING, java.nio.file.StandardCopyOption.ATOMIC_MOVE)
             synchronized(requestTimes) { requestTimes.clear() }
             synchronized(resolvedCache) { resolvedCache.clear() }
+            thumbnails.evictAll()
             _config.value = parsed; _message.value = "已导入 ${parsed.providers.size} 个 API"
         } finally { temporary.delete() }
     }
@@ -67,6 +78,30 @@ class OnlineRepository(private val context: Context, private val musicAllowed: (
         _downloadDirectory.value = uri?.toString()
     }
     fun provider(id: String) = _config.value?.providers?.firstOrNull { it.id == id } ?: error("API 配置已变化，请重新搜索")
+
+    /** Provider order supplies the default; explicit quality selection remains in the row menu. */
+    fun defaultPlaybackQuality(song: OnlineSong): ApiQuality = provider(song.providerId).qualities.firstOrNull {
+        (it.sources.isEmpty() || song.source in it.sources) &&
+            (song.availableQualities == null || it.id in song.availableQualities || it.value in song.availableQualities)
+    } ?: error("此歌曲暂无可播放音质")
+
+    /** Only visible rows request thumbnails. IO/decode is bounded and never runs in composition. */
+    internal suspend fun thumbnail(song: OnlineSong): Bitmap? = withContext(Dispatchers.IO) {
+        check(musicAllowed()) { "联网音乐已关闭" }
+        val key = "${song.providerId}:${song.source}:${song.id}:${song.picId}:${song.artworkUrl}"
+        thumbnails.get(key) ?: thumbnailWorkers.withPermit {
+            thumbnails.get(key) ?: artwork(song)?.path?.let { path ->
+                val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+                BitmapFactory.decodeFile(path, bounds)
+                var sample = 1
+                while (bounds.outWidth / sample > 160 || bounds.outHeight / sample > 160) sample *= 2
+                BitmapFactory.decodeFile(path, BitmapFactory.Options().apply { inSampleSize = sample })?.also {
+                    currentCoroutineContext().ensureActive()
+                    thumbnails.put(key, it)
+                }
+            }
+        }
+    }
 
     suspend fun search(providerId: String, source: String, query: String, page: Int = 1, lyrics: Boolean = false): List<OnlineSong> {
         val permitted = if (lyrics) lyricsAllowed else musicAllowed
@@ -147,13 +182,18 @@ class OnlineRepository(private val context: Context, private val musicAllowed: (
         return if (translation.isBlank()) text else mergeTranslatedLyrics(text, translation)
     }
 
-    /** Download only on an explicit music action, with bounded validation and a durable local cover. */
+    /** Bounded artwork for visible music results, playback and downloads, using one durable cache. */
+    internal fun artworkCacheUri(song: OnlineSong): Uri {
+        val hash = MessageDigest.getInstance("SHA-256").digest("${song.providerId}:${song.source}:${song.id}:${song.picId}".toByteArray()).joinToString("") { "%02x".format(it) }
+        return File(File(context.filesDir, "online-artwork"), "$hash.cover").toUri()
+    }
+
     suspend fun artwork(song: OnlineSong): Uri? = withContext(Dispatchers.IO) {
         check(musicAllowed()) { "联网音乐已关闭" }
         val p = provider(song.providerId)
         val dir = File(context.filesDir, "online-artwork").apply { mkdirs() }
-        val hash = MessageDigest.getInstance("SHA-256").digest("${song.providerId}:${song.source}:${song.id}:${song.picId}".toByteArray()).joinToString("") { "%02x".format(it) }
-        val target = File(dir, "$hash.cover")
+        val target = File(artworkCacheUri(song).path!!)
+        val hash = target.nameWithoutExtension
         if (target.isFile) return@withContext target.toUri()
         val url = if (song.artworkUrl.isNotBlank()) song.artworkUrl else {
             val e = p.artwork ?: return@withContext null

@@ -1,0 +1,5 @@
+--------- beginning of main
+10-08 12:00:30.501  6437  6648 I YYPlayerAudio: YYPLAYER_MEDIA3_SINK open=s24_3/44100Hz/ch=2 widened=false mixerRequested=false mixerApplied=false source=s24_3
+10-08 12:01:06.881  7565  7871 I YYPlayerAudio: YYPLAYER_MEDIA3_SINK open=s24_3/44100Hz/ch=2 widened=false mixerRequested=false mixerApplied=false source=s24_3
+10-08 12:02:29.164  7565 10302 I YYPlayerAudio: YYPLAYER_MEDIA3_SINK open=s24_3/44100Hz/ch=2 widened=false mixerRequested=false mixerApplied=false source=s24_3
+10-08 12:03:03.938  7565 11587 I YYPlayerAudio: YYPLAYER_MEDIA3_SINK open=s24_3/44100Hz/ch=2 widened=false mixerRequested=false mixerApplied=false source=s24_3

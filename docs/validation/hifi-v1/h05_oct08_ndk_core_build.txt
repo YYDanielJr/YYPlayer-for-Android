@@ -1,0 +1,14 @@
+[0/1] Re-running CMake...
+-- Configuring done
+-- Generating done
+-- Build files have been written to: E:/SourceFiles/androidstudio/YYPlayerforAndroid/native/build-android-arm64-v8a
+[1/11] Building CXX object CMakeFiles/yy_core.dir/core/src/policy.cpp.o
+[2/11] Building CXX object CMakeFiles/yy_core.dir/core/src/pcm.cpp.o
+[3/11] Building CXX object CMakeFiles/yy_core.dir/core/src/ring.cpp.o
+[4/11] Building CXX object CMakeFiles/yy_core_tests.dir/core/tests/policy_test.cpp.o
+[5/11] Building CXX object CMakeFiles/yy_core_tests.dir/core/tests/ring_test.cpp.o
+[6/11] Building CXX object CMakeFiles/yy_core_tests.dir/core/tests/pcm_test.cpp.o
+[7/11] Building CXX object CMakeFiles/yyplayer_jni.dir/jni/yy_jni.cpp.o
+[8/11] Linking CXX static library libyy_core.a
+[9/11] Linking CXX shared library libyyplayer_jni.so
+[10/11] Linking CXX executable yy_core_tests

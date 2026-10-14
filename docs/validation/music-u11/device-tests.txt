@@ -1,0 +1,6 @@
+
+yy.daniel.yyplayerforandroid.MusicUpgradeDeviceTest:.....
+
+Time: 3.072
+
+OK (5 tests)

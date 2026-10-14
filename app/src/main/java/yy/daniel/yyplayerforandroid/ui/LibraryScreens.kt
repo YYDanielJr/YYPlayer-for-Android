@@ -113,62 +113,20 @@ internal fun LibraryContent(kind: MediaKind, controller: LibraryPageController, 
     favorites: Set<String>, loading: Boolean, searching: Boolean, query: String, onQuery: (String) -> Unit,
     onCloseSearch: () -> Unit, onImport: () -> Unit, onPlay: (LocalMedia) -> Unit, onFavorite: (LocalMedia) -> Unit,
     onRemove: (LocalMedia) -> Unit, bottomSpace: Dp,
-    onBatch: (List<LocalMedia>, MusicBatchAction) -> Unit = { _, _ -> }, isActive: Boolean = true) {
-    var onlyFavorites by rememberSaveable(kind) { mutableStateOf(false) }
+    onBatch: (List<LocalMedia>, MusicBatchAction) -> Unit = { _, _ -> }, isActive: Boolean = true,
+    collections: MusicCollectionRepository? = null,
+    onPlayQueue: (List<LocalMedia>, Int) -> Unit = { items, index -> items.getOrNull(index)?.let(onPlay) },
+    onEnqueue: (List<LocalMedia>, Boolean) -> Unit = { _, _ -> }) {
+    if (kind == MediaKind.AUDIO) {
+        MusicLibraryBrowser(media, snapshot, favorites, controller, listState, padding, bottomSpace, loading, searching, query,
+            onQuery, onCloseSearch, onImport, onFavorite, onRemove, onBatch, isActive, collections, onPlayQueue, onEnqueue)
+        return
+    }
     var menuMedia by remember { mutableStateOf<LocalMedia?>(null) }
     var menuVisible by remember { mutableStateOf(false) }
-    val managing = controller.managing
-    val selectedKeys = controller.selectedKeys
-    fun batch(action: MusicBatchAction) {
-        onBatch(media.filter { it.identity in selectedKeys }, action)
-        controller.finish()
-    }
-    LaunchedEffect(media) { controller.retain(media) }
     LaunchedEffect(isActive) { if (!isActive) controller.finish() }
-    BackHandler(isActive && managing) { controller.finish() }
-    val filtered = media.filter { (!onlyFavorites || it.uri.toString() in favorites) &&
-        listOfNotNull(it.title, it.songTitle, it.artist, it.album).any { text -> text.contains(query, ignoreCase = true) } }
-    val isMusic = kind == MediaKind.AUDIO
-    if (isMusic) {
-        LazyColumn(state = listState, modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(top = padding.calculateTopPadding(), bottom = bottomSpace)) {
-            if (searching) item { SearchInput(query, onQuery, onCloseSearch, Modifier.padding(horizontal = PageGutter)) }
-            if (!managing) item {
-                Row(Modifier.padding(horizontal = PageGutter, vertical = 12.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    CollectionTile("全部音乐", "${media.size} 首", PlayerIcons.Music, Color(0xFFFF4949), !onlyFavorites, { onlyFavorites = false }, Modifier.weight(1f))
-                    CollectionTile("收藏", "${media.count { it.uri.toString() in favorites }} 首", PlayerIcons.Heart, Color(0xFFFFB020), onlyFavorites, { onlyFavorites = true }, Modifier.weight(1f))
-                }
-            }
-            if (managing) item {
-                HyperSection("已选择 ${selectedKeys.size} 首", "全选当前列表", { controller.add(filtered.map { it.identity }) })
-                HyperCard(Modifier.padding(horizontal = PageGutter)) {
-                    FlowRow(Modifier.padding(12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Button({ batch(MusicBatchAction.PLAY) }, enabled = selectedKeys.isNotEmpty()) { Text("播放所选") }
-                        Button({ batch(MusicBatchAction.FAVORITE) }, enabled = selectedKeys.isNotEmpty()) { Text("收藏") }
-                        Button({ batch(MusicBatchAction.UNFAVORITE) }, enabled = selectedKeys.isNotEmpty()) { Text("取消收藏") }
-                        Button({ controller.confirmRemove = true }, enabled = selectedKeys.isNotEmpty()) { Text("移除") }
-                    }
-                }
-            }
-            else item { HyperSection(if (onlyFavorites) "我的收藏" else "本地音乐", if (!onlyFavorites && filtered.isNotEmpty()) "播放全部" else null, { filtered.firstOrNull()?.let(onPlay) }) }
-            if (loading) item { Text("正在读取媒体…", Modifier.padding(horizontal = 26.dp, vertical = 10.dp), color = Muted, fontSize = 14.sp) }
-            if (filtered.isEmpty() && !loading) item {
-                LibraryEmpty(if (query.isNotBlank()) "没有找到相关音乐" else if (onlyFavorites) "还没有收藏" else "添加你的音乐",
-                    if (onlyFavorites) "在音乐右侧菜单中，收藏喜欢的作品" else "从设备选择本地音频，建立自己的音乐库", !onlyFavorites && query.isBlank(), onImport)
-            }
-            itemsIndexed(filtered, key = { _, it -> it.uri.toString() }) { index, item ->
-                val shape = RoundedCornerShape(topStart = if (index == 0) 24.dp else 0.dp, topEnd = if (index == 0) 24.dp else 0.dp,
-                    bottomStart = if (index == filtered.lastIndex) 24.dp else 0.dp, bottomEnd = if (index == filtered.lastIndex) 24.dp else 0.dp)
-                Surface(Modifier.padding(horizontal = PageGutter).fillMaxWidth(), shape = shape, color = MiuixTheme.colorScheme.surface) {
-                    MusicRow(item, snapshot.current?.uri == item.uri,
-                        { if (managing) controller.toggle(item) else onPlay(item) },
-                        { menuMedia = item; menuVisible = true },
-                        { controller.start(item) },
-                        managing, item.identity in selectedKeys)
-                }
-            }
-        }
-    } else {
+    val filtered = media.filter { listOfNotNull(it.title, it.songTitle, it.artist, it.album).any { text -> text.contains(query, ignoreCase = true) } }
+    run {
         LazyVerticalGrid(GridCells.Adaptive(160.dp), Modifier.fillMaxSize(), state = gridState,
             contentPadding = PaddingValues(start = PageGutter, end = PageGutter, top = padding.calculateTopPadding(), bottom = bottomSpace),
             horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
@@ -191,20 +149,14 @@ internal fun LibraryContent(kind: MediaKind, controller: LibraryPageController, 
         if (selected != null) {
         Text(selected.title, Modifier.padding(horizontal = DialogContentInset, vertical = 14.dp), color = Muted, fontSize = 14.sp)
         HyperSettingRow(if (selected.uri.toString() in favorites) "取消收藏" else "收藏", onClick = { onFavorite(selected); menuVisible = false })
-        if (isMusic) HyperSettingRow("多选管理", onClick = { controller.start(selected); menuVisible = false })
         HyperSettingRow("播放", onClick = { onPlay(selected); menuVisible = false })
         HyperSettingRow("从媒体库移除", "不会删除设备中的原文件", onClick = { onRemove(selected); menuVisible = false })
         }
     }
-    HyperDialog("移除所选歌曲", { controller.confirmRemove = false }, show = controller.confirmRemove) {
-        Text("从媒体库移除 ${selectedKeys.size} 首歌曲，设备中的原文件仍会保留。",
-            Modifier.padding(horizontal = DialogContentInset, vertical = 16.dp), color = Muted)
-        HyperSettingRow("移除 ${selectedKeys.size} 首歌曲", onClick = { batch(MusicBatchAction.REMOVE) })
-    }
 }
 
 @Composable
-private fun CollectionTile(title: String, count: String, icon: ImageVector, color: Color, selected: Boolean, onClick: () -> Unit, modifier: Modifier) {
+internal fun CollectionTile(title: String, count: String, icon: ImageVector, color: Color, selected: Boolean, onClick: () -> Unit, modifier: Modifier) {
     HyperCard(modifier.clip(RoundedCornerShape(24.dp)).clickable(onClick = onClick)) {
         Row(Modifier.padding(horizontal = 16.dp, vertical = 13.dp), verticalAlignment = Alignment.CenterVertically) {
             Surface(shape = RoundedCornerShape(13.dp), color = color, modifier = Modifier.size(40.dp)) {
@@ -221,7 +173,7 @@ private fun CollectionTile(title: String, count: String, icon: ImageVector, colo
 }
 
 @Composable
-private fun MusicRow(media: LocalMedia, current: Boolean, onClick: () -> Unit, onMenu: () -> Unit,
+internal fun MusicRow(media: LocalMedia, current: Boolean, onClick: () -> Unit, onMenu: () -> Unit,
     onLongClick: () -> Unit, managing: Boolean, selected: Boolean) {
     val details = rememberMediaDetails(media)
     Row(Modifier.fillMaxWidth().combinedClickable(onClick = onClick, onLongClick = onLongClick,
@@ -272,12 +224,12 @@ private fun LibraryEmpty(title: String, summary: String, canImport: Boolean, onI
         Icon(PlayerIcons.Add, null, Modifier.size(50.dp), tint = Muted.copy(alpha = .5f))
         Spacer(Modifier.height(20.dp)); Text(title, fontSize = 21.sp, fontWeight = FontWeight.Medium)
         Spacer(Modifier.height(10.dp)); Text(summary, color = Muted, fontSize = 14.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center, lineHeight = 21.sp)
-        if (canImport) { Spacer(Modifier.height(24.dp)); Button(onClick = onImport) { Text("选择文件") } }
+        if (canImport) { Spacer(Modifier.height(24.dp)); HyperActionButton("选择文件", onClick = onImport) }
     }
 }
 
 @Composable
-private fun SearchInput(query: String, onQuery: (String) -> Unit, onClose: () -> Unit, modifier: Modifier = Modifier) {
+internal fun SearchInput(query: String, onQuery: (String) -> Unit, onClose: () -> Unit, modifier: Modifier = Modifier) {
     val focus = remember { FocusRequester() }
     val keyboard = LocalSoftwareKeyboardController.current
     LaunchedEffect(Unit) { focus.requestFocus() }

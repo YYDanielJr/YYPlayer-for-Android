@@ -1,5 +1,21 @@
 # Android 技术设计与选型
 
+2026-10-14 U21：实体机 libmpv 输入改为授权 `fd://` 租约；视频控制器精简，新增可配置单指手势与后台有限预览。Media3 视频短缓冲／低延迟模式、mpv AAudio 共享输出决定与限制见 [ADR0009](adr/0009-video-rate-response.md)，实测见 [U21](validation/video-u21/README.md)。音乐路径未变；本轮未提交，不能将下面早期计划覆盖当前工作区。
+
+2026-10-14 U20：工具内视频倍速统一 0.1×–8×／步进 0.1×，外侧快捷档位保留。Media3 与 libmpv 范围一致，移除 U19 的超过 8× 自动切换和仅硬解专用范围。用户授权提交到 dev；见 [ADR0008](adr/0008-video-speed-range.md) 和 [U20 验证](validation/video-u20/README.md)。
+
+2026-10-14 U16 更新：视频增加固定 libmpv-android AAR 的可选路径，使用独立 C++ worker／JNI／真实 SimpleBasePlayer 会话适配器；音乐仍走原有 Media3 与可选 native PCM sink。默认保持 Media3，最终供应链与物理资格仍未完成。具体决定见 [ADR0007](adr/0007-libmpv-video-adapter.md)，下文关于未引入 FFmpeg／libmpv 的早期纵切叙述属于历史基线。
+
+## 当前实现边界（2026-10-14，dev 607ceb3）
+
+- Android 解码／播放仍为 Media3 ExoPlayer／MediaCodec；`PlayerSessionService` 已提供真实 MediaSession，持有 runtime 唯一引擎引用。Activity 和队列页共用它，不再按早期 U02 的纯前台生命周期接手。
+- 已有 C++17 PCM 核心、C ABI／JNI 和可选自研 AudioTrack sink；完整 FFmpeg／libmpv／Oboe runtime 未集成。输出策略、同路由宽松回退、严格拒绝与已知 native gapless 限制以 [ADR0006](adr/0006-hifi-output-core-android-split.md)、[HiFi 交接](HANDOFF_HIFI.md) 为准。
+- U11–U14 的音乐分类／歌单／队列、双语歌词和封面动效以 [音乐体验](UI_MUSIC_EXPERIENCE.md) 最新章节为准。音乐详情仍在 MainActivity；队列是独立 MusicQueueActivity，和视频／设置一样采用系统 Activity 转场。
+- 当前仓储使用版本化 JSON／偏好与 SAF 身份；下方 Room／DataStore、模块拆分和 FFmpeg 等是长期设计，不应描述为已部署。
+- 验收为有线小米 13 Ultra／API36，见 [STATUS](STATUS.md)；历史 MuMu 与 DAC 证据限定于各自版本／设备。本文下方早期接口和 S 阶段保留为设计背景，不能覆盖当前基线。
+
+## 早期设计背景
+
 版本：规划基线与E00实测补充，2026-10-04；音乐重构及真机反馈2026-10-05补充。**当前音乐标签、主页内详情、封面色背景、歌词和动画以 [UI_MUSIC_EXPERIENCE](UI_MUSIC_EXPERIENCE.md) 与 [ADR0004](adr/0004-inline-music-player.md) 为准。音乐不再新开 Activity，视频／设置保留原生 Activity。弹窗反馈与导航回退以 [UI_DIALOG_FEEDBACK](UI_DIALOG_FEEDBACK.md) 为准；U03设置/字重历史见 [UI_REAL_DEVICE_REFINEMENTS](UI_REAL_DEVICE_REFINEMENTS.md)。U02窗口/图标/Activity及动效见 [UI_COMPONENTS_AND_MOTION](UI_COMPONENTS_AND_MOTION.md) 和 [ADR0003](adr/0003-activity-stack-runtime.md)；U01视觉基线见 [UI_REWRITE](UI_REWRITE.md)。本文早期骨架/接口仍属于规划。** 事实依据见 [调研来源](RESEARCH_SOURCES.md)，执行顺序见 [实施计划](IMPLEMENTATION_PLAN.md)。第三方API必须对照锁定版本源码实现。
 
 2026-10-05 U07 用户新视觉与引导要求见 [UI_SETUP_AND_LIBRARY](UI_SETUP_AND_LIBRARY.md)。首次标记独立于偏好，SAF授权可选；竖屏库切换置顶，底栏仅真实播放；歌词样式与选中集属于UI数据投影。API33磨砂隔离与单一播放引擎保留。同日 U08 细化库页结构（用户已复核满意）：`HyperPage` 用 `headerAlpha: () -> Float` 延迟读取驱动顶栏淡入淡出、用 `tabs` 槽把 TabRow 放进 `TopAppBar.bottomContent`，页头因此留在 pager 之外、只有内容区横向切换；库页自持 `MiuixScrollBehavior`（把 `TopAppBarState` 提到共享会让滚动后栏内小标题不再出现），音乐／视频各持控制器与列表状态。
@@ -52,7 +68,7 @@ Android 根目录仅有 `:app`，`MainActivity.kt` 显示 Greeting，Material3 �
 
 系统控制仍使用 Media3 Session；借助 `SimpleBasePlayer` 适配真正的 native 状态，不创建空 ExoPlayer 来骗取通知。[Media3 自定义 Player](https://developer.android.com/reference/androidx/media3/common/SimpleBasePlayer)。
 
-**当前可运行纵切的例外见 [ADR 0001](adr/0001-android-media3-vertical-slice.md)：**现有 Windows 工程没有 native runtime，mpv-android 也没有可消费的 AAR。为了用户本轮“MuMu 前后端跑通 + UI 验收”，临时以 Media3 ExoPlayer 同时播放本地音频/视频，`PlaybackBackend` 为页面提供不暴露 ExoPlayer 类型的命令和 `StateFlow` 快照；由实际 `MediaCodecSelector` 策略允许 Auto、优先硬解、仅硬解、软件解码。严格硬解无候选时由真实播放错误反映失败。本阶段的后端只是 Android 适配器，不完成跨平台核心或 HiFi 输出资格。Linux native runtime、JNI/Surface gate 通过后，再按既定路线更换后端实现。
+**E00 时期的纵切例外见 [ADR 0001](adr/0001-android-media3-vertical-slice.md)：**现有 Windows 工程没有 native runtime，mpv-android 也没有可消费的 AAR。为了用户本轮“MuMu 前后端跑通 + UI 验收”，临时以 Media3 ExoPlayer 同时播放本地音频/视频，`PlaybackBackend` 为页面提供不暴露 ExoPlayer 类型的命令和 `StateFlow` 快照；由实际 `MediaCodecSelector` 策略允许 Auto、优先硬解、仅硬解、软件解码。严格硬解无候选时由真实播放错误反映失败。本阶段的后端只是 Android 适配器，不完成跨平台核心或 HiFi 输出资格。Linux native runtime、JNI/Surface gate 通过后，再按既定路线更换后端实现。
 
 ## 4. 工具链、依赖候选与冻结规则
 
@@ -63,10 +79,10 @@ Android 根目录仅有 `:app`，`MainActivity.kt` 显示 Greeting，Material3 �
 | applicationId/namespace | `yy.daniel.yyplayerforandroid` | 保持 |
 | Android | minSdk 26、compileSdk/targetSdk 37 | 保持现有；API 34 音频属性用版本隔离；验证 37 大屏行为 |
 | AGP / Gradle | 当前 9.4.1 / 9.6.0 | 保持，9.6 满足 AGP 9.4 最低要求；保留 wrapper SHA256 |
-| Kotlin/Compose compiler | 当前 2.2.10；候选 2.4.20 | 为 Miuix 0.9.4 对齐实际 Kotlin compiler、Compose 插件、serialization/KSP；禁止只改一处 |
-| Compose runtime/foundation/ui | 当前 BOM 2026.02.01；候选同一稳定 1.12 系列 | 查询官方 BOM 和 Miuix Android variant；选择能匹配的稳定 BOM，写入实际编号，不凭日期编造 |
-| Miuix | 候选 0.9.4 | `top.yukonga.miuix.kmp:miuix-ui` / `miuix-preference` / `miuix-icons` 同版本；用 Google/Maven Central，不依赖快照 |
-| Media3 | 候选 1.11.1 | common、session 同一版本；UI 自绘，首版无需 exoplayer |
+| Kotlin/Compose compiler | 已锁 2.4.20 | 保持 catalog 与 Compose 插件一致；AGP9 内置 Kotlin，不重复添加 kotlin-android |
+| Compose runtime/foundation/ui | 已锁 BOM 2026.09.00 | 保持 catalog 与实际依赖一致，不凭日期编造版本 |
+| Miuix | 已锁 0.9.4 | 使用 catalog 中官方 Android artifact `miuix-ui-android`；blur 按 ADR0002 隔离，不混旧坐标 |
+| Media3 | 已锁 1.11.1 | common／session／exoplayer 等统一版本；当前实际依赖 ExoPlayer，UI 自绘 |
 | NDK / CMake | 本机已安装 28.2.13676358 / 3.22.1 | Gradle、CI、全部第三方统一；不得临时混入旧 libc++ |
 | C++ | C++17、libc++_shared | 一套 runtime，异常不穿越 C/JNI；业务错误用分类 Result |
 | libmpv | 候选 v0.41.0 | 冻结 tag 对应完整 SHA、client API 2、头文件和编译选项 |

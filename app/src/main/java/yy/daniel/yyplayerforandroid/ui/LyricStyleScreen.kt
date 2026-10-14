@@ -44,8 +44,8 @@ internal fun LyricStyleScreen(style: LyricStyle, onStyle: (LyricStyle) -> Unit, 
                 Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(draft.lineSpacing.dp)) {
                     Text("让文字与音乐相遇", fontSize = draft.inactiveSize.sp, lineHeight = (draft.inactiveSize * 1.35f).sp,
                         fontWeight = FontWeight(draft.inactiveWeight), color = draft.inactiveColor?.let(::Color) ?: Muted)
-                    Text("这一行，是此刻的旋律", fontSize = draft.activeSize.sp, lineHeight = (draft.activeSize * 1.35f).sp,
-                        fontWeight = FontWeight(draft.activeWeight), color = draft.activeColor?.let(::Color) ?: MiuixTheme.colorScheme.onSurface)
+                    BilingualLyricText("Stay with me / 这一行，是此刻的旋律", style = draft, active = true,
+                        primarySize = draft.activeSize, color = draft.activeColor?.let(::Color) ?: MiuixTheme.colorScheme.onSurface)
                     Text("下一句，继续随音乐流动", fontSize = draft.inactiveSize.sp, lineHeight = (draft.inactiveSize * 1.35f).sp,
                         fontWeight = FontWeight(draft.inactiveWeight), color = draft.inactiveColor?.let(::Color) ?: Muted)
                 }
@@ -67,6 +67,17 @@ internal fun LyricStyleScreen(style: LyricStyle, onStyle: (LyricStyle) -> Unit, 
                 StyleSizeSlider("所有行间距", draft.lineSpacing, 0f..40f, "dp", { draft = draft.copy(lineSpacing = it) }, { onStyle(draft) })
                 HyperSettingRow("恢复默认歌词样式", onClick = { onStyle(LyricStyle()) })
             } }
+            item { HyperSection("双语歌词") }
+            item { HyperCard(Modifier.padding(horizontal = PageGutter).fillMaxWidth()) {
+                HyperSettingRow("显示译文", "识别原文 / 译文，不拆分网址或日期", trailing = {
+                    Switch(draft.bilingual, { onStyle(draft.copy(bilingual = it)) })
+                })
+                StyleSizeSlider("当前译文字号", draft.translationActiveSize, 12f..48f, "sp", { draft = draft.copy(translationActiveSize = it) }, { onStyle(draft) })
+                StyleSizeSlider("其他译文字号", draft.translationSize, 12f..48f, "sp", { draft = draft.copy(translationSize = it) }, { onStyle(draft) })
+                StyleSizeSlider("原文与译文间距", draft.bilingualSpacing, 0f..40f, "dp", { draft = draft.copy(bilingualSpacing = it) }, { onStyle(draft) })
+                HyperSpinnerPreference("译文字重", LyricStyle.WeightNames.map { DropdownItem(it) }, LyricStyle.Weights.indexOf(draft.translationWeight),
+                    { onStyle(draft.copy(translationWeight = LyricStyle.Weights[it])) })
+            } }
         }
     }
     HyperDialog(if (colorDialog == "active") "选中行颜色" else "非选中行颜色", { colorDialog = null }, show = colorDialog != null) {
@@ -79,7 +90,7 @@ internal fun LyricStyleScreen(style: LyricStyle, onStyle: (LyricStyle) -> Unit, 
             .background(MiuixTheme.colorScheme.surfaceContainerHigh, RoundedCornerShape(12.dp)).padding(16.dp).semantics { contentDescription = "十六进制歌词颜色" },
             textStyle = TextStyle(color = MiuixTheme.colorScheme.onSurface, fontSize = 17.sp), singleLine = true, cursorBrush = SolidColor(MiuixTheme.colorScheme.primary))
         Text(error ?: "输入 #RRGGBB 或 #AARRGGBB", Modifier.padding(horizontal = DialogContentInset, vertical = 8.dp), color = Muted, fontSize = 13.sp)
-        TextButton("应用自定义颜色", onClick = {
+        HyperActionButton("应用自定义颜色", onClick = {
             val parsed = LyricStyle.parseColor(hex)
             if (parsed == null) error = "请输入有效的 6 位或 8 位十六进制颜色" else setColor(parsed)
         }, modifier = Modifier.padding(horizontal = DialogContentInset).fillMaxWidth())

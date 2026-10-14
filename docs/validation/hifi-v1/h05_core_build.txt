@@ -1,0 +1,4 @@
+[1/4] Building CXX object CMakeFiles/yy_core.dir/core/src/policy.cpp.obj
+[2/4] Linking CXX static library yy_core.lib
+[3/4] Building CXX object CMakeFiles/yy_core_tests.dir/core/tests/policy_test.cpp.obj
+[4/4] Linking CXX executable yy_core_tests.exe

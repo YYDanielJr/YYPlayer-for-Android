@@ -148,14 +148,13 @@ internal fun SetupScreen(activity: MainActivity) {
                     if (busy) Text("正在处理…", Modifier.padding(top = 20.dp), fontSize = 14.sp, color = Muted)
                 }
             }
-            Row(Modifier.fillMaxWidth().padding(horizontal = 28.dp, vertical = 20.dp), verticalAlignment = Alignment.CenterVertically) {
-                if (step > 0) TextButton("上一步", onClick = { step--; message = null }, enabled = !busy)
-                Spacer(Modifier.weight(1f))
-                Button(onClick = { if (step == 4) runtime.setup.finish() else { step++; message = null } }, enabled = !busy) {
-                    Text(if (step == 0) "开始设置" else if (step == 4) "开始使用" else "继续", Modifier.padding(horizontal = 18.dp, vertical = 2.dp))
-                }
+            Row(Modifier.fillMaxWidth().padding(horizontal = 28.dp, vertical = 20.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                HyperActionButton(if (step > 0) "上一步" else "稍后设置", onClick = {
+                    if (step > 0) { step--; message = null } else runtime.setup.finish()
+                }, modifier = Modifier.weight(1f), primary = false, enabled = !busy)
+                HyperActionButton(if (step == 0) "开始设置" else if (step == 4) "开始使用" else "继续",
+                    onClick = { if (step == 4) runtime.setup.finish() else { step++; message = null } }, modifier = Modifier.weight(1f), enabled = !busy)
             }
-            if (step == 0) TextButton("稍后设置", onClick = runtime.setup::finish, modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 10.dp))
         }
     }
 }

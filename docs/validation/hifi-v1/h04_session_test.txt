@@ -1,0 +1,6 @@
+
+yy.daniel.yyplayerforandroid.PlayerSessionServiceDeviceTest:.
+
+Time: 9.496
+
+OK (1 test)

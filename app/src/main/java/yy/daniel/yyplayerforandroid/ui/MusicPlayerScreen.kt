@@ -37,6 +37,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.*
@@ -95,7 +99,13 @@ internal fun rememberMusicReduceMotion(preference: Boolean): Boolean {
 @Composable
 internal fun MusicPlayerScreen(snapshot: PlaybackSnapshot, backend: PlaybackBackend, repository: MusicLyricsRepository,
     reduceMotion: Boolean, favorite: Boolean, onFavorite: () -> Unit, onBack: () -> Unit, onOnlineLyrics: (() -> Unit)? = null,
-    lyricStyle: LyricStyle = LyricStyle()) {
+    lyricStyle: LyricStyle = LyricStyle(),
+    audioOutput: yy.daniel.yyplayerforandroid.audio.AudioOutputState? = null,
+    outputPath: yy.daniel.yyplayerforandroid.audio.OutputPath = yy.daniel.yyplayerforandroid.audio.OutputPath.SYSTEM,
+    onOutputPath: (yy.daniel.yyplayerforandroid.audio.OutputPath) -> Unit = {},
+    onSelectOutputDevice: (Int?) -> Unit = {}, onLyricStyle: (() -> Unit)? = null,
+    journeyProgress: Float = 1f, journeyOrigin: Offset = Offset.Zero,
+    hideCover: Boolean = false, onCoverBounds: (MusicCoverAnchor) -> Unit = {}, onQueue: () -> Unit = {}) {
     val current = snapshot.current ?: return
     val details = rememberMediaDetails(current)
     val context = LocalContext.current
@@ -159,7 +169,7 @@ internal fun MusicPlayerScreen(snapshot: PlaybackSnapshot, backend: PlaybackBack
         BoxWithConstraints(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
             val wide = maxWidth > maxHeight * 1.2f
             Column(Modifier.fillMaxSize()) {
-                Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp).heightIn(min = 64.dp), verticalAlignment = Alignment.CenterVertically) {
+                Row(Modifier.fillMaxWidth().musicJourney(journeyProgress, journeyOrigin, reduceMotion).padding(horizontal = 12.dp).heightIn(min = 64.dp), verticalAlignment = Alignment.CenterVertically) {
                     MusicAction(PlayerIcons.Back, "收起音乐详情", onBack, foreground, reduceMotion,
                         modifier = Modifier.graphicsLayer { rotationZ = -90f })
                     Row(Modifier.weight(1f), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
@@ -174,6 +184,7 @@ internal fun MusicPlayerScreen(snapshot: PlaybackSnapshot, backend: PlaybackBack
                             }
                         }
                     }
+                    if (audioOutput != null) MusicAction(PlayerIcons.Tune, "音频输出", { menu = "output" }, foreground, reduceMotion)
                     MusicAction(PlayerIcons.More, "歌词与播放选项", { menu = "options" }, foreground, reduceMotion)
                 }
                 if (wide) {
@@ -181,28 +192,38 @@ internal fun MusicPlayerScreen(snapshot: PlaybackSnapshot, backend: PlaybackBack
                         fadeIn(tween(if (reduceMotion) 0 else 500)) togetherWith fadeOut(tween(if (reduceMotion) 0 else 350))
                     }, label = "wide cover to lyrics") { lyricsOnly ->
                         Row(Modifier.fillMaxSize()) {
-                            if (!lyricsOnly) MusicCover(current, title, subtitle, Modifier.weight(1f).fillMaxHeight(), foreground, reduceMotion, onLyrics = { wideLyrics = true })
+                            if (!lyricsOnly) MusicCover(current, title, subtitle, Modifier.weight(1f).fillMaxHeight(), foreground, reduceMotion,
+                                hideCover = hideCover, onCoverBounds = onCoverBounds, journeyProgress = journeyProgress, journeyOrigin = journeyOrigin, onLyrics = { wideLyrics = true })
                             MusicLyricsPane(lyricState, snapshot, backend, loading, centered, offset, reduceMotion, foreground,
-                                onAdd = ::addLyrics, onAuthorize = { treePicker.launch(Unit) }, modifier = Modifier.weight(1f).fillMaxHeight(), onOnline = onOnlineLyrics, style = lyricStyle)
+                                onAdd = ::addLyrics, onAuthorize = { treePicker.launch(Unit) }, modifier = Modifier.weight(1f).fillMaxHeight().musicJourney(journeyProgress, journeyOrigin, reduceMotion), onOnline = onOnlineLyrics, style = lyricStyle)
                         }
                     }
                 } else {
                     HorizontalPager(pager, Modifier.weight(1f).fillMaxWidth(), beyondViewportPageCount = 1,
                         flingBehavior = PagerDefaults.flingBehavior(pager, snapAnimationSpec = spring(stiffness = 322.2f, dampingRatio = .9f))) { page ->
-                        if (page == 0) MusicCover(current, title, subtitle, Modifier.fillMaxSize(), foreground, reduceMotion, pager, onLyrics = { select(1) })
+                        val pageModifier = Modifier.fillMaxSize().graphicsLayer { alpha = if (hideCover && pager.currentPage != page) 0f else 1f }
+                        if (page == 0) MusicCover(current, title, subtitle, pageModifier, foreground, reduceMotion, pager,
+                            hideCover = hideCover, onCoverBounds = onCoverBounds, journeyProgress = journeyProgress, journeyOrigin = journeyOrigin, onLyrics = { select(1) })
                         else MusicLyricsPane(lyricState, snapshot, backend, loading, centered, offset, reduceMotion, foreground,
-                            onAdd = ::addLyrics, onAuthorize = { treePicker.launch(Unit) }, modifier = Modifier.fillMaxSize().musicTrail(pager, 1, reduceMotion, 220f, .10f), onOnline = onOnlineLyrics, style = lyricStyle)
+                            onAdd = ::addLyrics, onAuthorize = { treePicker.launch(Unit) }, modifier = pageModifier.musicJourney(journeyProgress, journeyOrigin, reduceMotion).musicTrail(pager, 1, reduceMotion, 220f, .10f), onOnline = onOnlineLyrics, style = lyricStyle)
                     }
                 }
-                if (snapshot.error != null) Row(Modifier.fillMaxWidth().padding(horizontal = 28.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text(snapshot.error, Modifier.weight(1f), fontSize = 13.sp, maxLines = 2, color = foreground)
-                    Text("重试", Modifier.clickable { backend.play(snapshot.queue, snapshot.queueIndex) }.padding(16.dp), color = foreground, fontSize = 14.sp)
+                if (snapshot.error != null) Column(Modifier.fillMaxWidth().padding(horizontal = 28.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(snapshot.error, fontSize = 13.sp, maxLines = 2, color = foreground)
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        HyperActionButton("重试", { backend.play(snapshot.queue, snapshot.queueIndex) }, Modifier.weight(1f), primary = false)
+                        if (snapshot.outputPath != yy.daniel.yyplayerforandroid.audio.OutputPath.SYSTEM)
+                            HyperActionButton("使用系统输出", { onOutputPath(yy.daniel.yyplayerforandroid.audio.OutputPath.SYSTEM) }, Modifier.weight(1f))
+                    }
                 }
+                if (snapshot.outputFallback != null) Text(snapshot.outputFallback, Modifier.padding(horizontal = 28.dp), fontSize = 12.sp, color = foreground.copy(alpha = .65f))
                 AnimatedContent(targetState = wide || pager.settledPage == 1,
+                    modifier = Modifier.musicJourney(journeyProgress, journeyOrigin, reduceMotion),
                     transitionSpec = { (fadeIn(tween(if (reduceMotion) 0 else 220)) togetherWith fadeOut(tween(if (reduceMotion) 0 else 120)))
                         .using(SizeTransform(sizeAnimationSpec = { _, _ -> if (reduceMotion) snap() else spring(stiffness = 320f, dampingRatio = .9f) })) }, label = "music controls") { compact ->
                     MusicControls(snapshot, backend, title, subtitle, foreground, reduceMotion, compact, favorite, onFavorite,
-                        onQueue = { menu = "queue" }, onSpeed = { menu = "speed" })
+                        onQueue = onQueue, onSpeed = { menu = "speed" }, hideCover = hideCover,
+                        onCoverBounds = { if (if (wide) wideLyrics else pager.currentPage == 1) onCoverBounds(it) })
                 }
             }
         }
@@ -212,27 +233,74 @@ internal fun MusicPlayerScreen(snapshot: PlaybackSnapshot, backend: PlaybackBack
         }
     }
     HyperDialog("歌词与播放", { menu = null }, show = menu == "options") {
+        if (audioOutput != null) HyperSettingRow("音频输出", outputPath.label,
+            value = audioOutput.selectedChannel?.productName ?: if (audioOutput.selectedDeviceId != null) "设备已断开" else "跟随系统",
+            onClick = { menu = "output" })
         if (current.onlineQuality != null) HyperSettingRow("在线音质", current.onlineQuality)
         if (onOnlineLyrics != null) HyperSettingRow("联网获取歌词", "按当前歌名查找，也可手动搜索", onClick = { menu = null; onOnlineLyrics() })
         HyperSettingRow("添加歌词", if (importing) "正在读取…" else "选择 LRC 或 TXT", onClick = { if (!importing) addLyrics() })
         HyperSettingRow("授权歌曲目录", "自动读取同目录的同名 LRC", onClick = { menu = null; treePicker.launch(Unit) })
+        if (onLyricStyle != null) HyperSettingRow("歌词显示", "字号、字重、颜色与行间距", onClick = { menu = null; onLyricStyle() })
         HyperSpinnerPreference("歌词对齐", listOf(DropdownItem("左对齐"), DropdownItem("居中")), if (centered) 1 else 0,
             { centered = it == 1; repository.setCentered(centered) })
         HyperSettingRow("歌词时间偏移", "正值提前显示，负值延后显示", value = "${offset / 1000f} 秒")
-        Row(Modifier.fillMaxWidth().padding(horizontal = 24.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
-            TextButton("−0.5 秒", onClick = { offset = (offset - 500).coerceAtLeast(-600_000); repository.setOffset(offset) })
-            TextButton("重置", onClick = { offset = 0; repository.setOffset(0) })
-            TextButton("+0.5 秒", onClick = { offset = (offset + 500).coerceAtMost(600_000); repository.setOffset(offset) })
-        }
+        HyperSettingRow("延后 0.5 秒", onClick = { offset = (offset - 500).coerceAtLeast(-600_000); repository.setOffset(offset) })
+        HyperSettingRow("提前 0.5 秒", onClick = { offset = (offset + 500).coerceAtMost(600_000); repository.setOffset(offset) })
+        HyperSettingRow("重置时间偏移", onClick = { offset = 0; repository.setOffset(0) })
         HyperSettingRow("恢复自动歌词", "移除当前曲目的手动关联", onClick = { menu = null; scope.launch { lyricState = repository.clear(current); revision++ } })
         HyperSettingRow("播放速度", value = speedLabel(snapshot.speed), onClick = { menu = "speed" })
-        HyperSettingRow("播放队列", value = "${snapshot.queue.size} 首", onClick = { menu = "queue" })
+        HyperSettingRow("播放队列", value = "${snapshot.queue.size} 首", onClick = { menu = null; onQueue() })
+        HyperSpinnerPreference("播放顺序", PlayOrder.entries.map { DropdownItem(it.label) }, snapshot.playOrder.ordinal, { backend.setPlayOrder(PlayOrder.entries[it]) })
         HyperSettingRow("媒体信息", onClick = { menu = "info" })
     }
+    if (audioOutput != null) MusicOutputDialog(audioOutput, outputPath, menu == "output",
+        onOutputPath, onSelectOutputDevice, currentPath = snapshot.outputPath, fallbackReason = snapshot.outputFallback, onDismiss = { menu = null })
     SpeedDialog(snapshot.speed, backend::setSpeed, show = menu == "speed") { menu = null }
-    SelectionDialog("播放队列 · ${snapshot.queue.size}", menu == "queue", snapshot.queue.map { DropdownItem(it.musicTitle, summary = it.musicSubtitle) },
-        snapshot.queueIndex, onSelect = { backend.play(snapshot.queue, it) }, onDismiss = { menu = null })
-    MediaInfoDialog(snapshot, menu == "info") { menu = null }
+    MediaInfoDialog(snapshot, menu == "info", audioOutput) { menu = null }
+}
+
+/** Shared runtime selections stay on the song page and retain WindowDialog exit composition. */
+@Composable
+internal fun MusicOutputDialog(state: yy.daniel.yyplayerforandroid.audio.AudioOutputState,
+    path: yy.daniel.yyplayerforandroid.audio.OutputPath, show: Boolean,
+    onPath: (yy.daniel.yyplayerforandroid.audio.OutputPath) -> Unit,
+    onDevice: (Int?) -> Unit, currentPath: yy.daniel.yyplayerforandroid.audio.OutputPath = path,
+    fallbackReason: String? = null, onDismiss: () -> Unit) {
+    val paths = yy.daniel.yyplayerforandroid.audio.OutputPath.entries
+    // Keep indices stable for the life of this dialog, including a finger-down hot-plug event.
+    // Missing devices remain as refused entries; new ones append instead of shifting an old choice.
+    val deviceIds = remember(show) { androidx.compose.runtime.mutableStateListOf<Int?>().apply {
+        add(null); addAll(state.channels.map { it.id })
+        state.selectedDeviceId?.let { if (it !in this) add(it) }
+    } }
+    LaunchedEffect(show, state.channels) {
+        if (show) state.channels.forEach { if (it.id !in deviceIds) deviceIds.add(it.id) }
+    }
+    val devices = deviceIds.toList()
+    val items = devices.map { id ->
+        val channel = state.channels.firstOrNull { it.id == id }
+        DropdownItem(if (id == null) "跟随系统" else channel?.productName ?: "设备已断开",
+            summary = channel?.typeLabel)
+    }
+    HyperDialog("音频输出", onDismiss, show = show) {
+        if (state.selfTestRunning) HyperSettingRow("正在输出测试", "测试结束后可切换输出")
+        else {
+            HyperSpinnerPreference("输出方式", paths.map { DropdownItem(it.label, summary = it.summary) },
+                path.ordinal, { paths.getOrNull(it)?.let(onPath) })
+            HyperSpinnerPreference("输出设备", items, devices.indexOf(state.selectedDeviceId).coerceAtLeast(0),
+                { index -> if (index in devices.indices) onDevice(devices[index]) })
+        }
+        val negotiated = state.negotiatedOutput
+        HyperSettingRow("当前输出", summary = when {
+            currentPath == yy.daniel.yyplayerforandroid.audio.OutputPath.SYSTEM -> "系统处理音频，设备选择以实际路由为准"
+            negotiated == null -> "开始播放后回读输出"
+            else -> "${negotiated.format.sampleRate} Hz · ${negotiated.format.encoding.effectiveBits} bit · ${negotiated.format.channelCount} 声道"
+        }, value = state.routedChannel?.productName ?: "路由待回读")
+        if (fallbackReason != null) HyperSettingRow("已回退系统输出", fallbackReason, onClick = { onPath(path) })
+        if (currentPath == yy.daniel.yyplayerforandroid.audio.OutputPath.NATIVE_EXACT)
+            HyperSettingRow("播放速度", "自研通道当前支持 1×；AudioTrack 不提供流独占证明")
+        state.message?.let { HyperSettingRow("输出状态", it) }
+    }
 }
 
 @Composable
@@ -262,19 +330,22 @@ private fun Modifier.musicTrail(pager: PagerState, page: Int, reduced: Boolean, 
 
 @Composable
 private fun MusicCover(current: LocalMedia, title: String, subtitle: String, modifier: Modifier, foreground: Color, reduceMotion: Boolean,
-    pager: PagerState? = null, onLyrics: () -> Unit) {
+    pager: PagerState? = null, hideCover: Boolean = false, onCoverBounds: (MusicCoverAnchor) -> Unit = {},
+    journeyProgress: Float = 1f, journeyOrigin: Offset = Offset.Zero, onLyrics: () -> Unit) {
     val incoming = rememberMediaDetails(current)
     var displayed by remember { mutableStateOf(current) }
     LaunchedEffect(current, incoming.loaded) { if (incoming.loaded) displayed = current }
     val interactions = remember { MutableInteractionSource() }
-    val tilt = remember(reduceMotion) { if (reduceMotion) null else TiltFeedback() }
     val shape = RoundedCornerShape(24.dp)
     BoxWithConstraints(modifier) {
         val coverSize = minOf(maxWidth - 64.dp, maxHeight * .69f, 420.dp).coerceAtLeast(88.dp)
         Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 32.dp, vertical = 12.dp),
             horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-            val artModifier = Modifier.size(coverSize).then(if (pager != null) Modifier.musicTrail(pager, 0, reduceMotion, 340f, .2f) else Modifier)
-                .pressable(interactions, indication = tilt, delay = null)
+            val artModifier = Modifier.size(coverSize).onGloballyPositioned { if (pager == null || pager.currentPage == 0)
+                onCoverBounds(MusicCoverAnchor(Rect(it.positionInRoot(), Size(it.size.width.toFloat(), it.size.height.toFloat())))) }
+                .graphicsLayer { alpha = if (hideCover) 0f else 1f }
+                .then(if (pager != null) Modifier.musicTrail(pager, 0, reduceMotion, 340f, .2f) else Modifier)
+                .gentleCoverTilt(reduceMotion, current.identity)
                 .shadow(24.dp, shape, clip = false).clip(shape).background(MiuixTheme.colorScheme.surfaceContainerHigh)
                 .clickable(interactionSource = interactions, indication = null, role = Role.Button, onClick = onLyrics)
                 .semantics { contentDescription = "专辑封面，切换到歌词" }
@@ -286,7 +357,7 @@ private fun MusicCover(current: LocalMedia, title: String, subtitle: String, mod
                 }, label = "music cover") { media -> MediaArtwork(media, Modifier.fillMaxSize(), 24.dp) }
             }
             Spacer(Modifier.height(28.dp))
-            Column(Modifier.fillMaxWidth().then(if (pager != null) Modifier.musicTrail(pager, 0, reduceMotion, 210f, .30f) else Modifier)) {
+            Column(Modifier.fillMaxWidth().musicJourney(journeyProgress, journeyOrigin, reduceMotion).then(if (pager != null) Modifier.musicTrail(pager, 0, reduceMotion, 210f, .30f) else Modifier)) {
                 Text(title, color = foreground, fontSize = 27.sp, lineHeight = 34.sp, fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis)
                 Spacer(Modifier.height(8.dp))
                 Text(subtitle, color = foreground.copy(alpha = .64f), fontSize = 15.sp, lineHeight = 22.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
@@ -346,18 +417,16 @@ private fun MusicLyricsPane(state: MusicLyrics, snapshot: PlaybackSnapshot, back
                             tween(if (reduced) 0 else 350), label = "lyric emphasis")
                         val fontSize by animateFloatAsState(if (selected) style.activeSize else style.inactiveSize, tween(if (reduced) 0 else 200), label = "lyric font size")
                         val scale by animateFloatAsState(if (selected) 1f else .96f, if (reduced) snap() else spring(stiffness = 240f, dampingRatio = .85f), label = "lyric line spring")
-                        Text(line.text.ifBlank { "•••" }, Modifier.fillMaxWidth().graphicsLayer {
+                        BilingualLyricText(line.text, Modifier.fillMaxWidth().graphicsLayer {
                             scaleX = scale; scaleY = scale; transformOrigin = TransformOrigin(if (centered) .5f else 0f, .5f)
                         }.semantics { stateDescription = if (selected) "当前歌词，点按跳转" else "点按跳转到 ${formatTime(line.milliseconds)}" }
-                            .clickable(role = Role.Button) { browsing = false; backend.seekTo((line.milliseconds - offset).coerceAtLeast(0)) }
-                            .padding(vertical = 7.dp).heightIn(min = 48.dp),
-                            textAlign = if (centered) TextAlign.Center else TextAlign.Start,
-                            fontSize = fontSize.sp, lineHeight = (fontSize * 1.35f).sp,
-                            fontWeight = FontWeight(if (selected) style.activeWeight else style.inactiveWeight), color = lineColor)
+                            // clickable expands small touch targets without inflating the lyric layout.
+                            // Keep the inter-item gap equal to the setting and its preview.
+                            .clickable(role = Role.Button) { browsing = false; backend.seekTo((line.milliseconds - offset).coerceAtLeast(0)) },
+                            style = style, active = selected, primarySize = fontSize, color = lineColor, centered = centered)
                     } else items(plainLines.size) { index ->
-                        Text(plainLines[index], Modifier.fillMaxWidth().padding(vertical = 7.dp), fontSize = style.inactiveSize.sp,
-                            lineHeight = (style.inactiveSize * 1.35f).sp, fontWeight = FontWeight(style.inactiveWeight),
-                            color = style.inactiveColor?.let(::Color) ?: foreground.copy(alpha = .82f), textAlign = if (centered) TextAlign.Center else TextAlign.Start)
+                        BilingualLyricText(plainLines[index], Modifier.fillMaxWidth(), style = style, active = false, primarySize = style.inactiveSize,
+                            color = style.inactiveColor?.let(::Color) ?: foreground.copy(alpha = .82f), centered = centered)
                     }
                 }
                 if (browsing) Text("回到当前歌词", Modifier.align(Alignment.BottomCenter).clip(CircleShape).background(foreground.copy(alpha = .1f))
@@ -370,46 +439,47 @@ private fun MusicLyricsPane(state: MusicLyrics, snapshot: PlaybackSnapshot, back
 
 @Composable
 private fun MusicControls(snapshot: PlaybackSnapshot, backend: PlaybackBackend, title: String, subtitle: String, foreground: Color,
-    reduced: Boolean, compact: Boolean, favorite: Boolean, onFavorite: () -> Unit, onQueue: () -> Unit, onSpeed: () -> Unit) {
+    reduced: Boolean, compact: Boolean, favorite: Boolean, onFavorite: () -> Unit,
+    onQueue: () -> Unit, onSpeed: () -> Unit, hideCover: Boolean = false, onCoverBounds: (MusicCoverAnchor) -> Unit = {}) {
     var dragging by remember(snapshot.current?.uri, snapshot.mediaGeneration) { mutableStateOf(false) }
     var value by remember(snapshot.current?.uri, snapshot.mediaGeneration) { mutableFloatStateOf(0f) }
     val progress = if (dragging) value else snapshot.progress
     Column(Modifier.fillMaxWidth().padding(horizontal = if (compact) 24.dp else 32.dp).padding(top = 4.dp, bottom = if (compact) 12.dp else 8.dp)) {
         if (compact) Row(Modifier.fillMaxWidth().padding(bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-            MediaArtwork(snapshot.current, Modifier.size(44.dp), 12.dp)
+            MediaArtwork(snapshot.current, Modifier.size(44.dp).onGloballyPositioned {
+                onCoverBounds(MusicCoverAnchor(Rect(it.positionInRoot(), Size(it.size.width.toFloat(), it.size.height.toFloat())), 12.dp, 0.dp)) }
+                .graphicsLayer { alpha = if (hideCover) 0f else 1f }, 12.dp)
             Column(Modifier.weight(1f).padding(start = 12.dp)) {
                 Text(title, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = foreground, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text(subtitle, fontSize = 12.sp, color = foreground.copy(alpha = .58f), maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
-            MusicAction(PlayerIcons.Queue, "播放队列", onQueue, foreground, reduced)
         }
-        MusicSeekBar(snapshot, backend, foreground, reduced, progress, dragging, { value = it; dragging = true }, { dragging = false })
+        PlaybackSeekBar(snapshot, backend, foreground, reduced, progress, dragging, { value = it; dragging = true }, { dragging = false })
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Text(formatTime(if (dragging) (value * snapshot.durationMs).toLong() else snapshot.positionMs), fontSize = 11.sp, color = foreground.copy(alpha = .5f))
             Text(if (snapshot.durationMs > 0) formatTime(snapshot.durationMs) else "—:—", fontSize = 11.sp, color = foreground.copy(alpha = .5f))
         }
         Row(Modifier.fillMaxWidth().padding(top = if (compact) 2.dp else 12.dp), verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceEvenly) {
-            if (compact) MusicAction(PlayerIcons.Heart, if (favorite) "取消收藏" else "收藏", onFavorite,
-                if (favorite) MiuixTheme.colorScheme.primary else foreground.copy(alpha = .7f), reduced)
             MusicAction(PlayerIcons.Previous, "上一首", backend::previous, foreground, reduced, size = if (compact) 48 else 56)
             MusicAction(if (snapshot.isPlaying) PlayerIcons.Pause else PlayerIcons.Play, if (snapshot.isPlaying) "暂停" else "播放", backend::togglePlayPause,
                 foreground, reduced, size = if (compact) 52 else 72, filled = true)
             MusicAction(PlayerIcons.Next, "下一首", backend::next, foreground, reduced, size = if (compact) 48 else 56)
-            if (compact) Text(speedLabel(snapshot.speed), Modifier.clickable(onClick = onSpeed).padding(14.dp), fontSize = 12.sp, color = foreground.copy(alpha = .7f))
         }
-        if (!compact) Row(Modifier.fillMaxWidth().padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(speedLabel(snapshot.speed), Modifier.clickable(onClick = onSpeed).padding(16.dp), fontSize = 14.sp, color = foreground.copy(alpha = .6f))
+        Row(Modifier.fillMaxWidth().padding(top = if (compact) 0.dp else 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceEvenly) {
+            Text(speedLabel(snapshot.speed), Modifier.clickable(onClick = onSpeed).sizeIn(minWidth = 48.dp, minHeight = 48.dp).wrapContentSize(Alignment.Center), fontSize = 14.sp, color = foreground.copy(alpha = .6f))
             MusicAction(PlayerIcons.Heart, if (favorite) "取消收藏" else "收藏", onFavorite,
                 if (favorite) MiuixTheme.colorScheme.primary else foreground.copy(alpha = .6f), reduced)
+            MusicAction(when(snapshot.playOrder) { PlayOrder.SEQUENTIAL -> PlayerIcons.Order; PlayOrder.SINGLE -> PlayerIcons.Repeat; PlayOrder.RANDOM -> PlayerIcons.Shuffle },
+                "播放顺序：${snapshot.playOrder.label}", { backend.setPlayOrder(PlayOrder.entries[(snapshot.playOrder.ordinal + 1) % PlayOrder.entries.size]) }, foreground.copy(alpha = .6f), reduced)
             MusicAction(PlayerIcons.Queue, "播放队列", onQueue, foreground.copy(alpha = .6f), reduced)
         }
     }
 }
 
 @Composable
-private fun MusicSeekBar(snapshot: PlaybackSnapshot, backend: PlaybackBackend, color: Color, reduced: Boolean,
-    progress: Float, dragging: Boolean, onPreview: (Float) -> Unit, onEnd: () -> Unit) {
+internal fun PlaybackSeekBar(snapshot: PlaybackSnapshot, backend: PlaybackBackend, color: Color, reduced: Boolean,
+    progress: Float, dragging: Boolean, onPreview: (Float) -> Unit, onEnd: () -> Unit, onBegin: () -> Unit = {}) {
     val latest by rememberUpdatedState(snapshot)
     val height by animateFloatAsState(if (dragging) 6f else 3f, if (reduced) snap() else spring(stiffness = 500f, dampingRatio = .8f), label = "seek track spring")
     val radius by animateFloatAsState(if (dragging) 8f else 4f, if (reduced) snap() else spring(stiffness = 500f, dampingRatio = .8f), label = "seek thumb spring")
@@ -423,6 +493,7 @@ private fun MusicSeekBar(snapshot: PlaybackSnapshot, backend: PlaybackBackend, c
         if (snapshot.durationMs <= 0) return@pointerInput
         awaitEachGesture {
             val down = awaitFirstDown(requireUnconsumed = true)
+            onBegin()
             var moved = false; var cancelled = false; var position = down.position
             try {
                 while (true) {

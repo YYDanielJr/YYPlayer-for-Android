@@ -1,6 +1,391 @@
 # 进度与交接记录
 
-## 2026-10-05：U08 媒体库分页与页头视觉（当前记录）
+## 2026-10-14：U21 13 Ultra 视频加载、手势与响应修复
+
+- 任务／结果：修复 libmpv 在实体机重开 `/proc/self/fd` 被拒绝的问题，改授权 `fd://`；精简控制器并支持暂停时点击淡出；新增可开关双击／横拖目标时间与真实预览／左右侧亮度和播放器音量。保留双指旋转缩放、8×、字幕和抽屉等原功能。
+- 音频响应：Media3仅视频40ms目标PCM缓冲＋低延迟AudioTrack，保持Sonic完整0.1–8×；mpv共享AAudio＋30ms软件队列与常驻tempo，回读current-ao。平台AudioTrack变速候选因小米拒绝7.4×而未采用，见ADR0009；音乐路径未变。
+- 文件：VideoSurface／VideoPlayerPage／VideoGestures／VideoSeekPreview、三个播放后端／输出工厂、状态与媒体信息、mpv_worker；新增跨UIDprovider与真实触摸测试，更新既有UI测试、README、AGENTS、技术设计／实施计划／视频体验／签名文档。
+- 命令／证据：两ABI debug＋release／37项JVM／lint exit0（0error、2既有warning）；13 Ultra最终28项真实手势与音视频回归＋1080p专项1项＋R8 release启动／JNI／mpv解码3项通过。四APK各12so的ELF／适用ZIP16KB检查全通过，git diff --check exit0。完整命令、日志、hash与自制截图见 [U21验证](validation/video-u21/README.md)。
+- 设备／数据：先枚举有线 `c9e352e3`／2304FPN6DC／API36／4KB页；原用户签名release及数据保留，显式-PdeviceQa=true共存安装YYPlayer QA，全部install-r，未清数据／全局设置。1080p松手倍速回读Media3约32ms／mpv79ms；实际播放时钟亦检查，仍存在有限缓冲，不宣称零延迟。
+- 未验／下一动作：17 Pro Max未连接，API26–32／其他路由／16KB页真机／4K HDR重负载／release帧率／完整无障碍未验。本轮最新参考截图未附，视觉手感待用户复核；手机已恢复QA debug供直接试用，正式release需用户原密钥签名。B01和U21均留在dev未提交／推送，app/release用户产物保留。
+
+## 2026-10-14：B01 版本 0.1.0、双 ABI 独立 APK 与 release 体积优化
+
+按用户要求更新编译规则，初始 dev `f24008b` 工作区干净；本轮没有新的提交／推送授权，改动保留在 dev 工作区。
+
+- 文件／行为：`app/build.gradle.kts` 将版本设为 0.1.0／versionCode 2，仅编译 arm64-v8a、x86_64 并分别打包 debug／release，不生成 universal；用公开 Variant API 命名 `YYPlayer_for_Android_<version>_<arch>_<debug/release>.apk`。Release 全应用 R8 代码／资源压缩，native 库压缩安装时解压；`src/release/keepRules/native.keep` 精确保留 PCM JNI，已有 MpvNative @Keep 保留。工具链、媒体能力与正式签名身份不变。
+- 脚本／文档：MuMu 脚本从 metadata 选择设备 ABI，保留数据并禁用增量安装；原生审计适配单 ABI／压缩库，继续检查 ELF 和未压缩 ZIP 16KB。更新 README、AGENTS，新增 [编译与签名](BUILD_AND_SIGNING.md)，明确正式签名、文件名、安装空间与 mapping 归档。
+- 验证：最终 assembleDebug／assembleRelease／assembleDebugAndroidTest／37 项 JVM／lintRelease exit 0（0 error、2 既有 warning）；四个主 APK 的命名／版本／ABI／12 so／16KB 静态审计通过。未签名 release 为 arm64 13.62 MiB、x86_64 14.62 MiB。现有调试证书签署独立 x86_64 release QA，验签／zipalign exit 0；新增仅依赖 Android API 的 ReleasePackagingInstrumentation，非 debug 包启动／音频 JNI／mpv 解码 **3 项通过**。恢复正常 debug 后视频 UI＋libmpv **14 项通过**。命令、异常修正、hash、日志见 [B01 证据](validation/build-b01/README.md)。
+- 设备／未验／下一步：当前 adb 为空后启动用户 MuMu，读取实际端口连接 API35／x86_64；自制 v15／v16 素材，全部 install -r，最终恢复 debug 0.1.0。首次 QA 证书误选和 debug runner 不适配混淆包均已修正。实体 arm64／API26–32／16KB 页设备／完整 release 性能与正式私钥签名流程未验，未宣称视觉满意或发布 gate 关闭。下一步使用正式签名配置及目标 arm64 真机验证；不因本轮构建任务扩展媒体功能。
+
+## 2026-10-14：U20 倍速上限统一 8×，删除特殊路由
+
+用户要求将最高倍速降至 8×，无需特殊适配，更新文档并提交。本轮在 dev `d551f38` 上实现，初始工作区干净，按授权提交到 dev，不推送／合入 master。
+
+- 文件／行为：`VideoSpeedSettings.kt`、`VideoPlayerPage.kt`、`AndroidMedia3PlaybackBackend.kt`、`MpvVideoBackend.kt`；UI 和两个后端统一 0.1×–8×／步进 0.1×，外侧快捷不变。删除超过 8× 自动换后端、requestedSpeed 参数和仅硬解专用范围／文案，调用原 setSpeed；手动后端选择保留。
+- 验证：assembleDebug／assembleDebugAndroidTest／37 项 JVM／lint exit 0（0 error、2 既有 warning）；MuMu 视频 UI 8＋libmpv 6 共 **14 项通过**。验证拖到 8仍是 Media3、越界限制8、MPV回读与重建、0.1步进／1.25快捷、3×恢复、抽屉真实滑动及返回。测试文件随之更新，详见 [U20 命令、APK hash 和证据](validation/video-u20/README.md)。
+- 文档：README、AGENTS、技术设计、实施计划、视频体验和 ADR0008 更新；U19 10× 和自动路由仅作为历史保留。
+- 设备／限制／下一步：先枚举 MuMu `127.0.0.1:16384`／API35／x86_64，自制 U15／U16 素材与独立偏好，全部 install -r。实体设备／API26–32／高速帧率听感／完整无障碍待验；未改 native 库／音频输出，不重复无关资格测试。用户下一步复核 8× 统一范围。
+
+## 2026-10-14：U19 自由倍速、文档及 dev 提交
+
+用户要求设置内新增 0.1×–10×／步进 0.1×、外侧档位不变，并更新文档和 AGENTS 后提交 dev。本轮按授权集中收录累计 U15–U19 视频实现、验证素材及当前／历史基线文档；不推送、不合入 master。具体提交身份以 git log 为准，以下旧章节“未提交”为当时记录。
+
+- 文件／行为：新增 `VideoSpeedSettings.kt`，修改 `VideoPlayerPage.kt`、`AndroidMedia3PlaybackBackend.kt`、`MpvVideoBackend.kt`；工具中滑杆松手生效、加减 0.1×／恢复 1×，快捷 0.5／1／1.25／1.5／2／3 保留。查锁定 Media3 字节码确认实际软件音频上限 8×，更高速度使用已有 libmpv；仅硬解保留 8×，不静默放弃严格策略。见 ADR0008。
+- 验证：assembleDebug／assembleDebugAndroidTest／37 项 JVM／lint exit 0，0 error／2 既有 warning；MuMu **28 项全部通过**（视频 UI 8、libmpv 6、视频后端 5、手势 4、音乐 5）。包含真实滑到 10、0.1 步进、1.25 快捷、重建保留、3× 恢复上下边界、真实抽屉滑动和返回。原生审计两 ABI 全部 24 so ELF／ZIP 16KB 通过。首次既有短屏点击因菜单增加需滚入目标，修正测试定位后全量通过；未删除断言。命令／exit／APK hash／日志／截图见 [U19 验证](validation/video-u19/README.md)。
+- 文档：README、AGENTS、视频体验、技术设计、实施计划及 ADR0008 同步；纠正“mpv 未集成”与 U17 仅语义滚动证据边界，保留历史记录。
+- 设备／限制／下一步：先枚举 MuMu `127.0.0.1:16384`／API35／x86_64，测试用自制素材和独立偏好，全部 install -r。实体小米／API26–32／高速帧率听感／完整无障碍与原生发布资格待验，未重复无关 DAC／主机测试。用户下一步复核新倍速体验。
+
+## 2026-10-14：U18 修复抽屉无法拖动、补子菜单返回
+
+用户在 MuMu 反馈设置列表不能滚动、子菜单没有返回上一级的画面按钮。已在 dev 修复并 install -r 更新模拟器，保留用户数据，未提交／推送。
+
+- 根因／文件：`VideoSettingsDrawer.kt` 原 Final pass 无条件消费触摸，取消了子级拖动；现仅退出动画期间拦截，正常打开时保留滚动事件。`VideoPlayerPage.kt` 增加父级历史，子菜单标题左侧提供 Miuix 返回按钮，系统返回逐级回退；完成／取消／遮罩直接关闭。保留横屏半透明外观与竖屏弹窗。
+- 检查：assembleDebug／assembleDebugAndroidTest／lintDebug exit 0，0 error、2 既有 warning。MuMu 直接 instrumentation **8 项通过**：真实 swipeUp／swipeDown 并断言滚动位移、短横屏／200% 字体滑动到底、画面内返回、字幕同步三级返回，兼顾原有动画／关闭／真实后端菜单。`VideoPlayerUiTest.kt`／`MpvVideoDeviceTest.kt` 更新；日志、APK hash、命令和截图见 [U18 验证](validation/video-u18/README.md)。
+- U17 证据更正：当时 performScrollTo 为语义滚动，绕过触摸流程，不能证明手指拖动可用；本轮补上真实注入事件测试。
+- 设备／边界：先枚举 MuMu `127.0.0.1:16384`、API35／x86_64，沿用自制 U15／U16 素材与独立偏好。实体小米、完整 TalkBack、API26–32、release 性能待验。下一步请用户在 MuMu 复核滚动与返回手感，未记视觉最终确认。
+
+## 2026-10-14：U17 横屏视频设置右侧半透明抽屉
+
+用户要求横屏视频设置从右侧抽屉弹出、背景略透明。已在 dev 完成并 install -r 更新 MuMu，未提交／推送；原 D01／U15／U16 改动保留。
+
+- 文件／行为：新增 `VideoSettingsDrawer.kt`，修改 `VideoPlayerPage.kt`、`HyperDesign.kt`、`PlayerScreens.kt`；按实际视口宽高选择布局，横屏设置统一右侧 320–420dp 抽屉，260ms 滑入／滑出、90% 不透明 Miuix 背景、22% 黑色遮罩。标题和完成／取消固定，内容可滚动；竖屏和音乐保留原弹窗。设置打开时隐藏底层播放按钮，退出动画期间禁止误触；支持返回键／点击空白关闭。
+- 验证：assembleDebug／assembleDebugAndroidTest／lintDebug exit 0（0 error、2 既有 warning），直接 instrumentation **7 项通过**（视频 UI 6＋libmpv 真实菜单 1）。新增 `VideoPlayerUiTest` 用例覆盖抽屉右侧几何、真实倍速选择、返回／遮罩关闭、布局宽高变化、360dp 高／200% 字体、滑入位置和退出屏蔽。首次返回测试缺少 Compose 同步已修正并复测通过；详见 [U17 命令、日志与截图](validation/video-u17/README.md)。
+- 设备／素材：先枚举 MuMu `127.0.0.1:16384`／API35／x86_64、1920×1080 横屏，自制 U15／U16 素材和独立偏好。APK 和测试 APK 均 install -r，保留用户数据；主页面启动 Status ok。截图只含测试素材。
+- 未验／下一步：实体小米、完整 TalkBack、API26–32、release 帧率待验；不因 UI 修改重复无关 native／音频硬件测试。下一步由用户复核横屏宽度、透明度和手感；未写视觉已满意。
+
+## 2026-10-14：U16 可选 libmpv 与第四项视频差异补齐
+
+用户要求继续未完成的第四项，并允许参考 libmpv-android、更换视频后端。已在 dev 加入可选 `dev.jdtech.mpv:libmpv:1.0.0` 原生路径，保留 Media3 默认及回退入口，没有提交／推送／发布。接手已有 D01／U15 改动保留；Rust 项目只读且状态干净。
+
+- 功能／UI：`VideoPlayerPage.kt`、`PlaybackBackend.kt` 增加后端选择、真实章节、双向逐帧、音频／字幕偏移、libass 样式与三种字体预设／覆盖、deband。已有 A–B、轨道、3×、比例／双指变换与截图继续可用；libmpv 截图带字幕。入口为「播放工具 → 视频后端 → libmpv · 扩展功能」。
+- 播放／生命周期：新 `MpvVideoBackend.kt`、`MpvNative.kt`、`native/jni/mpv_worker.cpp`；C++ worker 统一 mpv API，有界队列、合并 seek／poll、UTF-8、generation 与句柄注册表、白名单。Surface 和 FD 在 worker 销毁确认后释放，清空队列／退出也走同一保护。真实 SimpleBasePlayer 驱动 MediaSession，含 stop／prepare。`AndroidMedia3PlaybackBackend.kt`／`PlayerApplication.kt` 先停止释放视频再恢复音乐或启动音频自检，保留音量与播放意图。
+- 构建：`app/build.gradle.kts`、`native/CMakeLists.txt` 固定 AAR／SHA256，提取两 ABI。发现 NDK28 libc++ 缺浮点 from_chars，改为显式共用上游固定 NDK29 libc++；编译器和公开接口保持 NDK28。没有复制未知 APK 库、运行上游自动安装脚本或修改全局环境。原生 header、脚本及库 hash 与架构决定见 ADR0007／U16 audit。
+- 验证：assembleDebug／assembleDebugAndroidTest／37 项 JVM／lint exit 0（0 error、2 既有 warning）；MuMu 全量 **22 项**（libmpv 5＋U15 视频／手势／UI 12＋音乐 5）通过。之后补 stop／prepare 与清空队列销毁边界，再构建／单测／lint 并复测 5 项 libmpv。真实验证了单帧时间差、章节、偏移／样式实际属性、ASS 开关像素、Surface 重建、双后端往返、同一 MediaController 转 native PCM 音乐、A–B／3× 和菜单点击。`Verify-MpvArtifact.py` exit 0：全部 24 个 so、两 ABI ELF／ZIP 16 KB 对齐，单一 libc++。命令、exit、APK／素材 hash、日志／自制截图见 [U16 验证](validation/video-u16/README.md)。
+- 设备／素材：先枚举 `127.0.0.1:16384` MuMu API35，实际 app x86_64；不是实体小米。自制三章节 4:3 H.264／双 AAC／ASS 动画 MKV 与低幅 PCM WAV，独立偏好；所有安装 install -r，未动用户库或全局系统设置。
+- 限制／下一步：默认仍 Media3；物理 arm64 装载／硬解、API26–32、HDR、实体多指／触感、release 性能及完整 SAF 流程待验。libmpv 严格硬解不开放，字体仅三种预设；没有迁入全部桌面 shader／窗口功能。上游 FFmpeg 含 GPLv3+ 配置，完整依赖源码／许可证交付与可复现构建 gate 未关闭，所以本轮不发布、不称最终 native 迁移完成。下一步是用户从扩展入口复核体验与真实设备资格验证；未写视觉已满意。
+
+
+## 2026-10-14：U15 视频页面、全窗口变换与桌面视频功能补齐
+
+用户本轮要求优化小米风格的视频页、双指操作后提供还原、放大覆盖原黑边、3× 单次系统触感，并参考 Rust 桌面补视频功能。在 dev 上实现，未提交／推送；接手已有 D01 文档修改完整保留，Rust 工程只读（本轮参考 HEAD `e6a8456`）。
+
+- 前端：`VideoPlayerPage.kt`、`PlayerScreens.kt`、`VideoSurface.kt`、新 `VideoViewport.kt`／`VideoGeometry.kt`、`PlayerHostActivity.kt`；黑色沉浸画布、统一白色操作、细进度条、工具／字幕／画面分组窗口、锁定／还原、±10 秒、系统栏和保持亮屏。`MusicPlayerScreen.kt` 仅把既有进度条开放为共用组件，音乐外观不变。旧比例限制 PlayerView XML 已移除。
+- 变换：TextureView 布局铺满窗口，比例适应并入矩阵；0.5–5×、重心锚点、任意旋转与归一化平移保留。变换后独立显示还原。真实 4:3 样片的像素检查发现暂停画面未重绘，已通过同时 invalidate TextureView 与宿主修复；最终验证放大覆盖原黑边、还原恢复比例，不只检查矩阵。
+- 后端：`PlaybackBackend.kt`／`AndroidMedia3PlaybackBackend.kt` 增加真实轨道投影／选择、重建保留参数、视频独立顺序／单项循环／随机、后端 PlayerMessage A–B、带 token 的临时 3×。进入成功才调用 KEYBOARD_TAP，一次短触感；失焦、第二指、媒体切换、重建、结束和取消恢复基础速度。
+- 字幕与截图：新 `VideoSubtitle.kt` 后台限量导入 SAF SRT／VTT／ASS／SSA（4 MB／20000 条），Media3 预解析后才重建，拒绝旧 URI／generation；支持内外字幕、音轨开关和字幕字号。SubtitleView 跟随视频变换，控制层显示时提高默认字幕位置。截图单次读取，最长边 1920，系统选择保存位置，不含字幕／控制层。
+- 验证：`assembleDebug`、`assembleDebugAndroidTest`、`testDebugUnitTest`、`lintDebug` exit 0；37 项 JVM 无失败。MuMu 直接 instrumentation **17 项通过**（视频后端 5、手势 4、视频 UI 3、既有音乐回归 5），含真实字幕 cue、双音轨、解码重建、A–B 多次回绕、旧 boost 拒绝、黑边像素、还原／锁定、360dp／200% 字体约束布局。最终清理未使用资源后再打包／lint。具体命令、APK／样片 hash 和自制画面截图见 [U15 验证](validation/video-u15/README.md)。
+- 设备：先枚举为空；从正在运行的 MuMuManager info 获取并连接 `127.0.0.1:16384`，Android15／API35／报告型号 2304FPN6DC。所有安装 install -r，无卸载／清数据。样片为自制 testsrc2＋低幅双 AAC＋mov_text，测试偏好独立，不操作用户媒体或全局设置。
+- 限制：本轮不是 Rust 全功能对等。精确双向逐帧、通用容器章节、音频／字幕延迟、自选字幕字体／完整 libass 特效和 deband 未迁入；对照与原因见 [视频体验](UI_VIDEO_EXPERIENCE.md)。截图保存器的真实 SAF 写入完整流程、API26–32、实体多指／触感、TalkBack、release 性能／HDR仍待专项。MuMu 上的大字体约束测试不等于全系统无障碍验收，未写“视觉已满意”。
+
+下一动作：用户复核小米风格与物理手感；若继续推进桌面对等，按缺口表先建立章节／时间偏移／精确逐帧的后端契约与素材 gate，不能伪装为已实现或用估算 seek 冒充逐帧。
+
+## 2026-10-14：D01 文档与 AGENTS 接手基线同步
+
+用户要求更新文档和 AGENTS.md。功能代码基线为 `dev` 提交 **`607ceb3`**；HiFi 基线 `c75b34d` 已合入，master 保持 `836a920`。本轮仅修改文档，尚未提交／推送。
+
+- `AGENTS.md`：替换旧 U08／MuMu 接手入口，明确 dev 开发与 master 仅接受授权合入、最新 U11–U14 功能、真实 service／唯一引擎、最终按钮与动效规则，以及有线小米 13 Ultra／无 DAC 的验收条件。保留架构、线程、音频真实性、数据和兼容性约束；不把待验内容写成已通过。
+- `README.md`、`IMPLEMENTATION_PLAN.md`、`TECHNICAL_DESIGN.md`：更新当前实现与提交状态、设备命令和验收入口，区分已有 Media3／C++ PCM／JNI／AudioTrack 与后续 FFmpeg／libmpv／Oboe、Room／DataStore 规划；版本表核对实际 catalog，清除过时坐标与“无需 ExoPlayer”描述。
+- `HANDOFF_HIFI.md`：修正 H02–H05 已提交状态和当前启动指令，标记旧设备／无线地址／测试命令为历史范围，修复相对链接。`UI_SETUP_AND_LIBRARY.md`、`UI_MUSIC_EXPERIENCE.md` 同步底栏单按钮、收藏入口、52dp／50dp 按钮、双语样式 v2 和 U14 保留回弹；移除未收录原图的失效链接。
+- 验证：核对 `git log`／分支、catalog 和 service／歌词源码；文档入口本地链接检查及 `git diff --check` 通过（exit 0）。只改 Markdown，没有新增功能或重跑构建／设备测试，继续引用 U14／U13 已记录证据。
+
+下一动作：按用户后续任务在 dev 继续；本轮文档改动待提交。Compose suite、低版本／无障碍／性能与音频硬件资格的既有未验事项不变。
+
+## 2026-10-14：提交 U11–U14 到 dev
+
+用户明确授权提交。本次提交收录 U11 音乐库／歌单／队列／输出回退／双语歌词，以及 U12–U14 按钮、列表与封面动效修复，包含对应测试和实机验收记录。下方各轮“未提交”描述为当时状态，本条覆盖当前提交状态；不推送远端，不合入 master，不修改 Rust 参考工程。
+
+提交前检查：当前分支 `dev`，`git diff --check` exit 0；新增文件均为本批源码、测试素材或验收证据，没有加入 build、APK、设备参考原图或本地配置。沿用 U14 最终构建／34 项单测／lint 和真机录屏结果，本轮只提交及更新记录，不重复构建。后续按用户反馈继续开发，既有未验条件保持。
+
+## 2026-10-14：U14 保留收回弹簧，消除终点换图
+
+状态：**按用户纠正恢复收回回弹，已保留数据安装并录屏检查。** U13 的无回弹收回曲线被本轮覆盖，透明控件误触修复和 9° 无回弹按压保持。全部仍在 `dev` 未提交工作区，master／Rust 不变。
+
+- U14.1 `ui/YYPlayerApp.kt`：收回 spring 刚度 230／阻尼比 0.8／阈值 0.0001，几何使用带符号进度，允许轻微越过落点后复位；页面透明度与控件退出单独处理。共享封面层完成弹簧后继续显示底栏小图，消除结束瞬间切换另一绘制节点；静止位置跟随底栏实际测量，减少动画／视频走原路径。
+- U14.2 同文件：尾段快速重开时，以当前可见封面矩形重新起步并测量新页面目标，兼容歌词锚点转大封面。保留 U13 Initial pass 拦截、不可交互语义和透明详情移除，回弹不能让旧菜单恢复点击。
+- 构建 `:app:assembleDebug :app:assembleDebugAndroidTest :app:testDebugUnitTest :app:lintDebug --no-daemon --max-workers=4` → **exit 0／BUILD SUCCESSFUL 1m10s**；JVM **34 项、0 失败**；lint **0 error／2 既有 warning**。主 APK install -r Success，`git diff --check` exit 0。
+- 有线小米 13 Ultra `c9e352e3`／API36／`OS3.0.308.0.WMACNXM`，自制 QA Song 4 暂停。录屏确认末段宽度约 94→71→79px、顶部 y1466→1448（720px 宽录屏中的粉色边界），存在真实回弹，终点没有换图；大封面和歌词收起约 350ms 后点击底栏均正常重开，没有菜单闪现／意外播放。裁去系统栏的录屏和边界采样见 [U14 验收](validation/ui-u14/README.md)，此为视觉证据而非帧率基准。结束回到音乐库、4 首原顺序队列、QA Song 4 暂停，导入与偏好未清除。
+- APK SHA256 `31C6A63D0E3C69C71FF4B4582F4583B8F81950F7721B735BAC48B10F85E74F25`。README／音乐体验文档同步说明 U14 覆盖 U13 收回参数。
+
+未执行／下一步：本轮只有转场修改，未重跑 U13 已通过的播放 instrumentation 或 native CTest；Compose suite 已知挂起、release 帧率、横屏／大字体／TalkBack／API26–32 仍待验。由用户复核实际回弹幅度和收尾手感。
+
+## 2026-10-14：U13 按钮比例、封面返回与透明页面误触
+
+状态：**本轮四项修改已实现，最终 APK 已保留数据安装到有线小米 13 Ultra，旧版弹窗闪现已录到复现，新版相同操作对照通过。** 继续在 `dev`，保留 U11／U12 改动，未新提交／推送；master 为 `836a920`，Rust 参考仓库工作区干净。实机证据见 [U13 验收](validation/ui-u13/README.md)。
+
+- U13.1 `ui/HyperDesign.kt`、`PlayerScreens.kt`：分析用户企业模式／米家截图，按 density 560 换算高度约 52.3dp／50dp。公共页面操作由 56dp／SemiBold 调整为 52dp、18sp／Medium；弹窗通过局部令牌统一 50dp、17sp／Medium，选择弹窗取消也使用同一组件。圆角 16dp，并排等宽间隔 12dp，灰色次要／主题色确认，图标触控仍为 48dp。截图不能唯一确定第一方原始字号／字重，不宣称复制精确字体参数。实机新版量得页面 182px、弹窗 175px；队列、取消确认和引导前进／返回已检查。
+- U13.2 `ui/YYPlayerApp.kt`、`MusicMotion.kt`：收回从弹簧改为 360ms 单调贝塞尔曲线，避免在小目标处过冲和尾段迟迟不交接；展开保留低幅弹簧。共享封面层在详情静止时保留组合，更新稳定底栏测量，收回使用相同圆角／阴影插值；歌词页小封面连续回到左下角。角落最大倾角从 7° 增至 9°，临界阻尼 1／刚度 95 不变，保持无触底回弹。
+- U13.3 同上：旧版收起后约 350ms 点击 `(800,2970)`，录屏确认误触透明详情的“歌词与播放选项”，独立弹窗短暂显示再随详情销毁。新增 Initial pass 输入拦截、不可交互语义隐藏和尾段透明详情树移除，阻止消失中的按钮发命令；新版同操作正常重开封面，歌词页较早点击被拦截，无弹窗或意外播放。
+- U13.4 `ui/MusicLibraryBrowser.kt`：首页删除“全部音乐／收藏”卡片，直接显示歌曲组；原收藏数据保留，入口移至“歌单 → 我的收藏”，返回／分类／播放逻辑沿用。`LibraryTabsUiTest.kt` 改为断言“本地音乐”，适配卡片移除。
+
+验证／运行结果：
+
+- `:app:assembleDebug :app:assembleDebugAndroidTest :app:testDebugUnitTest :app:lintDebug --no-daemon --max-workers=4` → **exit 0／BUILD SUCCESSFUL 1m15s**；JVM **34 项、0 失败**，lint **0 error／2 既有 warning**。两 APK install -r 均 Success；直接 instrumentation `MusicUpgradeDeviceTest` → **exit 0／OK (5 tests)，3.148s**。`git diff --check` exit 0。
+- 设备 `c9e352e3`／小米 13 Ultra `2304FPN6DC`／API36／`OS3.0.308.0.WMACNXM`。沿用自制 4 首 30s 低幅 FLAC／纯色封面／双语 LRC；未卸载或清除数据，原导入、`QA-Playlist`、收藏和偏好保留；结束回到音乐库、4 首原顺序队列、QA Song 4 暂停。引导退出后完成标记保留。第一方参考原图只在忽略的 build 目录，公共证据只含自制素材。
+- 主 APK SHA256 `CD9250290E7FAE111F71678A9C317C425D261B715C38E49B9D9711C6BCAC0FEE`。修复前／后误触对照、歌词返回、截图和完整构建／测试日志见验收目录。没有把录屏观感当成 release 性能证明。
+
+未执行／下一动作：Compose Activity suite 在此 ROM 上既有挂起，本轮只完成编译；未改 native、未重跑 CTest。横屏／200% 字体／TalkBack／深色专项、API26–32、多指和 release 帧率仍待验；有线连接不具备 USB DAC 验证条件。下一步由用户复核此次按钮比例与收回手感，后续补齐设备专项。
+
+## 2026-10-13：U12 音乐动效衔接与 HyperOS 页面整理
+
+状态：**用户本轮四项修改已实现，最终 APK 已保留数据安装到有线小米 13 Ultra；实际页面、长按排序、多选移除和录屏已复核。** 继续在 `dev` 工作区，包含此前未提交 U11；没有新提交／推送，master／Rust 参考仓库不变。用户最新两张圈选截图仅在忽略的 build 目录作参考，没有进入公共证据。
+
+- U12.1 `YYPlayerApp.kt`、`MusicMotion.kt`、`MusicPlayerScreen.kt`：过渡封面与静态封面使用一致的圆角和阴影；阴影随尺寸连续插值，直到 Animatable 的完整弹簧尾段结束才交回静态层，避免仅按位置阈值在回弹经过终点时切层。降低回弹幅度；固定移动期间的目标位置，结束后继续测量布局。歌词页将 44dp／12dp 圆角小封面作为收回起点，平移到首页圆形封面；隐藏底栏重复封面至收回完成。关闭相邻 pager 页的过渡绘制，避免未选中歌词／标题漏入展开画面；保留快速反向、减少动画设置和无回弹倾斜。
+- U12.2 `MusicPlayerScreen.kt`：封面／歌词底部统一倍速、收藏、播放顺序、队列四项操作；播放顺序使用现有 Miuix ListView／Refresh／Replace 图标，不再单独占一行小胶囊。截图圈选的时间偏移小按钮改为整行“延后／提前／重置”操作。
+- U12.3 新增 `MusicQueueActivity.kt`、`ui/MusicQueueScreen.kt`，在 Manifest 和 PlayerHostActivity 注册导航；替换 U11 队列弹窗，共用 service 所有的播放器，使用系统 Activity 转场。提供单选／多选、全选、移除、清空确认、长按拖动排序、让位动画、靠边自动滚动和无障碍上移／下移动作。实机发现 LazyColumn 会先消费长按后的移动，已修正为长按成立后在 Initial pass 接管移动，普通滑动和点击仍走正常路径；临时日志已移除。
+- U12.4 `HyperDesign.kt` 新增统一 56dp 起的大操作按钮和分组列表行；`MusicLibraryBrowser.kt` 歌曲列表只有组首顶部／组尾底部圆角，中间行直连，继续按 lazy row 加载。`SetupScreen.kt`、`LyricStyleScreen.kt`、`LibraryScreens.kt`、`PlayerScreens.kt`、`OnlineSearchScreen.kt` 和歌单管理的相关小操作改为整行或大按钮；确认主题色，取消／次要操作灰色，既有弹窗全宽灰色取消保留。没有更换 UI 框架或引入第二播放器。
+
+验证／证据：
+
+- 最终 `:app:assembleDebug :app:assembleDebugAndroidTest :app:testDebugUnitTest :app:lintDebug --no-daemon --max-workers=4` → **exit 0／BUILD SUCCESSFUL 1m13s**；JVM **34 项、0 失败**，lint **0 error／2 warning**（原 ExportedService 与版本提示）。两 APK install -r 成功；实际完整输出见 [U12 验收](validation/ui-u12/README.md)。`git diff --check` exit 0。
+- 最终 APK 直接 instrumentation `MusicUpgradeDeviceTest` → **OK (5 tests)，2.934s，adb exit 0**，队列／播放／持久化／回退回归通过。本轮未再尝试已知挂起的 Compose Activity suite，不能将其计作通过；未改 native C++，未重跑 CTest。
+- 小米 13 Ultra `2304FPN6DC`，API36／`OS3.0.308.0.WMACNXM`，有线 `c9e352e3`。沿用自制 4 首低幅 FLAC／双语 LRC；最终版实机将第 4 首拖到首位，再拖回末位，当前歌曲仍为 QA Song 1、暂停位置未变；单／多选数量正确，移除第 3／4 首后仅剩 1／2，库和歌单不变。队列返回详情正常。向导前进／上一步／稍后设置正常，无导入或偏好清除。歌词偏移菜单已查看，未更改偏移。
+- 最终录屏包含大封面展开／收回、歌词小封面收回和快速反向；已抽帧复核阴影持续存在、圆角转圆形连续、相邻歌词不漏入展开。此为实机视觉检查，不是帧率／性能达标证明。截图／裁去系统栏的录屏见验收目录。
+- 最终主 APK SHA256 `BC128A9E1500488DB884015D451A334E2C3815AA6007410694985FADDD789C95`。结束在音乐库、4 首原顺序队列、QA Song 1 暂停；向导完成标记与原设置保持，用户素材未删除。
+
+未验／下一动作：最终动画手感由用户复核；队列长列表靠边滚动、重复 URI、多指取消、横屏／200% 字体／TalkBack／深色专项、API26–32尚未单独设备验证。本轮无 USB DAC，不新增独占／位准确资格。后续根据用户视觉反馈微调，并在可用设备补齐 Compose UI 自动化。
+
+## 2026-10-13：U11 音乐库／队列／输出回退／封面动画／双语歌词
+
+状态：**五项升级已实现，构建与专项真机测试通过；普通应用 UI 已在小米 13 Ultra 操作验证，动画观感待用户复核。** 先按用户授权将原 dev-hifi 升级提交为 `c75b34d`，再 fast-forward 合入 `dev`；本轮 U11 修改全部留在 `dev` 工作区，尚未提交／推送。`master` 保持 `836a920`；桌面 Rust `e6a8456` 仅只读参考，未修改。
+
+任务／主要文件：
+
+- U11.1 `playback/MusicCollections.kt`、`MusicCollectionRepository.kt`、`ui/MusicLibraryBrowser.kt`、`LibraryScreens.kt`、`PlayerApplication.kt`：歌曲／歌手／专辑／歌单分类；同名专辑按歌手区分；歌单增删改名、单曲／多选添加、移出与排序。后台版本化持久化、数量／体积限制和损坏备份，content URI 为成员身份；库、歌单和播放队列独立，失去授权的成员保留。搜索／收藏／分类／歌单从当前曲目建立队列。
+- U11.2 `PlaybackBackend.kt`、`AndroidMedia3PlaybackBackend.kt`、`MusicQueueDialog.kt`、`YYPlayerApp.kt`：顺序末尾停止、单曲自动循环、随机顺序和前后切歌；模式持久化，视频固定顺序。队列跳转、下一首播放、追加、移动、移除、清空；移动其他条目保留当前曲目和位置。`HyperDesign.kt` 移除底栏下一首，只留播放／暂停；详情页保留完整控制。
+- U11.3 `audio/OutputFallbackPolicy.kt`、`AndroidMedia3PlaybackBackend.kt`、`PlayerSessionService.kt`、`MusicPlayerScreen.kt`：当前 AudioTrack 后端无法证明独占，PreferExclusive 使用 SYSTEM；native sink 配置／初始化／写入异常在确认同一输出仍连接、非 strict 的前提下单次回退 SYSTEM，保留队列／位置／播放意图／音量。回调匹配引擎版本和媒体代次，旧输出先释放；失败原因与实际路径可见，可主动重试。StrictExclusive／StrictUnprocessed 仍拒绝静默降级；设备丢失不触发回退扬声器。决定补入 ADR0006。
+- U11.4 `ui/MusicMotion.kt`、`YYPlayerApp.kt`、`MusicPlayerScreen.kt`：实测底栏小封面与详情大封面位置，根层展开／收回至左下角，带轻微回弹；文字和控制区配套位移／渐变。角落倾斜改为临界阻尼、低刚度的连续跟随，按下不触底回弹；取消、滚动接管、第二指、换媒体复位。修正 clickable 消费初始按下导致倾斜提前复位的问题。
+- U11.5 `playback/Lyrics.kt`、`ui/BilingualLyricText.kt`、`LyricStyle.kt`、`LyricStyleScreen.kt`：同步 Rust 的非空 ` / ` 原译文拆分，避免误拆 AC/DC／日期／URL；定时和纯文本共用样式，译文显示开关、当前／其他译文字号、字重、原译文间距。v1→v2 保留原文设置。更新 README、UI_MUSIC_EXPERIENCE 和 [U11 验收记录](validation/music-u11/README.md)。
+
+命令／实际结果：
+
+- `:app:assembleDebug :app:assembleDebugAndroidTest :app:testDebugUnitTest :app:lintDebug --no-daemon --max-workers=4` → **exit 0 / BUILD SUCCESSFUL 1m22s**；JVM **34 项、0 失败**；lint **0 error／2 warning**（既有 ExportedService、Kotlin 新版本提示，未升级依赖）。最终源码构建见 [checks](validation/music-u11/checks.txt)。
+- 两 APK `adb -s c9e352e3 install -r ...` 成功，保留导入／偏好；没有运行会卸载数据的 connectedDebugAndroidTest。直接 `am instrument -w -r -e class yy.daniel.yyplayerforandroid.MusicUpgradeDeviceTest .../androidx.test.runner.AndroidJUnitRunner` → **exit 0 / OK (5 tests)，3.072s**，见 [device-tests](validation/music-u11/device-tests.txt)。覆盖真实 Media3 EOF／随机切歌／队列编辑、真实持久化／迁移、带 encoder delay 的 AAC 触发 native→SYSTEM 且播放时钟前进、strict 拒绝与 PreferExclusive 选择 SYSTEM。测试使用独立偏好和自制素材，不将模拟状态当播放证据。
+- 合并运行既有 Compose UI 测试时，新 5 项先通过，随后停在 LyricStyleUiTest；等待无进展后主动 force-stop，因此记录 `Process crashed`，**不计作 Compose UI 通过，也不能据此断言生产应用崩溃**。LibraryManagementUiTest／LibraryTabsUiTest 未完成。保存 [未完成输出](validation/music-u11/compose-ui-incomplete.txt)；普通应用 adb／uiautomator 操作正常。
+- 主 APK SHA256 `825F747F145C8475C170817906987BCA1A7F45B029C6B0B9CF9749E2AE9C3856`。`git diff --check` 最终 exit 0；本轮未改 native C++，未重跑主机 CTest。
+
+设备／UI 证据：小米 13 Ultra `2304FPN6DC`，API36／Android16／`OS3.0.308.0.WMACNXM`，有线 adb `c9e352e3`。只导入自制 4 首 30s 低幅 FLAC、内嵌纯色封面和双语 LRC，位于 `Music/YYPlayerQA-U11`，两个歌手各有同名专辑。实际验证分类、菜单创建 `QA-Playlist` 并添加歌曲、歌单播放／队列、底栏单按钮、封面展开／收回／快速反向和右上角按压。译文当前字号改至 24sp、原译间距 20dp 后返回立即生效；点句 seek 保持暂停。结束已恢复歌词默认值（原文 28sp、原行距 14dp、两种译文 20sp、原译间距 8dp），应用停留音乐库、播放暂停。截图仅自制素材，见验收目录。
+
+未验／下一动作：本轮有线占用 USB，没有 USB DAC，**不宣称 DAC、独占或端到端位准确通过**；API26–32、200% 字体／TalkBack、暗色专项、物理多指未重验。Compose Activity instrumentation 在此 ROM 上仍需单独排查或换模拟器重跑；新增 UI 测试已可编译但未完成设备执行。下一步由用户复核实机动画手感；有独立 DAC／设备条件后补做相应输出资格验证。既有 H05 native gapless 限制仍在，本轮提供可说明原因的系统回退，并未宣称原生 gapless 已修复。
+
+## 2026-10-13：保存 dev-hifi 升级基线
+
+用户授权将既有 H02–H05／U09／U10 未提交升级提交到 `dev-hifi`，再合入 `dev` 继续新一轮音乐库、队列、输出回退、封面动画和双语歌词升级。接手时 `dev-hifi` 与新建 `dev` 均位于 `1daef67`，尚未开始新需求源码修改；保留全部既有实现与验收证据，`master` 不变，不推送。
+
+- 提交前复查：`:app:assembleDebug :app:testDebugUnitTest :app:lintDebug --no-daemon --max-workers=4`，exit 0，BUILD SUCCESSFUL（19s，部分任务使用缓存）；`git diff --check` exit 0。
+- 本次仅保存既有升级，真机与 PCM 资格沿用下面历史记录，没有重新宣称独占／位准确通过；本次未重新运行设备测试或 native CTest。
+- 下一步：基线合入 `dev` 后，按 2026-10-13 用户五项需求实施；当前指定设备为小米 13 Ultra，adb `192.168.1.71:41155`，安装保留数据。
+
+## 2026-10-08：U10 歌词显示快捷入口与行间距（当前记录）
+
+状态：**两项用户要求已实现，在小米真实定时歌词页验证，并以install -r更新应用。** dev-hifi，保留全部此前未提交改动，无提交／推送。
+
+- U10.1 `ui/MusicPlayerScreen.kt`／`ui/YYPlayerApp.kt`：歌词与播放菜单新增“歌词显示”，调用现有 `PlayerHostActivity.openLyricStyle()`，正常Activity导航；返回仍在歌词页，共享偏好即时应用。
+- U10.2 `MusicPlayerScreen.kt`：原布局在lineSpacing之外叠加上下7dp留白和定时歌词48dp最小高度，小字号／0dp尤其明显。移除定时歌词这两项和纯文本歌词额外留白；保留clickable自动触控扩展、seek、字号／字重／颜色及行内行高／强调动画。更新UI_MUSIC_EXPERIENCE与 [验收README](validation/ui-lyrics-spacing/README.md)。
+- 命令：`:app:assembleDebug :app:assembleDebugAndroidTest :app:testDebugUnitTest :app:lintDebug --no-daemon --max-workers=4` → **exit0 / BUILD SUCCESSFUL 1m6s**，现有JVM **30项0失败／0error**，lint **0error／1warning**（既有ExportedService）。`git diff --check` exit0。未为简单布局修改增加镜像实现的单测。
+- 设备／证据：小米17 Pro Max `2509FPN0BC`，SDK37，`192.168.1.246:33103`，两APK install -r成功；用户库内真实FLAC及已有定时歌词。0dp时相邻非选中句位置差80px，40dp时200px，增加120px＝40dp（density3）。菜单入口、打开／返回、立即应用、点句seek到00:23且保持暂停均通过。最后恢复原25sp／20sp、特粗／粗体、0dp，停留歌词页暂停；未改输出偏好／系统设置。
+- 本轮未运行已知会挂起的Activity Compose instrumentation；使用普通应用UI／uiautomator真实操作与截图。纯文本分支已修复但未单独真机取证；API26–32、200%字体／TalkBack未新增验收，原H05 native gapless等限制不变。
+- 主APK SHA256 `a3ff42d2613b2fb93e6e818c583b88839851abd7507edada86216718a304aab7`。下一动作：用户复核当前歌词视觉，后续根据用户反馈；既有H05专项仍按审计／STATUS历史记录待验。
+
+## 2026-10-08：U09 在线音乐搜索 UI（当前记录）
+
+状态：**用户要求的搜索历史、居中无限指示器、结果专辑封面、整条点击播放和单个“…”菜单已实现，并在小米实际页面验收。** dev-hifi，沿用 `192.168.1.246:33103`；不提交／推送，不覆盖之前H02–H05改动。
+
+任务／文件：
+
+- U09.1 `online/OnlineSearchHistory.kt`：独立版本化本地偏好，默认保留，最多20条最近关键词；trim、大小写去重、200字符上限，关闭不新增，支持单条／全清。提交时记录，翻页不记，清除不会被网络迟到结果重新添加；歌词搜索不混入音乐历史。`SearchHistoryStateTest.kt`与`OnlineSearchHistoryDeviceTest.kt`核验MRU／关闭及真实持久化。
+- U09.2 `ui/OnlineSearchScreen.kt`：固定搜索输入下的内容区Box居中 `InfiniteProgressIndicator()`，替换纯文字加载，音质检查也用无限环形指示器；查询取消以revision隔离，旧finally不取消新spinner。历史入口位于页头菜单及空页“管理”，使用48dp触控；列表左56dp真实专辑图，原歌名／歌手／专辑文字样式保留，整条点按直接播放，右侧一个Miuix More菜单收纳选音质／下载，图与按钮仍遵守WindowDialog退场保留Composition。
+- U09.3 `OnlineRepository.kt`：首个满足配置来源／歌曲声明条件的音质作为直接播放默认；缩略图2个后台worker／4MB内存缓存，复用既有安全有界专辑图缓存，失败占位。`OnlineSearchActivity.kt`／`PlayerApplication.kt`：取得音频URL即发播放，封面独立补齐，不等待图片；匹配媒体generation／identity，关联网和销毁时取消。没有第二播放器、自动改输出方式或静默换音质。
+- U09.4 `OnlineApiTest.kt`新增默认档位／限制／无可用档位用例；更新ONLINE_API和 [验收记录](validation/ui-online-search/README.md)。
+
+命令／实际结果：
+
+- 普通四任务 `:app:assembleDebug :app:assembleDebugAndroidTest :app:testDebugUnitTest :app:lintDebug --no-daemon --max-workers=4` **exit0 / BUILD SUCCESSFUL 59s**，JVM **30项0失败**，lint **0error/1warning**（已有ExportedService），[checks-final](validation/ui-online-search/checks-final.txt)。新增test最后需显式Unit返回给JUnit，修正后`:app:assembleDebugAndroidTest` exit0，见`test-build-final.txt`；早期3项/1初始化失败保留为`device-tests.txt`。
+- 两APK均install -r保留数据；直接instrument 2项历史+默认音质+联网gate → **OK(4 tests)**（0.089s），[device-tests-final](validation/ui-online-search/device-tests-final.txt)，没有运行会卸载数据的connectedDebugAndroidTest。
+- 小米SDK37／OS4.0.0.44，既有GD／网易云API实际搜索123，已取得中心无限环、7个封面／7个“…”、历史重启保留／清除／点击重新搜的真实截图。点整条SYSTEM下真实MediaSession **PLAYING、24604ms、error=null**；直接进入音乐详情，无音质确认。结束暂停，并恢复原Native／跟随系统与默认保留历史，最终停留新搜索结果页。
+- 本机Native对这首源拒绝`gapless_trimming_requires_system_output`，属于H05已有encoder delay/padding限制，SYSTEM正面验证通过；本轮未修改PCM／sink，也不自动回退。
+- 自动审批拒绝拟导出／替换设备API配置并设置QA服务器／reverse的组合操作（可能含凭据与额外副作用），整条命令未执行。已用安全替代完成：隔离Context测试与原GD普通UI；用户配置没有导出／替换，未装QA包，server未启动，adb reverse空。忽略目录中仅准备过自有QA资源；普通APK online_qa资源数0。
+- 主APK SHA256 **`aafd67b65502864398a1da2a699d973a0db14f8f5fca14e38034703f290115cf`**；`git diff --check` exit0。源码及验证全部未提交。
+
+未执行／限制：该小米既有Compose Activity instrumentation挂起，仍用普通adb实际界面验收；200%字体／TalkBack、暗色专项、API26–32、全部提供方音质供给、SAF/MediaStore下载专项未重跑，本轮没有更改下载或音频资格。下一具体动作：按用户反馈微调U09；带delay/padding的Native兼容能力需独立音频任务。用户本轮UI项已完成。
+
+## 2026-10-08：H05 全量未提交代码审计／歌曲详情输出切换（前轮记录）
+
+状态：**H05 源码审计、修复与歌曲详情输出控制完成；最终 APK 29 项真机回归通过，USB 整曲与真实界面操作已取证。** `dev-hifi` 上 H02–H05 全部未提交。用户更换网络后设备为小米 17 Pro Max / 2509FPN0BC，Wi-Fi adb **`192.168.1.246:33103`**（SDK37）；lifeme HiFi Audio Pro USB DAC 与 OPPO Enco Free4 A2DP 均在线。本轮复读 42 个 USB mixer profile 全为 DEFAULT，BIT_PERFECT 正面硬件与数字捕获仍无条件。
+
+任务／文件／结果：
+
+- H05.1 完整审查 tracked diff 与全部未跟踪源码，覆盖 H02/H03/H04 的核心、JNI、Android 输出、自检、播放器／service、UI、清单与构建；发现及处理表见 [HIFI_CODE_AUDIT](HIFI_CODE_AUDIT.md)。没有仅沿用上一 AI 的结论。
+- H05.2 `yy_jni.cpp`、`NativeAudioCore.kt`、`pcm.cpp`、`ring.cpp`、`policy.cpp`：修正并发 release/Clear 的裸指针风险、ByteBuffer position/limit/只读目标、C++17 负数移位及 padding 溢出／重叠写、超 32 项 profile 截断、Android/core mask、异常边界及分配上限。DSP 参与处理时撤销 pristine 期待。
+- H05.3 `AudioOutputController.kt`、`NativeOutputAudioSink.kt`、`AudioTrackPcmSink.kt`、`OutputSelfTest.kt`：规划不再操作活动 mixer 或冒充实际 sharing；依据实时契约／路由／API 格式投影，reset/pause 清除证据。设备失联保留 pin，停止／清空并拒绝自动扬声器回退。USB 匹配 DEFAULT mixer 在开 track 前申请；它只解决本机 pin 后首帧回旧蓝牙的问题，不证明原样或独占。
+- H05.4 自检先释放歌曲输出，锁住播放和切换，finally 完成后解锁；保留软件音量／原位置，恢复为暂停。fixture 固定 S16 stereo，供帧前确认实际路由，短写重试、不补造 PCM，结束确认真实播放头；关闭不在调用线程 join。BIT 请求仅在原有系统／软件音量 unity 时允许，绝不调满音量；活动 BIT 的音量变化拒绝并停流。
+- H05.5 PCM 格式切换等待旧尾部，flush 保留下一格式；API31+ 排空时降低 start threshold，修复暂停后短尾部不足门槛的停摆。自研拒绝 float／encoder delay-padding／重排／未证严格策略，实际 1×；系统 2× 意图在来回切换后保留。视频硬解偏好不再筛掉音频软件解码器；旧 player 回调以实例／revision 隔离。
+- H05.6 `MusicPlayerScreen.kt`、`YYPlayerApp.kt`：歌曲详情右上“音频输出”图标及选项菜单进入同页 WindowDialog，内有“输出方式／输出设备”下拉，直接控制唯一 runtime，设置页同步；一次弹窗内设备 ID 索引稳定，断开 ID 保留为拒绝项。自研名称为“自研输出（原样优先）”，不把它宣传为已独占。
+- H05.7 `OutputAuditDeviceTest.kt` 新增 7 项真机回归：JNI 窗口／并发／完整 profiles、位完美负证据、两方式 USB/BT 实际路由与进度／速度、自检互斥／静音／位置，以及短尾部重配和 flush；补齐 audit、ADR0006、HANDOFF 与 validation 记录。
+
+实际命令／证据：
+
+- `:app:assembleDebug :app:assembleDebugAndroidTest :app:testDebugUnitTest :app:lintDebug --no-daemon --max-workers=4` → **exit0 / BUILD SUCCESSFUL**（1m3s），最终 [h05_oct08_gate_checks](validation/hifi-v1/h05_oct08_gate_checks.txt)。JVM **28 项 0 失败**；lint **0 error / 1 warning / 0 hint**，仅导出 MediaSessionService 的 ExportedService（供系统控制器绑定）。没有卸载、清数据或改变系统设置。
+- `cmake --build native/build-host` + `yy_core_tests.exe` → exit0，**6390 checks / 0 failures**；NDK arm64 重编译，adb push 到 `/data/local/tmp` 后手机执行也为 **6390 / 0**。证据 `h05_oct08_core_*`、`h05_oct08_ndk_core_build.txt`、`h05_oct08_device_core_test.txt`。
+- 两 APK 均 `adb install -r` Success。首次 29 项组合 **28 通过／1 失败**，暂停尾部重配 position=0，保留 [h05_oct08_device_test](validation/hifi-v1/h05_oct08_device_test.txt)。修正 API31 排空门槛后审计类 **OK (7 tests)**（18.282s），[h05_oct08_audit_retest](validation/hifi-v1/h05_oct08_audit_retest.txt)。先前 USB/BT 的真实路由失败与匹配 DEFAULT mixer 后通过日志亦保留，不把 shell exit0 当测试通过。
+- 最终 5 类组合 `am instrument -w -e class ...` → **OK (29 tests)**（103.102s），[h05_oct08_final_regression_test](validation/hifi-v1/h05_oct08_final_regression_test.txt)／`h05_oct08_final_logcat_audio.txt`；包含自检期间高级 sharing/transparency 与 backend rebuild 也被 gate 拒绝的新增断言。前一完整组合为 29 项通过（102.031s），不混作最终结果。
+- 固定实际 USB ID919，`-e fullPlayback true -e pinnedDeviceId 919 -e class '...NativeOutputPlaybackTest#nativeSinkPlaysALocalFileThroughExoPlayer'` → **OK (1 test)**（280.214s），[h05_oct08_usb_full_test](validation/hifi-v1/h05_oct08_usb_full_test.txt)／`h05_oct08_usb_full_logcat_audio.txt`。全程实际 USB，s24_3/44100Hz，结束 state=4，decoded=submitted=played=12109193、buffered=0、partial=0；metadata12109198，差5帧为毫秒舍入范围。该整曲 APK 为 `d30234def5969aea83adab453e295eeecc2dc9b8039244ed87d042f169c3fb0b`；其后只补 runtime/backend 自检 rebuild gate 和测试，PCM／sink 代码未变，最终 APK 又跑完整29项，不把两构建哈希混写。
+- 2 ABI 各 3 个打包 so 的 ELF LOAD 为 **0x4000**；最终 zipalign `-c -P 16 -v 4` exit0，见 `h05_oct08_elf.txt`／`h05_oct08_gate_zipalign.txt`。最终安装 APK SHA256 **`1219906f9f6b00dcfe21e9c904322a89b85228eaacdd787e94dd4898bc7d8734`**。
+- 最终 APK 的歌曲详情普通 adb/UI 验收：从真实库歌曲打开右上“音频输出”，操作方式 Native→SYSTEM、设备跟随→USB→A2DP，Native 分别回读 USB／OPPO；切换后本应用 MediaSession PLAYING、position=215218、error=null，暂停后详情03:37。恢复原 Native／跟随系统偏好。截图及操作记录见 [h05_ui_receipt](validation/hifi-v1/h05_ui_receipt.md)。持续动画时 uiautomator idle 偶发失败，暂停后正常；没有声称 Activity instrumentation 通过。
+- 最终回归后再次无 extra 普通启动 MainActivity，topResumedActivity 为本应用，见 `h05_oct08_final_launch.txt`；`git diff --check` exit0，NativeOutputAudioSink 临时 HANDLE_BUFFER/EOS/IS_ENDED/DISCONTINUITY/TRACK_FORMAT/TRACE 日志检查无匹配。
+
+未执行／限制：本机没有独占／BIT_PERFECT 正面资格，无数字 capture；API 格式不等于 HAL／hardware。API26–32 类加载、API26–30 短尾部、物理拔插／焦点、锁屏长测、高采样率、Oboe 与 FFmpeg PCM 解码均待专项。Compose Activity instrumentation 的旧挂起问题仍存在，不声称本轮 UI instrumentation 通过；歌曲详情采用普通 adb 启动／真实界面取证。
+
+下一动作：用 API26–32 设备核验类加载和短尾部；在保持停止策略的前提下做物理 USB/BT 断开与焦点／锁屏专项；取得合格 BIT_PERFECT DAC／数字捕获设备后独立做正面资格。H05 用户两项请求已完成，不自动提交／推送。
+
+## 2026-10-06：H04 输出通道与真实媒体会话（历史记录）
+
+状态：**4.2 秒停摆已修复，真实 24-bit FLAC 整曲与 MediaController/service 验收通过；实际独占／位完美硬件资格仍待验。** 分支 `dev-hifi`，H02/H03/H04 仍全部未提交。设备仍为小米 2509FPN0BC（Wi-Fi adb `192.168.114.116:33077`、SDK37、HyperOS OS4.0.0.44）+ lifeme HiFi Audio Pro；该 DAC 无 BIT_PERFECT 组合，不能声称独占、系统报告位完美或数字捕获已验证。
+
+任务／文件／实际行为：
+
+- H04.1 `PcmSink.kt`、`AudioOutputScreen.kt`、`PlayerApplication.kt`：保留 `SYSTEM / NATIVE_EXACT` 输出通道选择；切换时保留队列、位置、播放意图和软件音量，先释放旧输出，再启动新输出。视频使用 SYSTEM；自研路径拒绝没有证据的严格独占／严格原样请求。
+- H04.2 `NativeOutputAudioSink.kt`、`OutputPathRenderersFactory.kt`：修正两项真实根因。原 sink 只检查 `pcmEncoding`，FLAC 的源位深元数据被当作 PCM 支持，触发 Media3 压缩旁路，压缩块被写进 AudioTrack；现只接受 `audio/raw`，由 MediaCodec 真正解码。原时钟忽略 `presentationTimeUs` 中约 10^12 µs 的 renderer 偏移，造成 UI 位置约 −10^9 ms；现返回首输入时间戳 + 实际播放头，未初始化返回 `AudioSink.CURRENT_POSITION_NOT_SET`，与 `C.TIME_UNSET` 区分。**交接中“播放头落后缓冲导致门控停摆”的推断已被本轮证据纠正，写入位置方案未解决问题。**
+- H04.3 `OutputPathRenderersFactory.kt`：整数源显式请求 s16/s24_3/s32 PCM，检查 decoder 实际输出，不允许高位深源静默缩为 s16 或绕到 float。24-bit FLAC 已实测解码后 `s24_3/44100Hz`。
+- H04.4 `AudioTrackPcmSink.kt`：Media3 外部生产者使用非阻塞写入，短写只推进已接受的完整帧，余量交给 renderer 重试；原自检环泵保持独立。播放头扩展为 64 位并在 flush 后重置，pause/resume 真正作用于 track。实际播放链是 MediaCodec → AudioSink → AudioTrack，核心承担无损加宽；**本轮没有把普通播放改成由核心环泵取帧**，H02 自检仍经核心环。
+- H04.5 `PlayerSessionService.kt`、`PlayerApplication.kt`、`AndroidMedia3PlaybackBackend.kt`、清单：session 使用唯一真实引擎；替换 player 后 `MediaSession.setPlayer` 改绑；service 持有生命周期引用，最后 Activity 退出不销毁音乐引擎。原“Activity stop 后 500ms 自动暂停”仅保留视频／无 session 情况。
+- H04.6 混音器请求在创建 track 前进行，使用同一 attributes，并独立回读 preferred mixer；请求成功不等于路由或端到端验证。非默认软件音量保留，同时撤销原样资格；自研通道尚无变速／跳过静音处理，返回实际支持的默认值。
+- H04.7 `NativeOutputPlaybackTest.kt`、`PlayerSessionServiceDeviceTest.kt`：旧测试只有日志、可无素材直接返回且不判失败；现有真实进度／错误／帧数／结束断言，另验暂停、续播、seek、输出切换后控制、队列切换与后台生命周期。清除 HANDLE_BUFFER／SINK_EOS／SINK_IS_ENDED／SINK_DISCONTINUITY／TRACK_FORMAT／TRACE_* 临时日志；保留必要 counters 与测试进度。
+- H04.8 lint 发现并修正 H01/H02 遗留兼容边界：`AudioDeviceInfo.address` 是 API28，24/32 bit 平台编码是 API31，`getRoutedDevices` 是 API36（旧代码错守 API30）；Api34Mixer 标记 RequiresApi34，API26–35 使用单 routedDevice。这只有静态检查证据，低版本类加载仍待设备验证。
+
+实际命令／设备／证据：
+
+- 首先 `adb install -r` 两 APK + 原 `NativeOutputPlaybackTest`：仍在 `decodedFrames=186030` 停摆，`position=-999995781`；释放亦被阻塞，只能 force-stop **本应用**结束测试。instrumentation 的 shell exit0 不是通过，结果为 `Process crashed`。原始证据 `h04_initial_*`。
+- 修复后短测：`NativeOutputPlaybackTest` → **OK (2 tests)**；整数请求后 native 单测 → **OK (1 test)**，`position=15560 state=3 isPlaying=true decodedFrames=693268 opened=s24_3`，见 `h04_integer_*`。float 过渡验证独立保留为 `h04_playback_test.txt`，不拿它作为整数路径资格。
+- `cmake --build native/build-host` exit0（no work）；`yy_core_tests.exe` → **checks=6339 failures=0 RESULT OK**。JVM **28 项 0 失败**。
+- `:app:assembleDebug :app:assembleDebugAndroidTest :app:testDebugUnitTest :app:lintDebug --no-daemon --max-workers=4` 首次 lint 失败（API 守卫及 opt-in），修正后 BUILD SUCCESSFUL；最终检查 **exit0 / BUILD SUCCESSFUL**（1m4s），lint **0 errors / 1 warning / 1 hint**：ExportedService 是系统媒体控制器需绑定的导出服务，无权限墙；AutoboxingStateCreation 是既有 tick 提示。没有 suppress NewApi 或降低验收口径，输出见 `h04_final_checks.txt`。
+- 整曲 `-e fullPlayback true`：**OK (1 test)**，运行 280.196 s，STATE_ENDED=4、position=274592、decodedFrames=submitted=played=12109193、buffered=0、partial=0；metadata 估计 12109198 帧，差 5 帧在 1ms 舍入范围内，见 `h04_full_*`。最终版在严格策略／callback revision／缓冲容量契约收尾后，4 类组合 instrumentation **OK (22 tests)**（78.68 s，runner exit0），见 `h04_regression_test.txt` 与 `h04_regression_logcat_audio.txt`。每次 install 均使用 `-r`，没有卸载、清库或修改系统设置。
+- 真实 `PlayerSessionServiceDeviceTest`：**OK (1 test)**（9.496 s），MediaController 验暂停／续播／60s seek、SYSTEM ↔ NATIVE_EXACT 改绑、next、生产 UI `stop/release` 后 service 继续播放；日志 `background=true uiOwnersReleased=true position=4562 state=3`。首次测试线程创建 player 失败，修正后启动 Compose Activity 仍挂起，改为直接调用生产生命周期引用钩子、绑定真实 service/controller。失败记录 `h04_regression_failed_test.txt` 与 `h04_session_activity_hang_logcat.txt` 保留，**本轮没有取得实体机 UI Activity 自动化通过的证据**。
+- 最终 APK 已 install -r 保留数据，并无 qa extra 正常启动：`am start -n yy.daniel.yyplayerforandroid/.MainActivity` exit0，dumpsys 的 topResumedActivity 为本应用 MainActivity，证据 `h04_normal_launch.txt`。APK SHA256：`13194d6b6d812ceb3ed892589af556a8ea03141e1a0ca2adafb6eb8dd9f40c8f`。这只确认正常前台启动，不代替像素级 UI 或 Activity instrumentation 验收。
+- `AndroidMedia3PlaybackBackend` 的 sink 回调原在播放线程读取 Player，已移至 applicationLooper 并匹配 outputRevision；close/rebuild 使旧结果失效。`OnlineApiTest` 构造改为 `networkAllowed = { allowed }`，避免新增输出策略 callback 截获尾随 lambda；该网络用例本轮只重新编译，没有重跑联网。
+
+未执行检查／已知限制：Oboe/AAudio 独占、BIT_PERFECT DAC 合格组合、数字捕获、API26–32 真机、96kHz 以上输出、物理拔插／焦点、锁屏长期运行、HyperOS 灵动岛各形态均待专项。`getFormat` 只证明 AudioTrack 配置，不能证明 HAL／硬件格式或无重采样。高位深解码器不支持整数请求时拒绝，FFmpeg PCM 解码仍为 S06 后续；自研路径当前固定 1×，不声称具备无缝切歌。系统路径保留 Media3 默认处理。
+
+下一具体动作：本轮停摆修复与 service/controller 集成已取证，继续物理拔插／焦点与锁屏长期播放专项；实体机 Compose Activity instrumentation 启动挂起仍需独立排查。不自动提交／推送。
+
+## 2026-10-06：H03 位深加宽取证（24/32 bit 容器、非 USB 对照）（前轮记录）
+
+状态：**H03 已完成 24/32 bit 容器与非 USB 对照的真机取证，并修掉一个会造成 −48 dB 电平错误的真实核心缺陷。** 分支 `dev-hifi`。设备：小米 2509FPN0BC（Wi-Fi adb `192.168.114.116:33077`，Android 17／SDK 37，HyperOS OS4.0.0.44），USB DAC「lifeme HiFi Audio Pro」+ 蓝牙「OPPO Enco Free4」。完整证据见 [validation/hifi-v1/README.md](validation/hifi-v1/README.md)。
+
+任务／文件／实际行为：
+
+- H03.1 **核心加宽语义修正（最重要）**：`Convert()` 原实现只做符号扩展，把窄容器样本原样放进宽容器。整数 PCM 满刻度是 `2^(bits-1)`，样本是容器量程里的位置而非绝对幅度，因此 16-bit 满刻度 `32767` 放进 24-bit 容器只有满刻度的 1/256（**−48 dB**，几乎听不见）。现按位深差左移并补零（`native/core/src/pcm.cpp` + `pcm.h` 文档），`WidenS16ToS24/S16ToS32/S24ToS32` 三个死代码辅助函数同步改为保电平。性质：精确整数运算、新增低位全零、不丢有效位、不经浮点，仍在 pristine 路径；**同宽容器互转位移为 0（纯搬移，数值不变）**；**降位深仍按 `kLossy` 拒绝**。
+- H03.2 核心测试（`native/core/tests/pcm_test.cpp`）：原有断言把“不缩放”当作正确行为，已改写为电平不变量，并新增满刻度比例检查、位移后字节检查、2000 样本随机 16→32、24-in-32→s32 不重复位移、以及 48-bit 边界。主机断言 **2345 → 6339**。
+- H03.3 **格式比对修正**：`AudioTrack.getSampleRate()`/`getFormat()` 只是回显构造参数，拿它们与“请求”比对是同义反复，平台替换格式也发现不了。`PcmSink.SinkRouteReport` 新增 `platformFormat`（sink 打开时单独记录 `getFormat()` 结果），`OutputSelfTest.formatMatchesTrack` 与之比对并新增 `formatWasSubstituted`；`AudioOutputScreen` 在发生替换时显示“平台已替换”并单独列出平台实际接受的格式。
+- H03.4 **`s24_in32` 明确拒绝**（`AudioTrackPcmSink.open`）：`AudioFormat` 只有 `ENCODING_PCM_24BIT_PACKED`（3 字节）与 `ENCODING_PCM_32BIT`（32 位），没有“24 位有效放 4 字节容器”的编码，故对 `s24_in32` 返回 `sink_bad_format` 并带原因，不静默换容器。核心仍可把 `s24_in32` 无损加宽到 `s32`（低位是填充），该映射尚未接入策略，记为遗留。
+- H03.5 **参考信号改直接缓冲**：`AudioVerificationTone.renderS16()` 原用 `ByteBuffer.allocate`（堆缓冲），而 JNI 用 `GetDirectBufferAddress` 取样本内存，堆缓冲返回 null 使 `convertPcm` 返回 −1，表现成“核心拒绝无损转换”。已改 `allocateDirect`。
+- H03.6 设备测试（`AudioOutputSinkDeviceTest` 6 → 11 项）：新增 `widenedFormatsOpenAndDeliverAtTheDecidedFormat`（s24_3 / s32）、`twentyFourInThirtyTwoHasNoPlatformContainerAndIsRefused`、`builtInSpeakerDeliversWithoutEverClaimingBitPerfect`、`bluetoothRouteDeliversWithoutEverClaimingBitPerfect`，并把加宽用例改为**固定决策格式**驱动（原先让核心自选 profile，会选中匹配的 s16 profile 从而什么都没测到）。`widenedBytesAre…` 增加全长（336000 帧 / 1.3 MB → 2.7 MB）转换断言，覆盖缓冲区大小与直接缓冲属性。
+
+实际命令／设备／证据：
+
+- 主机核心：`cmake --build native/build-host` exit0；`yy_core_tests.exe` → **checks=6339 failures=0 RESULT OK**。真机：重新交叉编译 arm64-v8a 后推送 `/data/local/tmp/yy_core_tests` → **同样是 checks=6339 failures=0**，两侧同一套断言。
+- 宿主单测：`:app:testDebugUnitTest` BUILD SUCCESSFUL（28 项）。
+- 真机：`AudioOutputDeviceTest` + `AudioOutputSinkDeviceTest` → **OK (18 tests)**，连续 2 次全绿；`AudioOutputSinkDeviceTest` 单独 **OK (11 tests)**。
+- 三种路由同一套证据（均 336000 帧 = 7 s 48 kHz 双声道）：
+  - USB DAC `s24_3`：`platform=s24_3/48000Hz matches=true substituted=false fed=336000 dropped=0 consumed=336000`，路由 `USB-Audio - lifeme HiFi Audio Pro`。
+  - USB DAC `s32`：`platform=s32/48000Hz matches=true`，同样全部送达。
+  - 蓝牙 A2DP：`platform=s16/48000Hz`，`usb=false`，336000 帧送达，`systemReportedBitPerfect=false`，路由 `OPPO Enco Free4`。
+  - 内置扬声器：`usb=false`，336000 帧送达，`systemReportedBitPerfect=false`，路由 `2509FPN0BC`。
+  - `s24_in32`：`started=false reason=sink_bad_format`。
+- 加宽字节由设备侧断言锁定：`−12345 → s24_3 [00 C7 CF]`、`s24_in32 [00 C7 CF FF]`、`s32 [00 00 C7 CF]`，与 `−12345 << 8/8/16` 一致且符号扩展正确。
+
+未执行检查／已知问题：
+
+- **端到端位准确（`capture_verified`）仍未取得**：无数字捕获设备；`digestHex` 已作为比对基准记录。
+- **`system_reported` 级位完美仍取不到**：本机 USB DAC 无任何 BIT_PERFECT 组合（H02 已证），与位深无关。
+- **96 kHz 及以上高采样率实机输出未验**：本轮先在 96 kHz 上跑加宽用例，测试进程因反复渲染多兆字节缓冲陷入 GC 风暴而挂住（无 ANR，持续 sticky GC），因此把用例固定在 48 kHz。加宽是位深操作、与采样率无关，但高采样率输出本身仍未验。
+- **`s24_in32` → `s32` 的显式映射未接入策略**：核心支持，调用方尚未使用。
+- Oboe/AAudio 独占与实际 `SharingMode`、插拔与焦点策略、Android 17 后台音频收紧：均未验。
+- `duringSignal` 是泵块内节拍余量（每轮最多交一个缓冲块 = 4800 帧 ≈ 100 ms），不是丢数据（写入与取走都是 336000，平台 xrun=0）；断言写成“不得被整整一个块饿到”。
+- 实体机上 Compose UI instrumentation 仍会挂起（U08 既有问题）；UI 取证改用 adb + `uiautomator dump` + 截图。
+- 本轮两次撞到 Gradle 增量缓存把新测试类判为 `UP-TO-DATE` 而没编译进测试 APK（交接文档第 5 节第 2 条），均以 `--rerun-tasks` 解决。
+
+下一具体动作（H04 建议顺序）：
+
+1. **高采样率取证**：在 96 kHz 上跑同一自检（先让测试按需生成、用完释放，避免 GC 风暴），确认 `AudioTrack` 与 HAL 的实际采样率路径与投递计数。
+2. **`s24_in32` 源接入**：解码器若产出 24-in-32，由策略显式决定加宽到 `s32` 再打开（核心已支持无损加宽）。
+3. **Oboe/AAudio 独占**（ADR0006 退出条件）：用 `AAudioStream_getSharingMode` 读回实际共享模式；AudioTrack 路径不得据此声称独占。
+4. **换一台声明 `AUDIO_OUTPUT_FLAG_BIT_PERFECT` 的 USB DAC** 跑同一自检即可取 `system_reported`；随后数字捕获比对 `digestHex` 争取 `capture_verified`。
+5. **把决策格式接到真实播放**：S06 的 FFmpeg 解码 → `PcmSink`，替换 Media3 共享输出（ADR0001 退出条件）。不自动提交／推送。
+
+## 2026-10-06：H02 核心 PCM 环接到真实输出 sink（USB DAC 实机取证）（前轮记录）
+
+状态：**H02 已实现并在真机上取得 USB DAC 输出证据；该 DAC 不提供 BIT_PERFECT 组合，`system_reported` 级位完美仍记为未验；端到端位准确无数字捕获，未达成。**（H03 的位深加宽与非 USB 对照见上一条。） 分支 `dev-hifi`。设备：小米 2509FPN0BC（Wi-Fi adb `192.168.114.116:33077`，Android 17／SDK 37，HyperOS OS4.0.0.44），**同时接入 USB DAC「Synaptics lifeme HiFi Audio Pro」与蓝牙「OPPO Enco Free4」**。完整证据见 [docs/validation/hifi-v1/README.md](validation/hifi-v1/README.md)（含截图、instrumentation 输出与 logcat 原文）。
+
+任务／文件／实际行为：
+
+- H02.1 输出 sink 边界（新增 `audio/PcmSink.kt`）：定义“核心拥有环、sink 只拉取”的方向——sink 拿到环句柄后在自己的线程取帧，绝不接收样本数据本身，这样慢的输出只会让生产者丢帧计数，而不会阻塞解码。同时定义 `SinkFailure`（稳定原因码）、`SinkRouteReport`（播放中回读结果）与 `YY_AUDIO_TAG`。
+- H02.2 系统 AudioTrack sink（新增 `audio/AudioTrackPcmSink.kt`）：用**决策给出的确切格式**打开输出，`MODE_STREAM` + `PERFORMANCE_MODE_NONE`（低延迟会走 fast mixer 重采样/混音，与“决策格式必须原样到设备”冲突）；泵线程按平台可接纳量从核心环 `ringRead`，环空时补**全零静音**并同时在自己的计数器和核心的欠载计数里记账；写不满一次调用时只推进整帧，避免声道交织错位（`partialWriteFrames` 记录该情况从未发生）。自己的 `PcmSink.framesConsumed` 与核心 `ringStats` 的 `read_frames` 必须一致。
+- H02.3 决策真正作用到播放（`audio/OutputSelfTest.kt` 新增）：把“核心决定格式 → 打开 sink → 请求混音器契约 → 播放中回读”串成一次可复核的运行。契约请求用与 AudioTrack **同一个** `AudioAttributes` 实例（平台按属性+格式挂载到 preferred mixer），`boolean` 返回值只当请求结果，只有 `getPreferredMixerAttributes` 回读值算证据。`digestHex` 记录进入环的字节的 SHA-256，作为将来数字捕获的比对基准。
+- H02.4 `AudioOutputController`：新增 `runOutputSelfTest()`（唯一会用 native 通路出声的入口，且只由显式用户操作触发）。求值路由与实际打开路由必须是同一个设备，否则回读描述的就不是决策的那个输出；`publishRoutedDevice()` 只把平台回读写进状态。
+- H02.5 界面（`ui/AudioOutputScreen.kt` 新增“输出自检”分组 + `PlayerHostActivity` 接线）：一行“用当前决策格式试听 → 开始”，下面是位完美契约、播放中实际路由、实际输出格式、样本投递（写入/丢弃/取走/信号期间欠载/平台 xrun）与参考信号摘要。全部为回读事实，未请求或未回读的项显示“不可用／未回读”。
+- H02.6 参考信号与喂入（新增 `audio/AudioVerificationTone.kt`）：定点整数正弦（0.16 相位 + 四分之一波表），48 kHz 双声道 s16，计划为 2 s 静音 → 左 440 Hz → 右 880 Hz → 双声道 → 2 s 静音（共 7 s = 336000 帧）。开头静音是有意的：先开流并配置混音器，再出声。`PcmRingFeeder` 按**采样率节拍**投喂（否则 1 秒长的环会被瞬间灌满并全部丢弃），摘要只覆盖环真正接受的字节。样本不在此处转换：s16 用核心的 `convertPcm` 无损加宽到目标编码。
+- H02.7 修掉 H01 的真实缺陷（`native/jni/yy_jni.cpp`）：7 个环/转换入口的导出名缺少 `_00024Bridge_`。Kotlin 把嵌套 `Bridge` 编译成独立顶层类且**全部 10 个 native 声明都在它上面**（`javap` 证据见验证文档），所以 `createRing`／`ringWrite`／`ringRead`／`ringClear`／`ringStats`／`releaseRing`／`convertPcm` **从未解析成功过**：`System.loadLibrary` 照常成功，仅调用抛 `UnsatisfiedLinkError`，被 Kotlin 包装吞成“原生不可用”。H01 的 7 项真机测试没有一项触及环，因此当时不可见。现改为显式 `RegisterNatives` 表：签名或宿主类不匹配会使 `JNI_OnLoad` 失败、库装载失败，而不是某个功能静默变成“此设备不支持”。桥版本升到 2（新增 `nativeIsPristineConversion`，核心函数原本就有，仅补 JNI 入口）。
+- H02.8 新增宿主契约测试（`app/src/test/.../NativeAudioCoreContractTest.kt`，4 项）：用反射（不初始化类，因为 `Bridge` 初始化会装载 native 库）锁定 10 个声明都在 `Bridge`、外层 `NativeAudioCore` 无 native 方法、`EXPECTED_VERSION=2`、环入口只用 DirectByteBuffer 与标量。同类名字错误今后不需要真机就能发现。
+
+实际命令／设备／证据：
+
+- 主机核心测试：`cmake --build native/build-host` exit0；`yy_core_tests.exe` → `checks=2345 failures=0`、`RESULT OK`（H02 未改核心逻辑，断言数不变；H03 修正加宽语义后为 **6339**）。
+- 宿主单测：`:app:testDebugUnitTest` → **28 项 0 失败**（新增 4 项 JNI 契约）。
+- 构建：`:app:assembleDebug :app:assembleDebugAndroidTest` BUILD SUCCESSFUL；`llvm-nm -D` 确认 10 个导出全部带 `_00024Bridge_`，且 `JNI_OnLoad` 存在。
+- 真机 instrumentation：`AudioOutputDeviceTest` + `AudioOutputSinkDeviceTest` → **OK (13 tests)**，H01 的 7 项无回归；`AudioOutputSinkDeviceTest` 连续 4 次全绿。
+- 关键实测（`h02_logcat_audio.txt` 原文）：决策 `OutputFormat(48000, 2, s16, mask 3)`、`bitPerfectRequested=false`；`AudioTrack` 实际打开 `48000 Hz / s16 / mask 0x3 / frameCount 7688`；`framesFed=336000 dropped=0 consumed=336000`；`getRoutedDevices()` = **id 7927「USB-Audio - lifeme HiFi Audio Pro」**、`routedIsUsb=true`；平台 `getUnderrunCount()=0`；`digestSha256=cdf7b526…6e573eb0`。
+- **该 USB DAC 无任何 BIT_PERFECT 组合**：`getSupportedMixerAttributes` 返回 42 个组合（16000/32000/44100/48000/96000/192000/384000 Hz × s16/s24_3/s32 × mask 12/0），全部 `MIXER_BEHAVIOR_DEFAULT`。因此核心不请求契约，界面显示“不可用 / 该设备组合没有系统位完美契约”。这是本轮最重要的硬件事实：位完美资格由厂商 HAL 是否声明 `AUDIO_OUTPUT_FLAG_BIT_PERFECT` 决定，不是应用能争取的。
+- **`setPreferredDevice` 返回值不可作为路由证据**：小米上返回 `false` 而平台仍路由到该设备（`pinAccepted=false, routeMatchesRequest=true`）。已记录该字段但路由一律以回读为准。
+- 界面取证（真机 adb 点击 + `uiautomator dump` + 截图，见 `docs/validation/hifi-v1/shots/`）：设置页音频输出行显示 `不可用`；输出页位准确状态 `不可用`；USB 设备行“USB 耳机 · … · 无位完美组合”；自检进行中显示“正在用决策格式打开输出并回读系统报告…”；完成后显示“已用决策格式打开输出并完成一次参考信号输出”、路由 `USB-Audio - lifeme HiFi Audio Pro`（USB）、`48.0 kHz · 16 bit · 缓冲 7688 帧`、`与决策一致`。界面与 instrumentation 是同一次决策的两条路径，两者一致。
+
+未执行检查／已知问题：
+
+- **端到端位准确（`capture_verified`）未达成**：需要外接数字捕获并与 `digestHex` 比对，本机无捕获设备。
+- **`system_reported` 级位完美未验**：本机 USB DAC 没有 BIT_PERFECT 组合，**无法在此设备上取到该级别证据**。代码路径（请求 + 回读 + 判定）已就绪，换一台声明该 flag 的 DAC 即可取证。
+- **24/32 bit 实际输出未验**：本轮源与决策格式都是 s16。无损加宽路径（s16→s24_3/s24_in32/s32）已由宿主契约测试与真机用例锁定，但没有用真实播放验证过 24/32 bit 到 DAC。
+- **Oboe/AAudio 独占与实际 `SharingMode` 未实现**（H02 按交接建议只做系统 AudioTrack 共享路径）。
+- 蓝牙输出、插拔与焦点策略、Android 17 后台音频收紧：均未验。蓝牙设备在列表中且被正确标为“无位完美组合”，但未做播放取证。
+- `duringSignal=130` 帧（2.7 ms）：泵每轮最多交一个缓冲块，节拍落后时该块余量补静音。不是丢数据（写入/取走都是 336000，平台 xrun=0），测试断言写成“不得被整整一个块饿到”，而不是依赖调度器的 0。
+- 小米会把**应用自身**的 `android.util.Log` 从 logcat 过滤掉（同一次运行里 `AudioTrack`／`AudioPolicyManager` 等系统日志正常），因此应用侧证据以界面回读与 instrumentation 输出为准。
+- 实体机上 Compose UI instrumentation 仍会挂起（U08 既有问题）；本轮 UI 取证改用 adb 点击 + `uiautomator dump` + 截图。
+
+下一具体动作（H03 建议顺序）：
+
+1. 24/32 bit 取证：用 96 kHz / s24_3（或 s32）源跑同一自检，确认 `convertPcm` 无损加宽后的实际输出格式与投递计数，并把该组合加入设备测试。
+2. 蓝牙与内置输出的对照取证：同一条自检在 A2DP 上必须保持 `unavailable` 并给出原因，补齐“非 USB 不得报告位完美”的真机证据。
+3. Oboe/AAudio 独占路径（按 ADR0006 退出条件），用 `AAudioStream_getSharingMode` 读回实际共享模式；AudioTrack 路径不得据此声称独占。
+4. 若可换一台 HAL 声明 `AUDIO_OUTPUT_FLAG_BIT_PERFECT` 的 USB DAC，跑同一自检即可取 `system_reported`；随后做数字捕获比对 `digestHex` 争取 `capture_verified`。
+5. 把决策格式接到真实播放：S06 的 FFmpeg 解码 → `PcmSink`，替换 Media3 的共享输出（ADR0001 退出条件）。不自动提交／推送。
+
+## 2026-10-05：H01 HiFi 输出基础——可移植 C++ 核心 + Android 输出策略与设备选择（前轮记录）
+
+状态：**H01 已实现并在真机取得证据；位完美（BIT_PERFECT）与独占的硬件资格未验（H02 已在接 USB DAC 的实机上补测，见上）。** 分支 `dev-hifi`（由 master `836a920` 建立）。当时设备为小米 17 Pro Max（`ac07514c`、Android 17／SDK 37、HyperOS OS4.0），但**没有连接 USB DAC 或蓝牙音频设备**，因此任何 `system_reported` 级别的位完美都无法取证；本轮把这一点如实记为未验，没有伪造状态。设计决策见 [ADR0006](adr/0006-hifi-output-core-android-split.md)，官方 API 事实见 [USB_DAC_BITPERFECT_API_FACTS](research/USB_DAC_BITPERFECT_API_FACTS.md)。**H02 更正：当时记录的“导出符号与 Kotlin 声明一致”只核对了 `native*` 两个函数，7 个环/转换入口的 `_00024Bridge_` 缺失未被发现。**
+
+任务／文件／实际行为：
+
+- H01.1 Git 保存点：dev-api 的 U06/U07/U08 改动提交为 `4fff9f1`，以 `--no-ff` 合并入 master `836a920`，再由 dev-api 建立 `dev-hifi`。
+- H01.2 可移植核心（`native/core`）：C++17 静态库，无 Android/JNI/mpv 类型。`format`（PCM 格式、字节/帧运算与 64 位溢出检查）、`pcm`（只做不丢有效位的原样转换：整数加宽、24-packed 与 24-in-32 互转；丢位或经 float 一律拒绝）、`ring`（无锁单生产/单消费 PCM 环，区分丢弃与欠载计数）、`policy`（sharing 与 transparency 的 AND 判定，拒绝必带原因码）、`json`（控制桥用的点路径 JSON 读写）。
+- H01.3 JNI 桥（`native/jni/yy_jni.cpp`）：控制面 JSON、PCM 走 DirectByteBuffer 与预分配环；句柄经注册表校验，旧句柄返回失败而不是解引用；桥内不抛异常、不做 JNI 回调。
+- H01.4 平台层（`app/.../audio`）：`AudioDeviceProbe` 枚举输出设备并读取 API 34+ 混音器属性（API 34 引用全部隔离在嵌套对象内，API 26–33 不会加载新类）；`AudioOutputController` 按“核心决定 → 平台请求 → 只发布平台回读事实”的顺序工作；`NativeAudioCore` 是唯一 JNI 入口，其请求/响应翻译是纯函数，可在主机单测里锁定线格式。
+- H01.5 输出策略与设备选择 UI：新增 `AudioOutputActivity`／`AudioOutputScreen`，可设置“流独占／样本原样”策略、在软件内选择输出设备（或跟随系统）、查看实际流共享、位准确状态、实际输出格式与路由设备。设置页“播放”分组新增“音频输出”入口，媒体信息弹窗按实际观测显示音频输出路径。
+- H01.6 权限与清单：新增 `MODIFY_AUDIO_SETTINGS`（`AudioManager.setPreferredMixerAttributes` 必需，属普通权限，安装即授予）；注册 `AudioOutputActivity`（未导出，只能从应用内进入）。
+- H01.7 Gradle：接入 `externalNativeBuild`（NDK 28.2.13676358 + CMake 3.22.1），ABI 限 `arm64-v8a` 与 `x86_64`；`app/testOptions.unitTests.isReturnDefaultValues = true` 供主机单测运行含 `android.util.Log` 的代码。
+
+实际命令／设备／证据：
+
+- 主机核心测试：`cmake -S native -B native/build-host -G Ninja ... && cmake --build native/build-host` exit0；`yy_core_tests.exe` 输出 `checks=2345 failures=0`、`RESULT OK`；`ctest` 1/1 Passed。
+- 同一二进制在真机运行：`adb push native/build-android-arm64-v8a/yy_core_tests /data/local/tmp/` → `checks=2345 failures=0`、`RESULT OK`（arm64-v8a 与 x86_64 交叉编译均成功）。
+- App 构建：`:app:assembleDebug :app:assembleDebugAndroidTest` BUILD SUCCESSFUL；APK 内含 `lib/arm64-v8a/libyyplayer_jni.so` 与 `lib/x86_64/libyyplayer_jni.so`（`llvm-nm` 校验导出符号与 Kotlin 声明一致）。
+- 主机单测：`AudioBridgeJsonTest`、`AudioPolicyWireTest` 锁定请求/响应字段名与枚举拼写，`:app:testDebugUnitTest` 24 项 0 失败。
+- 真机 instrumentation：`AudioOutputDeviceTest` **OK (7 tests)**，覆盖原生核心装载与版本（`YYPLAYER_CORE_VERSION=1`）、无契约路由拒绝严格原样、软件音量拒绝严格原样、系统 AudioTrack 路径拒绝严格独占、设备能力记录（非 USB 输出不得报告位完美组合）。
+- 设备能力实测（无 USB DAC）：系统只报告内置输出；`getSupportedMixerAttributes` 无 USB 设备可查，故本机不存在任何 `system_reported` 位完美证据。
+
+未执行／已知边界：**没有 USB DAC 与蓝牙设备，BIT_PERFECT 契约、Oboe 独占、真实独占回读、数字捕获、耳机/USB 插拔策略全部未验**；本轮也**没有**把 Media3/ExoPlayer 的 PCM 换成核心输出通路（S06 的 FFmpeg 解码 + AudioTrack/Oboe sink 仍是后续工作），因此“位完美状态”目前只能显示 `unavailable`／`requested`，播放本身仍走系统共享输出。Android 17 后台音频收紧（后台播放与音量 API 静默失败）尚未专项验证。输出页 UI 只做了编译与控制器级验证，未在锁屏/无人值守条件下完成像素级目检（小米运行申请弹窗曾遮挡设备）。
+
+下一具体动作：H02 接入 S06 的 PCM 输出通路（FFmpeg 解码或先把核心环接到 AudioTrack sink），使策略决定真正作用到播放；随后 H03 在实体 USB DAC 上取证 `getSupportedMixerAttributes`／`setPreferredMixerAttributes`／`getRoutedDevices` 的真实结果，并按 ADR0006 的退出条件推进 S08（Oboe 独占）。不自动提交／推送。
+
+## 2026-10-05：U08 媒体库分页与页头视觉（前轮记录）
 
 状态：**用户已复核通过并明确表示满意（第二轮结果）。** 首个实现把标题/页头/分页整片横移，并按固定时间轴切换文字，用户实测指出“滑动时标题不收起、图标和标题闪一下”；本轮改为：页头（标题＋右侧图标＋TabRow）固定在 pager 之外，只有 TabRow 下方的内容左右切换；标题与图标透明度直接跟随 pager 偏移量，换字发生在两页交界、透明度最低处；滚动重新把大标题收成栏内小标题。用户确认 TabRow／卡片收窄与淡入淡出效果符合预期。仍在 dev-api 工作区，未自动提交／推送；未修改桌面 Rust 工程。交互规格见 [UI_SETUP_AND_LIBRARY](UI_SETUP_AND_LIBRARY.md)。
 

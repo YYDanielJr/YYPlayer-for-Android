@@ -1,0 +1,6 @@
+
+    topResumedActivity=ActivityRecord{140732225 u0 yy.daniel.yyplayerforandroid/.MainActivity t6881}
+
+  * ServiceRecord{8b65f6f u0 yy.daniel.yyplayerforandroid/.playback.PlayerSessionService c:yy.daniel.yyplayerforandroid}
+    intent={cmp=yy.daniel.yyplayerforandroid/.playback.PlayerSessionService}
+    infoAllowStartForeground=[callingPackage: yy.daniel.yyplayerforandroid; callingUid: 10159; uidState: TOP ; uidBFSL: [BFSL]; BFGS denied: false; intent: Intent { xflg=0x4 cmp=yy.daniel.yyplayerforandroid/.playback.PlayerSessionService }; code:PROC_STATE_TOP; tempAllowListReason:<null>; allowWiu:12; targetSdkVersion:37; callerTargetSdkVersion:37; startForegroundCount:0; bindFromPackage:null; isBindService:false]

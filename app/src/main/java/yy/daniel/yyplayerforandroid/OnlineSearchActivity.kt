@@ -63,13 +63,12 @@ class OnlineSearchActivity : PlayerHostActivity() {
                                 busy = true
                                 try {
                                     val resolved = runtime.online.resolve(song, quality)
-                                    val cover = try { runtime.online.artwork(song) }
-                                        catch (e: CancellationException) { throw e } catch (_: Exception) { null }
                                     val media = LocalMedia(resolved.url.toUri(), song.title, MediaKind.AUDIO, null,
                                         song.title, song.artist, song.album, song.durationMs, true, resolved.headers,
                                         onlineKey = "online:${song.providerId}:${song.source}:${song.id}",
-                                        onlineQuality = "请求：${quality.name}；服务报告：${resolved.reportedQuality.ifBlank { "未提供" }}", artworkUri = cover)
+                                        onlineQuality = "请求：${quality.name}；服务报告：${resolved.reportedQuality.ifBlank { "未提供" }}", artworkUri = runtime.online.artworkCacheUri(song))
                                     runtime.playback.play(listOf(media))
+                                    runtime.fetchOnlineArtwork(song, media)
                                     runtime.fetchOnlineLyrics(song, media)
                                     openPlayer(); closePage()
                                 } catch (e: CancellationException) { throw e }

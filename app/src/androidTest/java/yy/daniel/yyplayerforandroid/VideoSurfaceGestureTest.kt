@@ -29,7 +29,8 @@ import kotlin.math.sqrt
 /** Injected MotionEvents exercise the real Compose/TextureView path. No production fake media. */
 @androidx.annotation.OptIn(markerClass = [androidx.media3.common.util.UnstableApi::class])
 class VideoSurfaceGestureTest {
-    @get:Rule val compose = createComposeRule()
+    private val compose = createComposeRule()
+    @get:Rule val rules: org.junit.rules.RuleChain = org.junit.rules.RuleChain.outerRule(QaForegroundRule()).around(compose)
     private lateinit var player: ExoPlayer
     private val backend = GestureBackend()
     private val visible = mutableStateOf(true)
@@ -37,6 +38,7 @@ class VideoSurfaceGestureTest {
     private val snapshot = PlaybackSnapshot(queue = listOf(LocalMedia(Uri.parse("file:///gesture-test.mp4"), "gesture-test.mp4", MediaKind.VIDEO, "video/mp4")), queueIndex = 0, speed = 1.5f)
 
     @Before fun setup() {
+
         compose.runOnUiThread { player = ExoPlayer.Builder(InstrumentationRegistry.getInstrumentation().targetContext).build() }
         compose.setContent { if (visible.value) VideoSurface(Modifier.fillMaxSize().testTag("surface"), player, backend, snapshot, 0, surfaceActive = surfaceActive.value) }
     }
@@ -111,6 +113,11 @@ class VideoSurfaceGestureTest {
         override fun setDecoderMode(mode: DecoderMode) = Unit
         override fun next() = Unit
         override fun previous() = Unit
+        override fun setPlayOrder(order: yy.daniel.yyplayerforandroid.playback.PlayOrder) = Unit
+        override fun enqueue(items: List<LocalMedia>, next: Boolean) = Unit
+        override fun removeQueueItem(index: Int) = Unit
+        override fun moveQueueItem(from: Int, to: Int) = Unit
+        override fun clearQueue() = Unit
         override fun close() = Unit
     }
 }

@@ -2,6 +2,8 @@ package yy.daniel.yyplayerforandroid.playback
 
 import android.net.Uri
 import kotlinx.coroutines.flow.StateFlow
+import yy.daniel.yyplayerforandroid.audio.NativeOutputAudioSink
+import yy.daniel.yyplayerforandroid.audio.OutputPath
 
 enum class MediaKind { AUDIO, VIDEO }
 
@@ -32,6 +34,11 @@ enum class DecoderMode(val title: String) {
 }
 
 enum class PlaybackPhase { IDLE, BUFFERING, READY, ENDED, ERROR }
+enum class PlayOrder(val label: String) { SEQUENTIAL("顺序播放"), SINGLE("单曲循环"), RANDOM("随机播放") }
+enum class VideoEngine(val label: String) { MEDIA3("Media3 · 兼容"), MPV("libmpv · 扩展功能") }
+data class VideoChapter(val title: String, val positionMs: Long)
+
+data class PlaybackTrack(val group: Int, val track: Int, val type: Int, val label: String, val selected: Boolean, val supported: Boolean)
 
 data class PlaybackSnapshot(
     val mediaGeneration: Long = 0,
@@ -47,13 +54,36 @@ data class PlaybackSnapshot(
     val videoDecoderHardwareFlag: Boolean? = null,
     val videoDecoderSoftwareFlag: Boolean? = null,
     val audioDecoderName: String? = null,
+    /** Actual libmpv AO driver, not a latency or exclusive-output qualification. */
+    val videoAudioOutput: String? = null,
     val audioSampleRate: Int? = null,
     val audioChannels: Int? = null,
+    /** Which output path the engine was built with; a switch rebuilds the player. */
+    val outputPath: OutputPath = OutputPath.SYSTEM,
+    /**
+     * What the native output negotiated for the current stream, or null on the system path. This is
+     * evidence about the opened output, not a request.
+     */
+    val negotiatedOutput: NativeOutputAudioSink.Negotiated? = null,
     val videoWidth: Int = 0,
     val videoHeight: Int = 0,
     val videoPixelRatio: Float = 1f,
     val videoRotationDegrees: Int = 0,
     val error: String? = null,
+    val playOrder: PlayOrder = PlayOrder.SEQUENTIAL,
+    val outputFallback: String? = null,
+    val tracks: List<PlaybackTrack> = emptyList(),
+    val subtitleName: String? = null,
+    val loopStartMs: Long? = null,
+    val loopEndMs: Long? = null,
+    val videoEngine: VideoEngine = VideoEngine.MEDIA3,
+    val chapters: List<VideoChapter> = emptyList(),
+    val chapterIndex: Int = -1,
+    val subtitleDelayMs: Long = 0,
+    val audioDelayMs: Long = 0,
+    val subtitleFont: String = "sans-serif",
+    val overrideAssStyle: Boolean = false,
+    val deband: Boolean = false,
 ) {
     val current: LocalMedia? get() = queue.getOrNull(queueIndex)
     val isVideo: Boolean get() = current?.kind == MediaKind.VIDEO
@@ -68,7 +98,18 @@ interface PlaybackBackend : AutoCloseable {
     fun seekTo(positionMs: Long)
     fun seekBy(deltaMs: Long)
     fun setSpeed(speed: Float)
+    fun beginSpeedBoost(): Long? { setSpeed(3f); return 0L }
+    fun endSpeedBoost(token: Long, baseSpeed: Float) { setSpeed(baseSpeed) }
     fun setDecoderMode(mode: DecoderMode)
     fun next()
     fun previous()
+    fun setPlayOrder(order: PlayOrder)
+    fun jumpTo(index: Int) { play(state.value.queue, index) }
+    fun enqueue(items: List<LocalMedia>, next: Boolean = false)
+    fun removeQueueItem(index: Int)
+    fun moveQueueItem(from: Int, to: Int)
+    fun clearQueue()
+    fun selectTrack(type: Int, group: Int?, track: Int = 0, generation: Long) {}
+    fun markLoop() {}
+    fun clearLoop() {}
 }

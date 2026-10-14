@@ -1,0 +1,54 @@
+--------- beginning of main
+10-06 14:13:33.590  9130  9218 I YYPlayerAudio: YYPLAYER_WIDENED encoding=s32 usb=true started=true reason=ok/参考信号输出已结束，完整性以帧计数与实际播放头为准 platform=s32/48000Hz matches=true substituted=false fed=336000 dropped=0 consumed=336000 duringSignal=0 routed=[USB-Audio - lifeme HiFi Audio Pro]
+10-06 14:13:33.624  9130  9218 I YYPlayerAudio: YYPLAYER_SELFTEST_DECISION accepted=true reason=ok sink=audiotrack_system format=OutputFormat(sampleRate=48000, channelCount=2, encoding=S24_3, channelMask=3) requestBitPerfect=false pinning=7927
+10-06 14:13:40.870  9130  9218 I YYPlayerAudio: YYPLAYER_OUTPUT_SELFTEST
+10-06 14:13:40.870  9130  9218 I YYPlayerAudio: started=true
+10-06 14:13:40.870  9130  9218 I YYPlayerAudio: reason=ok 参考信号输出已结束，完整性以帧计数与实际播放头为准
+10-06 14:13:40.870  9130  9218 I YYPlayerAudio: sink=audiotrack_system
+10-06 14:13:40.870  9130  9218 I YYPlayerAudio: decidedFormat=OutputFormat(sampleRate=48000, channelCount=2, encoding=S24_3, channelMask=12)
+10-06 14:13:40.870  9130  9218 I YYPlayerAudio: requestedDeviceId=7927 pinAccepted=true routeMatchesRequest=true
+10-06 14:13:40.870  9130  9218 I YYPlayerAudio: bitPerfectRequested=false
+10-06 14:13:40.870  9130  9218 I YYPlayerAudio: mixerContractAccepted=false
+10-06 14:13:40.870  9130  9218 I YYPlayerAudio: mixerContractReadBack=null
+10-06 14:13:40.870  9130  9218 I YYPlayerAudio: systemReportedBitPerfect=false
+10-06 14:13:40.870  9130  9218 I YYPlayerAudio: routedIds=[7927]
+10-06 14:13:40.870  9130  9218 I YYPlayerAudio: routedNames=[USB-Audio - lifeme HiFi Audio Pro]
+10-06 14:13:40.870  9130  9218 I YYPlayerAudio: routedIsUsb=true
+10-06 14:13:40.870  9130  9218 I YYPlayerAudio: track=48000Hz/s24_3 mask=12 platformFormat=OutputFormat(sampleRate=48000, channelCount=2, encoding=S24_3, channelMask=12) substituted=false
+10-06 14:13:40.870  9130  9218 I YYPlayerAudio: bufferFrames=7688 platformUnderruns=0
+10-06 14:13:40.870  9130  9218 I YYPlayerAudio: framesFed=336000 dropped=0 consumed=336000
+10-06 14:13:40.870  9130  9218 I YYPlayerAudio: ringUnderrun=3655942 sinkStarving=0 atFeedEnd=0 duringSignal=0 partialWrites=0
+10-06 14:13:40.870  9130  9218 I YYPlayerAudio: digestSha256=723182cc43e5468cd1b029073377b391839f1b0eceeafcf8a3d69db27f566fb9
+10-06 14:13:40.870  9130  9218 I YYPlayerAudio: tone=静音 2s（开流与混音器配置） → 仅左 440Hz 1s → 仅右 880Hz 1s → 双声道 440Hz 1s → 静音 2s（收尾静音）
+10-06 14:13:40.870  9130  9218 I YYPlayerAudio: note=参考信号按 s16 → s24_3 无损加宽（未丢弃有效位）
+10-06 14:13:40.870  9130  9218 I YYPlayerAudio: note=已请求把输出固定到设备 id=7927（USB-Audio - lifeme HiFi Audio Pro），平台是否照做以回读为准
+10-06 14:13:40.870  9130  9218 I YYPlayerAudio: YYPLAYER_PIN_EVIDENCE requested=7927 pinAccepted=true routed=[7927] matches=true
+10-06 14:13:48.191  9130  9218 I YYPlayerAudio: YYPLAYER_WIDENED encoding=s16 usb=false started=true reason=ok/参考信号输出已结束，完整性以帧计数与实际播放头为准 platform=s16/48000Hz matches=true substituted=false fed=336000 dropped=0 consumed=336000 duringSignal=0 routed=[2509FPN0BC]
+10-06 14:17:10.490 12062 12062 I YYPlayerAudio: YYTEST_SWITCH path=SYSTEM requested=7927 device=USB-Audio - lifeme HiFi Audio Pro position=624 actualConfirmed=true
+10-06 14:17:11.363 12062 12062 I YYPlayerAudio: YYTEST_SWITCH path=SYSTEM requested=7945 device=OPPO Enco Free4 position=1211 actualConfirmed=true
+10-06 14:17:11.420 12062 12270 I YYPlayerAudio: YYPLAYER_MEDIA3_SINK open=s24_3/44100Hz/ch=2 widened=false mixerRequested=false mixerApplied=false source=s24_3
+10-06 14:17:11.521 12062 12270 E ExoPlayerImplInternal: Playback error
+10-06 14:17:11.521 12062 12270 E ExoPlayerImplInternal:   androidx.media3.exoplayer.ExoPlaybackException: MediaCodecAudioRenderer error, index=1, format=Format(null, null, audio/flac, audio/flac, null, -1, null, [-1, -1, -1.0, null], [2, -1, 44100]), format_supported=YES
+10-06 14:17:11.521 12062 12270 E ExoPlayerImplInternal:       at androidx.media3.exoplayer.BaseRenderer.createRendererException(BaseRenderer.java:586)
+10-06 14:17:11.521 12062 12270 E ExoPlayerImplInternal:       at androidx.media3.exoplayer.audio.MediaCodecAudioRenderer.processOutputBuffer(MediaCodecAudioRenderer.java:954)
+10-06 14:17:11.521 12062 12270 E ExoPlayerImplInternal:       at androidx.media3.exoplayer.mediacodec.MediaCodecRenderer.drainOutputBuffer(MediaCodecRenderer.java:2325)
+10-06 14:17:11.521 12062 12270 E ExoPlayerImplInternal:       at androidx.media3.exoplayer.mediacodec.MediaCodecRenderer.render(MediaCodecRenderer.java:981)
+10-06 14:17:11.521 12062 12270 E ExoPlayerImplInternal:       at androidx.media3.exoplayer.RendererHolder.render(RendererHolder.java:425)
+10-06 14:17:11.521 12062 12270 E ExoPlayerImplInternal:       at androidx.media3.exoplayer.ExoPlayerImplInternal.doSomeWork(ExoPlayerImplInternal.java:1484)
+10-06 14:17:11.521 12062 12270 E ExoPlayerImplInternal:       at androidx.media3.exoplayer.ExoPlayerImplInternal.handleMessage(ExoPlayerImplInternal.java:765)
+10-06 14:17:11.521 12062 12270 E ExoPlayerImplInternal:       at android.os.Handler.dispatchMessageImpl(Handler.java:142)
+10-06 14:17:11.521 12062 12270 E ExoPlayerImplInternal:       at android.os.Handler.dispatchMessage(Handler.java:129)
+10-06 14:17:11.521 12062 12270 E ExoPlayerImplInternal:       at android.os.Looper.loopOnce(Looper.java:315)
+10-06 14:17:11.521 12062 12270 E ExoPlayerImplInternal:       at android.os.Looper.loop(Looper.java:419)
+10-06 14:17:11.521 12062 12270 E ExoPlayerImplInternal:       at android.os.HandlerThread.run(HandlerThread.java:139)
+10-06 14:17:11.521 12062 12270 E ExoPlayerImplInternal:   Caused by: androidx.media3.exoplayer.audio.AudioSink$WriteException: AudioTrack write failed: -6
+10-06 14:17:11.521 12062 12270 E ExoPlayerImplInternal:       at yy.daniel.yyplayerforandroid.audio.NativeOutputAudioSink.checkRoute(NativeOutputAudioSink.kt:450)
+10-06 14:17:11.521 12062 12270 E ExoPlayerImplInternal:       at yy.daniel.yyplayerforandroid.audio.NativeOutputAudioSink.handleBuffer(NativeOutputAudioSink.kt:263)
+10-06 14:17:11.521 12062 12270 E ExoPlayerImplInternal:       at androidx.media3.exoplayer.audio.MediaCodecAudioRenderer.lambda$processOutputBuffer$0$androidx-media3-exoplayer-audio-MediaCodecAudioRenderer(MediaCodecAudioRenderer.java:938)
+10-06 14:17:11.521 12062 12270 E ExoPlayerImplInternal:       at androidx.media3.exoplayer.audio.MediaCodecAudioRenderer$$ExternalSyntheticLambda0.run(D8$$SyntheticClass:0)
+10-06 14:17:11.521 12062 12270 E ExoPlayerImplInternal:       at androidx.media3.exoplayer.mediacodec.AsynchronousMediaCodecAdapter.lambda$useBuffer$0$androidx-media3-exoplayer-mediacodec-AsynchronousMediaCodecAdapter(AsynchronousMediaCodecAdapter.java:274)
+10-06 14:17:11.521 12062 12270 E ExoPlayerImplInternal:       at androidx.media3.exoplayer.mediacodec.AsynchronousMediaCodecAdapter$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+10-06 14:17:11.521 12062 12270 E ExoPlayerImplInternal:       at androidx.media3.exoplayer.mediacodec.AsynchronousMediaCodecCallback.useBuffer(AsynchronousMediaCodecCallback.java:147)
+10-06 14:17:11.521 12062 12270 E ExoPlayerImplInternal:       at androidx.media3.exoplayer.mediacodec.AsynchronousMediaCodecAdapter.useBuffer(AsynchronousMediaCodecAdapter.java:271)
+10-06 14:17:11.521 12062 12270 E ExoPlayerImplInternal:       at androidx.media3.exoplayer.audio.MediaCodecAudioRenderer.processOutputBuffer(MediaCodecAudioRenderer.java:940)
+10-06 14:17:11.521 12062 12270 E ExoPlayerImplInternal:       ... 10 more

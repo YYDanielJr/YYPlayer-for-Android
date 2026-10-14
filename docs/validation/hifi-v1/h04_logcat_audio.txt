@@ -1,0 +1,78 @@
+--------- beginning of main
+10-06 12:59:39.201 19849 19899 I YYPlayerAudio: YYTEST_native_TRACK=编织光流 (For Your Name) uri=content://com.android.externalstorage.documents/tree/primary%3AMusic/document/primary%3AMusic%2F%E9%93%81%E7%97%95%E7%94%B5%E5%8F%B0-MSR%2CEdine%20-%20%E7%BC%96%E7%BB%87%E5%85%89%E6%B5%81%20(For%20Your%20Name).flac
+10-06 12:59:39.239 19849 19899 I YYPlayerAudio: YYTEST_native_FILE durationMs=274585 sampleRate=44100 expectedFrames=12109198
+10-06 12:59:39.269 19849 19849 I YYPlayerAudio: YYTEST_native_STATE=2
+10-06 12:59:39.324 19849 19913 I YYPlayerAudio: YYPLAYER_TRACK_FORMAT requested=s24_3/44100Hz/mask=12 reported=s24_3/44100Hz/mask=12 substituted=false
+10-06 12:59:39.398 19849 19913 I YYPlayerAudio: YYTEST_native_NEGOTIATED format=s24_3/44100Hz widened=false bitPerfectRequested=false reason=ok
+10-06 12:59:39.398 19849 19913 I YYPlayerAudio: YYPLAYER_MEDIA3_SINK open=s24_3/44100Hz/ch=2 widened=false mixerRequested=false mixerApplied=false source=s24_3
+10-06 12:59:39.398 19849 19913 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=1 frames=247 accepted=247 submitted=247 played=0 bufferedUs=5600 positionUs=5600 pending=true
+10-06 12:59:39.398 19849 19913 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=2 frames=331 accepted=331 submitted=578 played=0 bufferedUs=13106 positionUs=13106 pending=true
+10-06 12:59:39.398 19849 19913 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=3 frames=356 accepted=356 submitted=934 played=0 bufferedUs=21179 positionUs=21179 pending=true
+10-06 12:59:39.398 19849 19913 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=4 frames=378 accepted=378 submitted=1312 played=0 bufferedUs=29750 positionUs=29750 pending=true
+10-06 12:59:39.398 19849 19913 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=5 frames=399 accepted=399 submitted=1711 played=0 bufferedUs=38798 positionUs=38798 pending=true
+10-06 12:59:39.398 19849 19913 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=6 frames=411 accepted=411 submitted=2122 played=0 bufferedUs=48117 positionUs=48117 pending=true
+10-06 12:59:39.398 19849 19913 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=7 frames=415 accepted=415 submitted=2537 played=0 bufferedUs=57528 positionUs=57528 pending=true
+10-06 12:59:39.398 19849 19913 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=8 frames=429 accepted=429 submitted=2966 played=0 bufferedUs=67256 positionUs=67256 pending=true
+10-06 12:59:39.398 19849 19913 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=9 frames=440 accepted=440 submitted=3406 played=0 bufferedUs=77233 positionUs=77233 pending=true
+10-06 12:59:39.398 19849 19913 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=10 frames=448 accepted=448 submitted=3854 played=0 bufferedUs=87392 positionUs=87392 pending=true
+10-06 12:59:39.398 19849 19913 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=11 frames=458 accepted=458 submitted=4312 played=0 bufferedUs=97777 positionUs=97777 pending=true
+10-06 12:59:39.398 19849 19913 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=12 frames=464 accepted=464 submitted=4776 played=0 bufferedUs=108299 positionUs=108299 pending=true
+10-06 12:59:41.796 19849 19913 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=200 frames=549 accepted=549 submitted=106861 played=100548 bufferedUs=143151 positionUs=2423151 pending=true
+10-06 12:59:42.514 19849 19913 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=250 frames=571 accepted=571 submitted=134597 played=132300 bufferedUs=52086 positionUs=3052086 pending=true
+10-06 12:59:43.115 19849 19913 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=300 frames=550 accepted=550 submitted=162345 played=158760 bufferedUs=81292 positionUs=3681292 pending=true
+10-06 12:59:43.272 19849 19849 I YYPlayerAudio: YYTEST_native_PROGRESS step=0 isPlaying=false state=2 position=0 duration=274584 buffered=394 error=null decodedFrames=171101 fileFrames=12109198 counters=submitted=171101 played=164052 buffered=7049 starving=0 partial=0 bufferFrames=7072 opened=s24_3
+10-06 12:59:43.597 19849 19849 I YYPlayerAudio: YYTEST_native_STATE=3
+10-06 12:59:43.805 19849 19849 I YYPlayerAudio: YYTEST_native_STATE=2
+10-06 12:59:47.271 19849 19849 I YYPlayerAudio: YYTEST_native_PROGRESS step=1 isPlaying=false state=2 position=-999995781 duration=274584 buffered=7941 error=null decodedFrames=186030 fileFrames=12109198 counters=submitted=186030 played=186030 buffered=0 starving=0 partial=0 bufferFrames=7072 opened=s24_3
+10-06 12:59:51.271 19849 19849 I YYPlayerAudio: YYTEST_native_PROGRESS step=2 isPlaying=false state=2 position=-999995781 duration=274584 buffered=7941 error=null decodedFrames=186030 fileFrames=12109198 counters=submitted=186030 played=186030 buffered=0 starving=0 partial=0 bufferFrames=7072 opened=s24_3
+10-06 13:05:22.087 21095 21117 I YYPlayerAudio: YYTEST_native_TRACK=编织光流 (For Your Name) uri=content://com.android.externalstorage.documents/tree/primary%3AMusic/document/primary%3AMusic%2F%E9%93%81%E7%97%95%E7%94%B5%E5%8F%B0-MSR%2CEdine%20-%20%E7%BC%96%E7%BB%87%E5%85%89%E6%B5%81%20(For%20Your%20Name).flac
+10-06 13:05:22.106 21095 21117 I YYPlayerAudio: YYTEST_native_FILE durationMs=274585 sampleRate=44100 expectedFrames=12109198
+10-06 13:05:22.137 21095 21095 I YYPlayerAudio: YYTEST_native_STATE=2
+10-06 13:05:22.246 21095 21132 I YYPlayerAudio: YYPLAYER_TRACK_FORMAT requested=f32/44100Hz/mask=12 reported=f32/44100Hz/mask=12 substituted=false
+10-06 13:05:22.264 21095 21132 I YYPlayerAudio: YYTEST_native_NEGOTIATED format=f32/44100Hz widened=false bitPerfectRequested=false reason=ok
+10-06 13:05:22.264 21095 21132 I YYPlayerAudio: YYPLAYER_MEDIA3_SINK open=f32/44100Hz/ch=2 widened=false mixerRequested=false mixerApplied=false source=f32
+10-06 13:05:22.264 21095 21132 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=1 frames=1024 accepted=1024 submitted=1024 played=0 bufferedUs=23219 positionUs=1000000000000 pending=true
+10-06 13:05:22.265 21095 21132 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=2 frames=1024 accepted=1024 submitted=2048 played=0 bufferedUs=46439 positionUs=1000000000000 pending=true
+10-06 13:05:22.265 21095 21132 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=3 frames=1024 accepted=1024 submitted=3072 played=0 bufferedUs=69659 positionUs=1000000000000 pending=true
+10-06 13:05:22.265 21095 21132 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=4 frames=1024 accepted=1024 submitted=4096 played=0 bufferedUs=92879 positionUs=1000000000000 pending=true
+10-06 13:05:22.267 21095 21132 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=5 frames=1024 accepted=1024 submitted=5120 played=0 bufferedUs=116099 positionUs=1000000000000 pending=true
+10-06 13:05:22.267 21095 21132 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=6 frames=1024 accepted=1024 submitted=6144 played=0 bufferedUs=139319 positionUs=1000000000000 pending=true
+10-06 13:05:22.268 21095 21132 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=7 frames=1024 accepted=928 submitted=7072 played=0 bufferedUs=160362 positionUs=1000000000000 pending=true
+10-06 13:05:22.268 21095 21132 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=8 frames=96 accepted=0 submitted=7072 played=0 bufferedUs=160362 positionUs=1000000000000 pending=true
+10-06 13:05:22.279 21095 21132 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=9 frames=96 accepted=0 submitted=7072 played=0 bufferedUs=160362 positionUs=1000000000000 pending=true
+10-06 13:05:22.289 21095 21132 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=10 frames=96 accepted=0 submitted=7072 played=0 bufferedUs=160362 positionUs=1000000000000 pending=true
+10-06 13:05:22.299 21095 21132 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=11 frames=96 accepted=0 submitted=7072 played=0 bufferedUs=160362 positionUs=1000000000000 pending=true
+10-06 13:05:22.371 21095 21132 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=12 frames=96 accepted=0 submitted=7072 played=0 bufferedUs=160362 positionUs=1000000000000 pending=true
+10-06 13:05:22.372 21095 21095 I YYPlayerAudio: YYTEST_native_STATE=3
+10-06 13:05:25.136 21095 21132 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=200 frames=1024 accepted=1024 submitted=126976 played=119952 bufferedUs=159274 positionUs=1000002720000 pending=true
+10-06 13:05:25.851 21095 21132 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=250 frames=1024 accepted=1024 submitted=156672 played=149940 bufferedUs=152653 positionUs=1000003400000 pending=true
+10-06 13:05:26.139 21095 21095 I YYPlayerAudio: YYTEST_native_PROGRESS step=0 isPlaying=true state=3 position=3680 duration=274584 buffered=52709 error=null decodedFrames=169360 fileFrames=12109198 counters=submitted=169360 played=164052 buffered=5308 starving=0 partial=0 bufferFrames=7072 opened=f32
+10-06 13:05:26.559 21095 21132 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=300 frames=108 accepted=108 submitted=185344 played=181692 bufferedUs=82811 positionUs=1000004120000 pending=true
+10-06 13:05:27.251 21095 21132 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=350 frames=1024 accepted=1024 submitted=219136 played=213444 bufferedUs=129070 positionUs=1000004840000 pending=true
+10-06 13:05:28.011 21095 21132 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=400 frames=376 accepted=376 submitted=250880 played=245196 bufferedUs=128888 positionUs=1000005560000 pending=true
+10-06 13:05:28.717 21095 21132 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=450 frames=1024 accepted=1024 submitted=281600 played=276948 bufferedUs=105487 positionUs=1000006280000 pending=true
+10-06 13:05:29.426 21095 21132 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=500 frames=1024 accepted=380 submitted=315772 played=308700 bufferedUs=160362 positionUs=1000007000000 pending=true
+10-06 13:05:30.132 21095 21132 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=550 frames=352 accepted=352 submitted=346112 played=340452 bufferedUs=128344 positionUs=1000007720000 pending=true
+10-06 13:05:30.138 21095 21095 I YYPlayerAudio: YYTEST_native_PROGRESS step=1 isPlaying=true state=3 position=7720 duration=274584 buffered=52709 error=null decodedFrames=347524 fileFrames=12109198 counters=submitted=347524 played=340452 buffered=7072 starving=0 partial=0 bufferFrames=7072 opened=f32
+10-06 13:05:30.835 21095 21132 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=600 frames=1024 accepted=1024 submitted=376832 played=370440 bufferedUs=144943 positionUs=1000008400000 pending=true
+10-06 13:05:31.554 21095 21132 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=650 frames=1024 accepted=688 submitted=409264 played=402192 bufferedUs=160362 positionUs=1000009120000 pending=true
+10-06 13:05:32.356 21095 21132 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=700 frames=1024 accepted=1024 submitted=442368 played=437472 bufferedUs=111020 positionUs=1000009920000 pending=true
+10-06 13:05:33.070 21095 21132 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=750 frames=1024 accepted=1024 submitted=475136 played=469224 bufferedUs=134058 positionUs=1000010640000 pending=true
+10-06 13:05:33.795 21095 21132 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=800 frames=1024 accepted=144 submitted=508048 played=500976 bufferedUs=160362 positionUs=1000011360000 pending=true
+10-06 13:05:34.139 21095 21095 I YYPlayerAudio: YYTEST_native_PROGRESS step=2 isPlaying=true state=3 position=11680 duration=274584 buffered=52709 error=null decodedFrames=522160 fileFrames=12109198 counters=submitted=522160 played=516852 buffered=5308 starving=0 partial=0 bufferFrames=7072 opened=f32
+10-06 13:05:34.582 21095 21132 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=850 frames=1024 accepted=1024 submitted=542720 played=536256 bufferedUs=146575 positionUs=1000012160000 pending=true
+10-06 13:05:35.292 21095 21132 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=900 frames=124 accepted=0 submitted=573316 played=566244 bufferedUs=160362 positionUs=1000012840000 pending=true
+10-06 13:05:35.985 21095 21132 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=950 frames=116 accepted=0 submitted=605068 played=597996 bufferedUs=160362 positionUs=1000013560000 pending=true
+10-06 13:05:36.699 21095 21132 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=1000 frames=1024 accepted=916 submitted=636820 played=629748 bufferedUs=160362 positionUs=1000014280000 pending=true
+10-06 13:05:37.469 21095 21132 I YYPlayerAudio: YYPLAYER_HANDLE_BUFFER call=1050 frames=1024 accepted=1024 submitted=668672 played=663264 bufferedUs=122630 positionUs=1000015040000 pending=true
+10-06 13:05:38.142 21095 21095 I YYPlayerAudio: YYTEST_native_PROGRESS step=3 isPlaying=true state=3 position=15680 duration=274584 buffered=52709 error=null decodedFrames=698560 fileFrames=12109198 counters=submitted=698560 played=693252 buffered=5308 starving=0 partial=0 bufferFrames=7072 opened=f32
+10-06 13:05:38.156 21095 21117 I YYPlayerAudio: YYTEST_native_RESULT reached=true error=null negotiated=format=f32/44100Hz widened=false bitPerfectRequested=false reason=ok
+10-06 13:05:38.180 21095 21117 I YYPlayerAudio: YYTEST_system_TRACK=编织光流 (For Your Name) uri=content://com.android.externalstorage.documents/tree/primary%3AMusic/document/primary%3AMusic%2F%E9%93%81%E7%97%95%E7%94%B5%E5%8F%B0-MSR%2CEdine%20-%20%E7%BC%96%E7%BB%87%E5%85%89%E6%B5%81%20(For%20Your%20Name).flac
+10-06 13:05:38.202 21095 21117 I YYPlayerAudio: YYTEST_system_FILE durationMs=274585 sampleRate=44100 expectedFrames=12109198
+10-06 13:05:38.206 21095 21095 I YYPlayerAudio: YYTEST_system_STATE=2
+10-06 13:05:38.262 21095 21095 I YYPlayerAudio: YYTEST_system_STATE=3
+10-06 13:05:42.211 21095 21095 I YYPlayerAudio: YYTEST_system_PROGRESS step=0 isPlaying=true state=3 position=3476 duration=274584 buffered=52709 error=null decodedFrames=0 fileFrames=12109198 counters=null opened=null
+10-06 13:05:46.212 21095 21095 I YYPlayerAudio: YYTEST_system_PROGRESS step=1 isPlaying=true state=3 position=7458 duration=274584 buffered=52709 error=null decodedFrames=0 fileFrames=12109198 counters=null opened=null
+10-06 13:05:50.208 21095 21095 I YYPlayerAudio: YYTEST_system_PROGRESS step=2 isPlaying=true state=3 position=11437 duration=274584 buffered=52709 error=null decodedFrames=0 fileFrames=12109198 counters=null opened=null
+10-06 13:05:54.209 21095 21095 I YYPlayerAudio: YYTEST_system_PROGRESS step=3 isPlaying=true state=3 position=15405 duration=274584 buffered=52709 error=null decodedFrames=0 fileFrames=12109198 counters=null opened=null
+10-06 13:05:54.223 21095 21117 I YYPlayerAudio: YYTEST_system_RESULT reached=true error=null negotiated=null

@@ -34,95 +34,32 @@ import top.yukonga.miuix.kmp.theme.MiuixTheme
 import yy.daniel.yyplayerforandroid.playback.*
 import yy.daniel.yyplayerforandroid.ui.theme.YYPlayerTheme
 
-private enum class PlayerMenu { SPEED, QUEUE, INFO, VIDEO }
-
 @Composable
 @androidx.annotation.OptIn(markerClass = [androidx.media3.common.util.UnstableApi::class])
 internal fun PlayerScreen(backend: AndroidMedia3PlaybackBackend, snapshot: PlaybackSnapshot, reduceMotion: Boolean,
     onOpenOrientation: () -> Unit, favorite: Boolean,
-    onFavorite: () -> Unit, onBack: () -> Unit, surfaceActive: Boolean = true) {
-    var menu by remember { mutableStateOf<PlayerMenu?>(null) }
-    var resetKey by remember { mutableIntStateOf(0) }
-    val current = snapshot.current
-    if (current == null) {
-        HyperPage("正在播放", onBack) { padding -> Column(Modifier.fillMaxSize().padding(padding), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-            Text("选择一首音乐或一个视频", fontSize = 20.sp); Spacer(Modifier.height(24.dp)); Button(onClick = onBack) { Text("返回媒体库") }
-        } }
-        return
-    }
-    @Composable fun dialogs() {
-        // Always mount the native popup nodes. Removing a node at show=false cuts off its exit spring.
-        SpeedDialog(snapshot.speed, backend::setSpeed, show = menu == PlayerMenu.SPEED) { menu = null }
-        MediaInfoDialog(snapshot, show = menu == PlayerMenu.INFO) { menu = null }
-        SelectionDialog("播放队列 · ${snapshot.queue.size}", menu == PlayerMenu.QUEUE,
-            snapshot.queue.map { DropdownItem(displayTitle(it.title)) }, snapshot.queueIndex,
-            onSelect = { backend.play(snapshot.queue, it) }, onDismiss = { menu = null })
-        HyperDialog("播放设置", { menu = null }, show = menu == PlayerMenu.VIDEO) {
-            HyperSpinnerPreference(title = "解码方式", items = DecoderMode.entries.map { DropdownItem(it.title, summary = decoderSummary(it)) },
-                selectedIndex = snapshot.decoderMode.ordinal, onSelectedIndexChange = { backend.setDecoderMode(DecoderMode.entries[it]) })
-            HyperSettingRow("屏幕方向", onClick = { menu = null; onOpenOrientation() })
-            HyperSpinnerPreference(title = "播放速度", items = SpeedChoices.map { DropdownItem(speedLabel(it)) },
-                selectedIndex = SpeedChoices.indexOf(snapshot.speed), onSelectedIndexChange = { backend.setSpeed(SpeedChoices[it]) })
-            HyperSettingRow("重置画面", "恢复缩放、旋转与位置", onClick = { resetKey++; menu = null })
-            HyperSettingRow("媒体信息", onClick = { menu = PlayerMenu.INFO })
-            HyperSettingRow("播放队列", value = "${snapshot.queue.size} 项", onClick = { menu = PlayerMenu.QUEUE })
+    onFavorite: () -> Unit, onBack: () -> Unit, surfaceActive: Boolean = true, inputActive: Boolean = true,
+    audioOutput: yy.daniel.yyplayerforandroid.audio.AudioOutputState? = null) {
+    if (snapshot.current == null) {
+        HyperPage("正在播放", onBack) { padding ->
+            Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) { Text("选择一个视频开始播放") }
         }
-    }
-    if (snapshot.isVideo) {
-        // Controls remain readable over video regardless of the library theme.
+    } else if (snapshot.isVideo) {
         YYPlayerTheme(ColorSchemeMode.Dark, MiuixTheme.colorScheme.primary) {
-            var visible by remember(current.uri) { mutableStateOf(true) }
-            var boost by remember(current.uri) { mutableStateOf(false) }
-            var interaction by remember { mutableIntStateOf(0) }
-            LaunchedEffect(visible, snapshot.isPlaying, menu, interaction) {
-                if (visible && snapshot.isPlaying && menu == null) { delay(3500); visible = false }
-            }
-            Box(Modifier.fillMaxSize().background(Color.Black)) {
-                VideoSurface(Modifier.fillMaxSize(), backend.exoPlayer(), backend, snapshot, resetKey,
-                    onTap = { visible = !visible; interaction++ }, onBoostChanged = { boost = it }, surfaceActive = surfaceActive)
-                AnimatedVisibility(visible = visible || !snapshot.isPlaying, enter = fadeIn(tween(if (reduceMotion) 0 else 300, easing = DecelerateEasing(1.5f))), exit = fadeOut(tween(if (reduceMotion) 0 else 250, easing = DecelerateEasing(1.5f)))) {
-                    Box(Modifier.fillMaxSize()) {
-                        Row(Modifier.fillMaxWidth().align(Alignment.TopCenter)
-                            .background(Brush.verticalGradient(listOf(Color.Black.copy(alpha = .75f), Color.Transparent)))
-                            .statusBarsPadding().padding(start = 8.dp, end = 8.dp, bottom = 30.dp), verticalAlignment = Alignment.CenterVertically) {
-                            HyperIconButton(PlayerIcons.Back, "返回媒体库", onBack, tint = Color.White)
-                            Text(displayTitle(current.title), Modifier.weight(1f).padding(horizontal = 8.dp), fontSize = 17.sp, color = Color.White, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                            HyperIconButton(PlayerIcons.More, "播放设置", { menu = PlayerMenu.VIDEO }, tint = Color.White)
-                        }
-                        Column(Modifier.align(Alignment.BottomCenter).fillMaxWidth()
-                            .background(Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = .85f))))
-                            .navigationBarsPadding().padding(start = 22.dp, end = 22.dp, top = 28.dp, bottom = 12.dp)) {
-                            if (snapshot.error != null) PlaybackError(snapshot, backend)
-                            SeekControl(snapshot, backend, video = true)
-                            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                                HyperIconButton(if (snapshot.isPlaying) PlayerIcons.Pause else PlayerIcons.Play, if (snapshot.isPlaying) "暂停" else "播放", { backend.togglePlayPause(); interaction++ }, tint = Color.White)
-                                HyperIconButton(PlayerIcons.Previous, "上一个视频", { backend.previous(); interaction++ }, tint = Color.White)
-                                HyperIconButton(PlayerIcons.Next, "下一个视频", { backend.next(); interaction++ }, tint = Color.White)
-                                Spacer(Modifier.weight(1f))
-                                Text(speedLabel(snapshot.speed), Modifier.clickable { menu = PlayerMenu.SPEED }.padding(16.dp), color = Color.White, fontSize = 15.sp)
-                                HyperIconButton(PlayerIcons.Rotate, "屏幕方向", onOpenOrientation, tint = Color.White)
-                            }
-                        }
-                    }
-                }
-                if (boost) Text("3× 快进中", Modifier.align(Alignment.TopCenter).statusBarsPadding().padding(top = 64.dp)
-                    .background(Color.Black.copy(alpha = .55f), CircleShape).padding(horizontal = 18.dp, vertical = 10.dp), color = Color.White, fontSize = 14.sp)
-                if (snapshot.phase == PlaybackPhase.BUFFERING) Text("正在加载…", Modifier.align(Alignment.Center), color = Color.White, fontSize = 15.sp)
-            }
-            dialogs()
+            VideoPlayerPage(backend, snapshot, reduceMotion, onOpenOrientation, onBack, surfaceActive, audioOutput, inputActive)
         }
     } else {
-        // PlayerActivity redirects audio to MainActivity; no second music page or transition here.
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("正在返回音乐详情…", color = Muted) }
     }
 }
-
 @Composable
-private fun SeekControl(snapshot: PlaybackSnapshot, backend: PlaybackBackend, video: Boolean = false) {
+internal fun SeekControl(snapshot: PlaybackSnapshot, backend: PlaybackBackend, video: Boolean = false, reduced: Boolean = false, onDragging: (Boolean) -> Unit = {}) {
     var dragging by remember(snapshot.current?.uri) { mutableStateOf(false) }
     var value by remember(snapshot.current?.uri) { mutableFloatStateOf(snapshot.progress) }
-    Slider(value = if (dragging) value else snapshot.progress, onValueChange = { value = it; dragging = true },
-        onValueChangeFinished = { if (snapshot.durationMs > 0) backend.seekTo((value * snapshot.durationMs).toLong()); dragging = false }, enabled = snapshot.durationMs > 0)
+    PlaybackSeekBar(snapshot, backend, if (video) Color.White else MiuixTheme.colorScheme.primary, reduced,
+        if (dragging) value else snapshot.progress, dragging,
+        onPreview = { value = it; dragging = true }, onEnd = { dragging = false; onDragging(false) },
+        onBegin = { onDragging(true) })
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
         val color = if (video) Color.White.copy(alpha = .75f) else Muted
         Text(formatTime(if (dragging) (value * snapshot.durationMs).toLong() else snapshot.positionMs), fontSize = 12.sp, color = color)
@@ -131,7 +68,7 @@ private fun SeekControl(snapshot: PlaybackSnapshot, backend: PlaybackBackend, vi
 }
 
 @Composable
-private fun PlaybackError(snapshot: PlaybackSnapshot, backend: PlaybackBackend) {
+internal fun PlaybackError(snapshot: PlaybackSnapshot, backend: PlaybackBackend) {
     Row(Modifier.fillMaxWidth().padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
         Text(snapshot.error.orEmpty(), Modifier.weight(1f), color = MiuixTheme.colorScheme.error, fontSize = 13.sp, maxLines = 3, overflow = TextOverflow.Ellipsis)
         Text("重试", Modifier.clickable { backend.play(snapshot.queue, snapshot.queueIndex.coerceAtLeast(0)) }.padding(12.dp), color = MiuixTheme.colorScheme.primary, fontSize = 14.sp)
@@ -155,6 +92,22 @@ internal fun SelectionDialog(title: String, show: Boolean, items: List<DropdownI
     // Same layout/rows as upstream WindowDropdownDialog, with the surface override
     // its public API lacks. Keep native selection feedback and native window motion.
     val haptics = LocalHapticFeedback.current
+    if (LocalVideoSettingsInDrawer.current) {
+        if (show) VideoDrawerPage(title, onDismiss, "取消", scrollContent = false) {
+            LazyColumn(Modifier.fillMaxSize()) {
+                items(items.size) { index ->
+                    DropdownImpl(item = items[index], optionSize = items.size,
+                        isSelected = selectedIndex == index, index = index, dialogMode = true,
+                        onSelectedIndexChange = {
+                            haptics.performHapticFeedback(HapticFeedbackType.Confirm)
+                            onSelect(it)
+                            onDismiss()
+                        })
+                }
+            }
+        }
+        return
+    }
     WindowDialog(show = show, title = title, backgroundColor = MiuixTheme.colorScheme.surface,
         insideMargin = DpSize(0.dp, 24.dp), onDismissRequest = onDismiss) {
         val dismiss = LocalDismissState.current
@@ -170,7 +123,7 @@ internal fun SelectionDialog(title: String, show: Boolean, items: List<DropdownI
                         })
                 }
             }
-            TextButton(text = "取消", minHeight = 50.dp,
+            HyperActionButton(text = "取消", primary = false, compact = true,
                 modifier = Modifier.padding(start = 24.dp, top = 12.dp, end = 24.dp).fillMaxWidth(),
                 onClick = { dismiss?.invoke() })
         }) { measurables, constraints ->
@@ -192,7 +145,12 @@ internal fun SpeedDialog(speed: Float, onSpeed: (Float) -> Unit, show: Boolean =
 }
 
 @Composable
-internal fun MediaInfoDialog(snapshot: PlaybackSnapshot, show: Boolean = true, onDismiss: () -> Unit) {
+internal fun MediaInfoDialog(
+    snapshot: PlaybackSnapshot,
+    show: Boolean = true,
+    audioOutput: yy.daniel.yyplayerforandroid.audio.AudioOutputState? = null,
+    onDismiss: () -> Unit,
+) {
     HyperDialog("媒体信息", onDismiss, show = show, buttonText = "完成") {
         HyperSettingRow("文件", snapshot.current?.title ?: "尚未播放")
         if (snapshot.isVideo) {
@@ -208,6 +166,24 @@ internal fun MediaInfoDialog(snapshot: PlaybackSnapshot, show: Boolean = true, o
         }
         HyperSettingRow("音频输入", listOfNotNull(snapshot.audioSampleRate?.let { "${it / 1000f} kHz" }, snapshot.audioChannels?.let { "$it 声道" }).joinToString(" · ").ifBlank { "未报告" })
         HyperSettingRow("音频解码器", snapshot.audioDecoderName ?: "未报告")
-        HyperSettingRow("音频输出", "Android 系统输出；独占与输出格式尚未验证")
+        if (snapshot.videoEngine == yy.daniel.yyplayerforandroid.playback.VideoEngine.MPV)
+            HyperSettingRow("视频音频驱动", snapshot.videoAudioOutput ?: "未报告")
+        // Only what the output controller observed is shown: an unreported value stays "未知"
+        // instead of being filled in with the input format.
+        val output = audioOutput
+        if (output == null) {
+            HyperSettingRow("音频输出", "Android 系统输出；独占与输出格式尚未验证")
+        } else {
+            HyperSettingRow("音频输出路径", output.decision.reasonText)
+            HyperSettingRow("位准确", output.bitPerfect.label)
+            HyperSettingRow(
+                "实际输出格式",
+                listOfNotNull(
+                    output.actualSampleRate?.let { "${it / 1000f} kHz" },
+                    output.actualEncoding.takeIf { it.effectiveBits > 0 }?.let { "${it.effectiveBits} bit" },
+                ).joinToString(" · ").ifBlank { "未知（系统未报告硬件输出格式）" },
+            )
+            HyperSettingRow("独占状态", output.actualSharing.label)
+        }
     }
 }

@@ -13,9 +13,21 @@ try {
     }
     & .\gradlew.bat @buildArguments
     if ($LASTEXITCODE -ne 0) { throw 'Android build/check failed' }
-    & $AdbPath -s $Serial install -r app/build/outputs/apk/debug/app-debug.apk
+    $metadataPath = 'app/build/outputs/apk/debug/output-metadata.json'
+    $metadata = Get-Content -LiteralPath $metadataPath -Raw | ConvertFrom-Json
+    $deviceAbiOutput = & $AdbPath -s $Serial shell getprop ro.product.cpu.abilist
+    if ($LASTEXITCODE -ne 0) { throw 'Unable to read device ABIs' }
+    $deviceAbis = ($deviceAbiOutput -join '').Trim().Split(',')
+    $apkOutput = $null
+    foreach ($abi in $deviceAbis) {
+        $apkOutput = $metadata.elements | Where-Object { $_.filters | Where-Object { $_.filterType -eq 'ABI' -and $_.value -eq $abi } } | Select-Object -First 1
+        if ($null -ne $apkOutput) { break }
+    }
+    if ($null -eq $apkOutput) { throw "No APK for device ABIs: $deviceAbis" }
+    $appApk = Join-Path (Split-Path $metadataPath -Parent) $apkOutput.outputFile
+    & $AdbPath -s $Serial install --no-incremental -r $appApk
     if ($LASTEXITCODE -ne 0) { throw 'App update failed' }
-    & $AdbPath -s $Serial install -r app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+    & $AdbPath -s $Serial install --no-incremental -r app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
     if ($LASTEXITCODE -ne 0) { throw 'Test APK update failed' }
     $instrumentArguments = @('-s', $Serial, 'shell', 'am', 'instrument', '-w', '-r')
     if ($OnlineQa) { $instrumentArguments += @('-e', 'onlineQa', 'true') }

@@ -1,0 +1,2 @@
+Starting: Intent { cmp=yy.daniel.yyplayerforandroid/.MainActivity }
+    topResumedActivity=ActivityRecord{259812678 u0 yy.daniel.yyplayerforandroid/.MainActivity t7036}

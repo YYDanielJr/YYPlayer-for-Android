@@ -52,6 +52,18 @@ class OnlineApiTest {
         assertEquals(999, body.getJSONObject("options").getJSONArray("qualities").getInt(1))
         assertEquals(5, parsed.qualities.size)
     }
+    @Test fun directPlaybackUsesFirstApplicableConfiguredQuality(): Unit = runBlocking {
+        isolated { c ->
+            val repository = OnlineRepository(c, { true }, { false })
+            repository.load()
+            val provider = repository.config.value!!.providers.single()
+            val song = OnlineSong(provider.id, provider.sources.keys.first(), "test", "测试", "歌手", "专辑", "test", null)
+            assertEquals(provider.qualities.first(), repository.defaultPlaybackQuality(song))
+            val last = provider.qualities.last()
+            assertEquals(last, repository.defaultPlaybackQuality(song.copy(availableQualities = setOf(last.id))))
+            assertThrows(IllegalStateException::class.java) { repository.defaultPlaybackQuality(song.copy(availableQualities = emptySet())) }
+        }
+    }
     @Test fun actualProviderFallbackCannotBeSelectedAsHighResolutionQuality() = runBlocking {
         assumeTrue(InstrumentationRegistry.getArguments().getString("onlineQa") == "true")
         isolated { c ->
@@ -153,7 +165,7 @@ class OnlineApiTest {
         lateinit var backend: AndroidMedia3PlaybackBackend
         var allowed = true
         instrumentation.runOnMainSync {
-            backend = AndroidMedia3PlaybackBackend(context) { allowed }
+            backend = AndroidMedia3PlaybackBackend(context, networkAllowed = { allowed })
             backend.play(listOf(LocalMedia(Uri.parse("https://localhost:18443/audio.wav"), songs.last().title, MediaKind.AUDIO, "audio/wav",
                 mediaHeaders = mapOf("localhost" to mapOf("X-QA-Media" to "fixture-media")))))
         }

@@ -1,0 +1,55 @@
+
+yy.daniel.yyplayerforandroid.OutputAuditDeviceTest:...
+Error in bothPathsSwitchActualDevicesAndRetainPosition(yy.daniel.yyplayerforandroid.OutputAuditDeviceTest):
+java.lang.AssertionError: 切换不能产生播放错误 expected null, but was:<播放失败（ERROR_CODE_AUDIO_TRACK_WRITE_FAILED）>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotNull(Assert.java:756)
+	at org.junit.Assert.assertNull(Assert.java:738)
+	at yy.daniel.yyplayerforandroid.OutputAuditDeviceTest.bothPathsSwitchActualDevicesAndRetainPosition$lambda$9(OutputAuditDeviceTest.kt:61)
+	at yy.daniel.yyplayerforandroid.OutputAuditDeviceTest$$ExternalSyntheticLambda6.invoke(D8$$SyntheticClass:0)
+	at yy.daniel.yyplayerforandroid.OutputAuditDeviceTest.bothPathsSwitchActualDevicesAndRetainPosition$await$lambda$5(OutputAuditDeviceTest.kt:35)
+	at yy.daniel.yyplayerforandroid.OutputAuditDeviceTest$$ExternalSyntheticLambda9.invoke(D8$$SyntheticClass:0)
+	at yy.daniel.yyplayerforandroid.OutputAuditDeviceTest.bothPathsSwitchActualDevicesAndRetainPosition$main$lambda$4(OutputAuditDeviceTest.kt:30)
+	at yy.daniel.yyplayerforandroid.OutputAuditDeviceTest$$ExternalSyntheticLambda10.run(D8$$SyntheticClass:0)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:520)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:328)
+	at android.app.Instrumentation$SyncRunnable.run(Instrumentation.java:2725)
+	at android.os.Handler.handleCallback(Handler.java:1129)
+	at android.os.Handler.dispatchMessageImpl(Handler.java:139)
+	at android.os.Handler.dispatchMessage(Handler.java:129)
+	at android.os.Looper.loopOnce(Looper.java:315)
+	at android.os.Looper.loop(Looper.java:419)
+	at android.app.ActivityThread.main(ActivityThread.java:10840)
+	at java.lang.reflect.Method.invoke(Native Method)
+	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:598)
+	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:1150)
+.
+
+Time: 2.679
+There was 1 failure:
+1) bothPathsSwitchActualDevicesAndRetainPosition(yy.daniel.yyplayerforandroid.OutputAuditDeviceTest)
+java.lang.AssertionError: 切换不能产生播放错误 expected null, but was:<播放失败（ERROR_CODE_AUDIO_TRACK_WRITE_FAILED）>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotNull(Assert.java:756)
+	at org.junit.Assert.assertNull(Assert.java:738)
+	at yy.daniel.yyplayerforandroid.OutputAuditDeviceTest.bothPathsSwitchActualDevicesAndRetainPosition$lambda$9(OutputAuditDeviceTest.kt:61)
+	at yy.daniel.yyplayerforandroid.OutputAuditDeviceTest$$ExternalSyntheticLambda6.invoke(D8$$SyntheticClass:0)
+	at yy.daniel.yyplayerforandroid.OutputAuditDeviceTest.bothPathsSwitchActualDevicesAndRetainPosition$await$lambda$5(OutputAuditDeviceTest.kt:35)
+	at yy.daniel.yyplayerforandroid.OutputAuditDeviceTest$$ExternalSyntheticLambda9.invoke(D8$$SyntheticClass:0)
+	at yy.daniel.yyplayerforandroid.OutputAuditDeviceTest.bothPathsSwitchActualDevicesAndRetainPosition$main$lambda$4(OutputAuditDeviceTest.kt:30)
+	at yy.daniel.yyplayerforandroid.OutputAuditDeviceTest$$ExternalSyntheticLambda10.run(D8$$SyntheticClass:0)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:520)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:328)
+	at android.app.Instrumentation$SyncRunnable.run(Instrumentation.java:2725)
+	at android.os.Handler.handleCallback(Handler.java:1129)
+	at android.os.Handler.dispatchMessageImpl(Handler.java:139)
+	at android.os.Handler.dispatchMessage(Handler.java:129)
+	at android.os.Looper.loopOnce(Looper.java:315)
+	at android.os.Looper.loop(Looper.java:419)
+	at android.app.ActivityThread.main(ActivityThread.java:10840)
+	at java.lang.reflect.Method.invoke(Native Method)
+	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:598)
+	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:1150)
+
+FAILURES!!!
+Tests run: 5,  Failures: 1

@@ -1,0 +1,12 @@
+--------- beginning of main
+10-06 13:28:01.150 22354 22420 I YYPlayerAudio: YYTEST_SESSION_STAGE start
+10-06 13:28:01.227 22354 22420 I YYPlayerAudio: YYTEST_SESSION_STAGE library
+10-06 13:28:01.258 22354 22420 I YYPlayerAudio: YYTEST_SESSION_STAGE engine
+10-06 13:28:01.261 22354 22420 I YYPlayerAudio: YYTEST_SESSION_STAGE launch
+10-06 13:31:04.923 25309 25376 I YYPlayerAudio: YYTEST_SESSION_STAGE start
+10-06 13:31:04.968 25309 25376 I YYPlayerAudio: YYTEST_SESSION_STAGE library
+10-06 13:31:05.006 25309 25376 I YYPlayerAudio: YYTEST_SESSION_STAGE engine
+10-06 13:31:05.144 25309 25387 I YYPlayerAudio: YYPLAYER_MEDIA3_SINK open=s24_3/44100Hz/ch=2 widened=false mixerRequested=false mixerApplied=false source=s24_3
+10-06 13:31:08.813 25309 25468 I YYPlayerAudio: YYPLAYER_MEDIA3_SINK open=s24_3/44100Hz/ch=2 widened=false mixerRequested=false mixerApplied=false source=s24_3
+10-06 13:31:09.826 25309 25468 I YYPlayerAudio: YYPLAYER_MEDIA3_SINK open=s24_3/44100Hz/ch=2 widened=false mixerRequested=false mixerApplied=false source=s24_3
+10-06 13:31:14.402 25309 25309 I YYPlayerAudio: YYTEST_SESSION background=true uiOwnersReleased=true position=4562 state=3

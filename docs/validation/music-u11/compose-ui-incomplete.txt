@@ -1,0 +1,4 @@
+
+yy.daniel.yyplayerforandroid.MusicUpgradeDeviceTest:.....
+yy.daniel.yyplayerforandroid.LyricStyleUiTest:INSTRUMENTATION_RESULT: shortMsg=Process crashed.
+INSTRUMENTATION_CODE: 0

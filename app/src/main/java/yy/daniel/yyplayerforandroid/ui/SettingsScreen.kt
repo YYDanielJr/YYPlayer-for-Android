@@ -30,7 +30,8 @@ internal fun SettingsScreen(theme: ThemeChoice, onTheme: (ThemeChoice) -> Unit,
     onlineLyrics: Boolean = false, onOnlineLyrics: (Boolean) -> Unit = {},
     apiSummary: String = "", apiMessage: String? = null, onImportApi: () -> Unit = {}, onDownloadDirectory: () -> Unit = {},
     downloadDirectory: String = "系统 Music（默认）", onDefaultDownloadDirectory: () -> Unit = {},
-    onLyricStyle: () -> Unit = {}, onSetup: () -> Unit = {}) {
+    onLyricStyle: () -> Unit = {}, onSetup: () -> Unit = {},
+    audioOutput: yy.daniel.yyplayerforandroid.audio.AudioOutputState? = null, onAudioOutput: () -> Unit = {}) {
     var dialog by remember { mutableStateOf<String?>(null) }
     HyperPage("设置", onBack) { padding ->
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
@@ -63,6 +64,7 @@ internal fun SettingsScreen(theme: ThemeChoice, onTheme: (ThemeChoice) -> Unit,
                 item { HyperCard(Modifier.padding(horizontal = PageGutter).fillMaxWidth()) {
                     HyperSpinnerPreference(title = "视频解码", items = DecoderMode.entries.map { DropdownItem(it.title, summary = decoderSummary(it)) },
                         selectedIndex = snapshot.decoderMode.ordinal, onSelectedIndexChange = { onDecoder(DecoderMode.entries[it]) })
+                    HyperSettingRow("音频输出", summary = audioOutputSummary(audioOutput), value = audioOutput?.bitPerfect?.label, onClick = onAudioOutput)
                     HyperSettingRow("屏幕方向", value = orientation.label, onClick = onOpenOrientation)
                     HyperSettingRow("播放手势", "长按临时 3 倍速，双指缩放、旋转与移动")
                     HyperSettingRow("歌词显示", "分别设置选中行、非选中行的字号、字重与颜色，以及行间距", onClick = onLyricStyle)
@@ -87,8 +89,12 @@ internal fun SettingsScreen(theme: ThemeChoice, onTheme: (ThemeChoice) -> Unit,
         HyperSettingRow("系统 Music（默认）", "歌曲保存到 Music；歌词与专辑图自动保存在应用内", onClick = { onDefaultDownloadDirectory(); dialog = null })
         HyperSettingRow("选择文件夹", "同时保存歌曲、同名歌词与专辑图", onClick = { dialog = null; onDownloadDirectory() })
     }
-    MediaInfoDialog(snapshot, show = dialog == "info") { dialog = null }
+    MediaInfoDialog(snapshot, show = dialog == "info", audioOutput = audioOutput) { dialog = null }
 }
+
+/** One line for the settings row: the decision text is the honest summary of the output plan. */
+internal fun audioOutputSummary(state: yy.daniel.yyplayerforandroid.audio.AudioOutputState?): String =
+    state?.decision?.reasonText ?: "尚未评估输出计划"
 
 @Composable
 internal fun ThemePreview(choice: ThemeChoice, selected: Boolean, onClick: () -> Unit, modifier: Modifier) {

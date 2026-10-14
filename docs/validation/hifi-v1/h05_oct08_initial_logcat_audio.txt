@@ -1,0 +1,77 @@
+--------- beginning of main
+10-08 11:48:06.714 26812 26812 I YYPlayerAudio: YYTEST_system_PROGRESS step=1 isPlaying=true state=3 position=7626 duration=274584 buffered=52709 error=null decodedFrames=0 fileFrames=12109198 counters=null opened=null
+10-08 11:48:10.712 26812 26812 I YYPlayerAudio: YYTEST_system_PROGRESS step=2 isPlaying=true state=3 position=11546 duration=274584 buffered=52709 error=null decodedFrames=0 fileFrames=12109198 counters=null opened=null
+10-08 11:48:14.713 26812 26812 I YYPlayerAudio: YYTEST_system_PROGRESS step=3 isPlaying=true state=3 position=15724 duration=274584 buffered=52709 error=null decodedFrames=0 fileFrames=12109198 counters=null opened=null
+10-08 11:48:14.721 26812 26879 I YYPlayerAudio: YYTEST_system_RESULT reached=true error=null negotiated=null
+10-08 11:48:14.723 26812 26879 I YYPlayerAudio: YYTEST_SESSION_STAGE start
+10-08 11:48:14.742 26812 26879 I YYPlayerAudio: YYTEST_SESSION_STAGE library
+10-08 11:48:14.743 26812 26879 I YYPlayerAudio: YYTEST_SESSION_STAGE engine
+10-08 11:48:14.804 26812 28161 I YYPlayerAudio: YYPLAYER_MEDIA3_SINK open=s24_3/44100Hz/ch=2 widened=false mixerRequested=false mixerApplied=false source=s24_3
+10-08 11:48:18.842 26812 28232 I YYPlayerAudio: YYPLAYER_MEDIA3_SINK open=s24_3/44100Hz/ch=2 widened=false mixerRequested=false mixerApplied=false source=s24_3
+10-08 11:48:20.542 26812 28232 I YYPlayerAudio: YYPLAYER_MEDIA3_SINK open=s24_3/44100Hz/ch=2 widened=false mixerRequested=false mixerApplied=false source=s24_3
+10-08 11:48:25.467 26812 26812 I YYPlayerAudio: YYTEST_SESSION background=true uiOwnersReleased=true position=4574 state=3
+10-08 11:48:25.690 26812 26879 I YYPlayerAudio: YYPLAYER_CORE_VERSION=2
+10-08 11:48:25.693 26812 26879 I YYPlayerAudio: YYPLAYER_POLICY request={"format":{"sampleRate":44100,"channels":2,"encoding":"s16","channelMask":3},"sharing":"shared","transparency":"strict_unprocessed","routeSelected":false,"processing":{"softwareVolume":true,"equalizer":false,"replayGain":false,"speedChange":false},"route":{"deviceId":0,"sink":"unknown","supportsBitPerfect":false,"supportsExclusive":false,"canReportActualSharing":false,"profiles":[]}} accepted=false reason=no_route_selected
+10-08 11:48:26.698 26812 26879 I YYPlayerAudio: YYPLAYER_RING_ROUNDTRIP capacity=24000 readable=0 written=48000 read=48000 dropped=0 underrun=146560 feederWritten=48000/48000 feederDropped=0 digest=cd8810540de860aa73502e26e33a6147ae51f4f029f62cea0c722f4bd2ceb713
+10-08 11:48:26.698 26812 26879 I YYPlayerAudio: YYPLAYER_RING_NOTE readerShortfall=146560 frames=48000 (consumer waiting for the paced producer; written==read==48000 is the real invariant)
+10-08 11:48:34.251 26812 26879 I YYPlayerAudio: YYPLAYER_WIDENED encoding=s16 usb=false started=true reason=ok/参考信号输出已结束，完整性以帧计数与实际播放头为准 platform=s16/48000Hz matches=true substituted=false fed=336000 dropped=0 consumed=336000 duringSignal=0 routed=[OPPO Enco Free4]
+10-08 11:48:34.256 26812 26879 I YYPlayerAudio: YYPLAYER_PRISTINE_BRIDGE OK
+10-08 11:48:34.260 26812 26879 I YYPlayerAudio: YYPLAYER_WIDEN_BYTES encoding=s24_3 capacity=6 frames=1 hex=[00 C7 CF 00 C7 CF] expected=-3160320 actual=-3160320
+10-08 11:48:34.261 26812 26879 I YYPlayerAudio: YYPLAYER_WIDEN_BYTES encoding=s24_in32 capacity=8 frames=1 hex=[00 C7 CF FF 00 C7 CF FF] expected=-3160320 actual=-3160320
+10-08 11:48:34.261 26812 26879 I YYPlayerAudio: YYPLAYER_WIDEN_BYTES encoding=s32 capacity=8 frames=1 hex=[00 00 C7 CF 00 00 C7 CF] expected=-809041920 actual=-809041920
+10-08 11:48:34.358 26812 26879 I YYPlayerAudio: YYPLAYER_WIDEN_SIZE encoding=s24_3 srcBytes=1344000 srcFrames=336000 dstBytes=2016000 converted=336000
+10-08 11:48:34.368 26812 26879 I YYPlayerAudio: YYPLAYER_WIDEN_SIZE encoding=s24_in32 srcBytes=1344000 srcFrames=336000 dstBytes=2688000 converted=336000
+10-08 11:48:34.378 26812 26879 I YYPlayerAudio: YYPLAYER_WIDEN_SIZE encoding=s32 srcBytes=1344000 srcFrames=336000 dstBytes=2688000 converted=336000
+10-08 11:48:34.489 26812 26879 I YYPlayerAudio: YYPLAYER_S24IN32_REFUSED started=false reason=sink_bad_format
+10-08 11:48:34.497 26812 26879 I YYPlayerAudio: YYPLAYER_USB_CAPABILITY
+10-08 11:48:34.497 26812 26879 I YYPlayerAudio: sdk=37 release=17 model=2509FPN0BC
+10-08 11:48:34.497 26812 26879 I YYPlayerAudio: - 2509FPN0BC id=2 usb=false rates=[48000] channels=[1] encodings=[2]
+10-08 11:48:34.497 26812 26879 I YYPlayerAudio:   bitPerfect=
+10-08 11:48:34.497 26812 26879 I YYPlayerAudio:   other=
+10-08 11:48:34.497 26812 26879 I YYPlayerAudio: - 2509FPN0BC id=3 usb=false rates=[48000] channels=[2] encodings=[2]
+10-08 11:48:34.497 26812 26879 I YYPlayerAudio:   bitPerfect=
+10-08 11:48:34.497 26812 26879 I YYPlayerAudio:   other=
+10-08 11:48:34.497 26812 26879 I YYPlayerAudio: - OPPO Enco Free4 id=910 usb=false rates=[8000, 16000] channels=[1] encodings=[2]
+10-08 11:48:34.497 26812 26879 I YYPlayerAudio:   bitPerfect=
+10-08 11:48:34.497 26812 26879 I YYPlayerAudio:   other=
+10-08 11:48:34.497 26812 26879 I YYPlayerAudio: - OPPO Enco Free4 id=903 usb=false rates=[44100] channels=[2] encodings=[2]
+10-08 11:48:34.497 26812 26879 I YYPlayerAudio:   bitPerfect=
+10-08 11:48:34.497 26812 26879 I YYPlayerAudio:   other=
+10-08 11:48:34.497 26812 26879 I YYPlayerAudio: - 2509FPN0BC id=11 usb=false rates=[8000, 16000] channels=[1, 2] encodings=[2]
+10-08 11:48:34.497 26812 26879 I YYPlayerAudio:   bitPerfect=
+10-08 11:48:34.497 26812 26879 I YYPlayerAudio:   other=
+10-08 11:48:34.497 26812 26879 I YYPlayerAudio: - 2509FPN0BC id=4 usb=false rates=[48000] channels=[1, 2] encodings=[2]
+10-08 11:48:34.497 26812 26879 I YYPlayerAudio:   bitPerfect=
+10-08 11:48:34.497 26812 26879 I YYPlayerAudio:   other=
+10-08 11:48:34.497 26812 26879 I YYPlayerAudio: - USB-Audio - lifeme HiFi Audio Pro id=919 usb=true rates=[16000, 32000, 48000, 96000, 192000, 44100, 384000] channels=[2] encodings=[2, 4, 21, 22]
+10-08 11:48:34.497 26812 26879 I YYPlayerAudio:   bitPerfect=
+10-08 11:48:34.497 26812 26879 I YYPlayerAudio:   other=16000Hz/s16/mask=12, 16000Hz/s16/mask=0, 32000Hz/s16/mask=12, 32000Hz/s16/mask=0, 44100Hz/s16/mask=12, 44100Hz/s16/mask=0, 48000Hz/s16/mask=12, 48000Hz/s16/mask=0, 96000Hz/s16/mask=12, 96000Hz/s16/mask=0, 192000Hz/s16/mask=12, 192000Hz/s16/mask=0, 384000Hz/s16/mask=12, 384000Hz/s16/mask=0, 16000Hz/s24_3/mask=12, 16000Hz/s24_3/mask=0, 32000Hz/s24_3/mask=12, 32000Hz/s24_3/mask=0, 44100Hz/s24_3/mask=12, 44100Hz/s24_3/mask=0, 48000Hz/s24_3/mask=12, 48000Hz/s24_3/mask=0, 96000Hz/s24_3/mask=12, 96000Hz/s24_3/mask=0, 192000Hz/s24_3/mask=12, 192000Hz/s24_3/mask=0, 384000Hz/s24_3/mask=12, 384000Hz/s24_3/mask=0, 16000Hz/s32/mask=12, 16000Hz/s32/mask=0, 32000Hz/s32/mask=12, 32000Hz/s32/mask=0, 44100Hz/s32/mask=12, 44100Hz/s32/mask=0, 48000Hz/s32/mask=12, 48000Hz/s32/mask=0, 96000Hz/s32/mask=12, 96000Hz/s32/mask=0, 192000Hz/s32/mask=12, 192000Hz/s32/mask=0, 384000Hz/s32/mask=12, 384000Hz/s32/mask=0
+10-08 11:48:34.497 26812 26879 I YYPlayerAudio: usbAttached=true
+10-08 11:48:34.497 26812 26879 I YYPlayerAudio: verdict=usb_present_without_bit_perfect_contract
+10-08 11:48:42.994 26812 26879 I YYPlayerAudio: YYPLAYER_WIDENED encoding=s24_3 usb=true started=true reason=ok/参考信号输出已结束，完整性以帧计数与实际播放头为准 platform=s24_3/48000Hz matches=true substituted=false fed=336000 dropped=0 consumed=336000 duringSignal=0 routed=[USB-Audio - lifeme HiFi Audio Pro]
+10-08 11:48:50.940 26812 26879 I YYPlayerAudio: YYPLAYER_WIDENED encoding=s32 usb=true started=true reason=ok/参考信号输出已结束，完整性以帧计数与实际播放头为准 platform=s32/48000Hz matches=true substituted=false fed=336000 dropped=0 consumed=336000 duringSignal=0 routed=[USB-Audio - lifeme HiFi Audio Pro]
+10-08 11:48:51.001 26812 26879 I YYPlayerAudio: YYPLAYER_SELFTEST_DECISION accepted=true reason=ok sink=audiotrack_system format=OutputFormat(sampleRate=48000, channelCount=2, encoding=S24_3, channelMask=3) requestBitPerfect=false pinning=919
+10-08 11:48:58.962 26812 26879 I YYPlayerAudio: YYPLAYER_OUTPUT_SELFTEST
+10-08 11:48:58.962 26812 26879 I YYPlayerAudio: started=true
+10-08 11:48:58.962 26812 26879 I YYPlayerAudio: reason=ok 参考信号输出已结束，完整性以帧计数与实际播放头为准
+10-08 11:48:58.962 26812 26879 I YYPlayerAudio: sink=audiotrack_system
+10-08 11:48:58.962 26812 26879 I YYPlayerAudio: decidedFormat=OutputFormat(sampleRate=48000, channelCount=2, encoding=S24_3, channelMask=12)
+10-08 11:48:58.962 26812 26879 I YYPlayerAudio: requestedDeviceId=919 pinAccepted=true routeMatchesRequest=true
+10-08 11:48:58.962 26812 26879 I YYPlayerAudio: bitPerfectRequested=false
+10-08 11:48:58.962 26812 26879 I YYPlayerAudio: mixerContractAccepted=false
+10-08 11:48:58.962 26812 26879 I YYPlayerAudio: mixerContractReadBack=null
+10-08 11:48:58.962 26812 26879 I YYPlayerAudio: systemReportedBitPerfect=false
+10-08 11:48:58.962 26812 26879 I YYPlayerAudio: routedIds=[919]
+10-08 11:48:58.962 26812 26879 I YYPlayerAudio: routedNames=[USB-Audio - lifeme HiFi Audio Pro]
+10-08 11:48:58.962 26812 26879 I YYPlayerAudio: routedIsUsb=true
+10-08 11:48:58.962 26812 26879 I YYPlayerAudio: track=48000Hz/s24_3 mask=12 platformFormat=OutputFormat(sampleRate=48000, channelCount=2, encoding=S24_3, channelMask=12) substituted=false
+10-08 11:48:58.962 26812 26879 I YYPlayerAudio: bufferFrames=7688 platformUnderruns=0
+10-08 11:48:58.962 26812 26879 I YYPlayerAudio: framesFed=336000 dropped=0 consumed=336000
+10-08 11:48:58.962 26812 26879 I YYPlayerAudio: ringUnderrun=3198749 sinkStarving=0 atFeedEnd=0 duringSignal=0 partialWrites=0
+10-08 11:48:58.962 26812 26879 I YYPlayerAudio: digestSha256=723182cc43e5468cd1b029073377b391839f1b0eceeafcf8a3d69db27f566fb9
+10-08 11:48:58.962 26812 26879 I YYPlayerAudio: tone=静音 2s（开流与混音器配置） → 仅左 440Hz 1s → 仅右 880Hz 1s → 双声道 440Hz 1s → 静音 2s（收尾静音）
+10-08 11:48:58.962 26812 26879 I YYPlayerAudio: note=参考信号按 s16 → s24_3 无损加宽（未丢弃有效位）
+10-08 11:48:58.962 26812 26879 I YYPlayerAudio: note=已请求把输出固定到设备 id=919（USB-Audio - lifeme HiFi Audio Pro），平台是否照做以回读为准
+10-08 11:48:58.962 26812 26879 I YYPlayerAudio: note=匹配的普通共享 mixer 请求：true；它不提供位完美或独占证据
+10-08 11:48:58.963 26812 26879 I YYPlayerAudio: YYPLAYER_PIN_EVIDENCE requested=919 pinAccepted=true routed=[919] matches=true
+10-08 11:49:06.590 26812 26879 I YYPlayerAudio: YYPLAYER_WIDENED encoding=s16 usb=false started=true reason=ok/参考信号输出已结束，完整性以帧计数与实际播放头为准 platform=s16/48000Hz matches=true substituted=false fed=336000 dropped=0 consumed=336000 duringSignal=0 routed=[2509FPN0BC]

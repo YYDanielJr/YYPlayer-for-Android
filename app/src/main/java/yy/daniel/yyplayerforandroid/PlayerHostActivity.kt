@@ -47,6 +47,8 @@ abstract class PlayerHostActivity : ComponentActivity() {
     }
     internal fun openOrientation() = open(OrientationActivity::class.java)
     internal fun openLyricStyle() = open(LyricStyleActivity::class.java)
+    internal fun openMusicQueue() = open(MusicQueueActivity::class.java)
+    internal fun openAudioOutput() = open(AudioOutputActivity::class.java)
     internal fun openSetup() {
         runtime.setup.restart()
         startActivity(Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP))
@@ -91,6 +93,7 @@ class SettingsActivity : PlayerHostActivity() {
             val config by runtime.online.config.collectAsStateWithLifecycle()
             val apiMessage by runtime.online.message.collectAsStateWithLifecycle()
             val downloadDirectory by runtime.online.downloadDirectory.collectAsStateWithLifecycle()
+            val audioOutput by runtime.audioOutput.state.collectAsStateWithLifecycle()
             var localMessage by remember { mutableStateOf<String?>(null) }
             val scope = rememberCoroutineScope()
             val configPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
@@ -112,7 +115,8 @@ class SettingsActivity : PlayerHostActivity() {
                     config?.providers?.joinToString("、") { it.name }.orEmpty(), localMessage ?: apiMessage,
                     { configPicker.launch(arrayOf("application/json", "text/*", "application/octet-stream")) }, { directoryPicker.launch(Unit) },
                     downloadDirectory?.let { runCatching { android.provider.DocumentsContract.getTreeDocumentId(it.toUri()).replace(':', '/') }.getOrDefault("已选择文件夹") } ?: "系统 Music（默认）",
-                    { runtime.online.rememberDownloadTree(null); localMessage = "已恢复默认 Music 下载目录" }, ::openLyricStyle, ::openSetup)
+                    { runtime.online.rememberDownloadTree(null); localMessage = "已恢复默认 Music 下载目录" }, ::openLyricStyle, ::openSetup,
+                    audioOutput, ::openAudioOutput)
             }
         }
     }
@@ -130,6 +134,8 @@ class LyricStyleActivity : PlayerHostActivity() {
 
 @androidx.annotation.OptIn(markerClass = [androidx.media3.common.util.UnstableApi::class])
 class PlayerActivity : PlayerHostActivity() {
+    private var windowFocused by mutableStateOf(true)
+    override fun onWindowFocusChanged(hasFocus: Boolean) { super.onWindowFocusChanged(hasFocus); windowFocused = hasFocus }
     @android.annotation.SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -137,6 +143,7 @@ class PlayerActivity : PlayerHostActivity() {
             val snapshot by runtime.playback.state.collectAsStateWithLifecycle()
             val preferences by runtime.preferences.collectAsStateWithLifecycle()
             val lifecycleState by lifecycle.currentStateFlow.collectAsState()
+            val audioOutput by runtime.audioOutput.state.collectAsStateWithLifecycle()
             LaunchedEffect(snapshot.current?.uri, snapshot.isVideo) {
                 if (snapshot.current != null && !snapshot.isVideo) openPlayer()
             }
@@ -154,10 +161,25 @@ class PlayerActivity : PlayerHostActivity() {
                 }
             }
             AppTheme(snapshot.isVideo) {
+                DisposableEffect(snapshot.isVideo) {
+                    val controller = WindowCompat.getInsetsController(window, window.decorView)
+                    if (snapshot.isVideo) {
+                        controller.systemBarsBehavior = androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                        controller.hide(androidx.core.view.WindowInsetsCompat.Type.systemBars())
+                    }
+                    onDispose { controller.show(androidx.core.view.WindowInsetsCompat.Type.systemBars()) }
+                }
+                DisposableEffect(snapshot.isVideo, snapshot.isPlaying) {
+                    if (snapshot.isVideo && snapshot.isPlaying) window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                    else window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                    onDispose { window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON) }
+                }
                 PlayerScreen(runtime.playback, snapshot, preferences.reduceMotion,
                     onOpenOrientation = ::openOrientation, favorite = snapshot.current?.uri.toString() in preferences.favorites,
                     onFavorite = { snapshot.current?.let { runtime.toggleFavorite(it.uri.toString()) } },
-                    onBack = ::closePage, surfaceActive = lifecycleState.isAtLeast(Lifecycle.State.STARTED))
+                    onBack = ::closePage, surfaceActive = lifecycleState.isAtLeast(Lifecycle.State.STARTED),
+                    inputActive = windowFocused && lifecycleState.isAtLeast(Lifecycle.State.RESUMED),
+                    audioOutput = audioOutput)
             }
         }
     }
@@ -169,6 +191,34 @@ class OrientationActivity : PlayerHostActivity() {
         setContent {
             val preferences by runtime.preferences.collectAsStateWithLifecycle()
             AppTheme { OrientationPage(preferences.orientation, runtime::setOrientation, ::closePage) }
+        }
+    }
+}
+
+/**
+ * Output strategy and device selection. The screen only shows state that the controller published
+ * from platform evidence, so an unavailable bit-perfect contract stays visible as unavailable.
+ */
+class AudioOutputActivity : PlayerHostActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            val preferences by runtime.preferences.collectAsStateWithLifecycle()
+            val output by runtime.audioOutput.state.collectAsStateWithLifecycle()
+            AppTheme {
+                AudioOutputScreen(
+                    state = output,
+                    sharing = preferences.audioSharing,
+                    transparency = preferences.audioTransparency,
+                    outputPath = preferences.audioOutputPath,
+                    onSharing = runtime::setAudioSharing,
+                    onTransparency = runtime::setAudioTransparency,
+                    onOutputPath = runtime::setAudioOutputPath,
+                    onSelectDevice = runtime::selectAudioOutputDevice,
+                    onRunSelfTest = { runtime.runAudioOutputSelfTest() },
+                    onBack = ::closePage,
+                )
+            }
         }
     }
 }

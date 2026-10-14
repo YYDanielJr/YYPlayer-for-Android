@@ -1,0 +1,71 @@
+[suite] format
+  case sample widths
+  case effective bits are not container bits
+  case rate range
+  case plausible format
+  case byte and frame math
+  case byte math overflow
+  case channel masks
+  case encoding names are stable
+[suite] json
+  case integers are range checked
+  case booleans and strings
+  case nested objects are addressed by path
+  case arrays of objects
+  case a member is read from the addressed object only
+  case string values are not mistaken for member names
+  case braces inside strings do not confuse the scanner
+  case an escaped quote inside a string is handled
+  case malformed input is refused, not guessed
+  case writers produce parseable fragments
+  case writer escapes quotes and control characters
+[suite] pcm
+  case pristine conversion matrix
+  case extreme and alternating samples
+  case 16 -> 24 packed keeps sign
+  case 24 packed -> 24 in 32 keeps value
+  case same encoding copies
+  case lossy conversions are refused, not approximated
+  case partial frames are never read or written
+  case arguments and small buffers
+  case random round trip 16 -> 32 is level preserving and refuses narrowing
+  case widening helpers keep the level
+  case result names are stable for logs
+  case overlapping ranges are refused before modifying PCM
+  case 24-in-32 ignores padding and widens signed extremes without overflow
+[suite] policy
+  case prefer preserves DSP but revokes pristine and bit-perfect expectations
+  case no route selected is a refusal, not a fallback
+  case usb bit-perfect + shared + strict unprocessed stays unproven exclusive
+  case audiotrack cannot satisfy strict exclusive even with bit-perfect
+  case oboe exclusive with unknown HAL processing plays but claims nothing extra
+  case oboe without exclusive support fails a strict exclusive request
+  case prefer exclusive degrades to shared only on the same route
+  case software processing refuses strict unprocessed instead of disabling it
+  case processing is allowed when the user only asked for compatible output
+  case software volume refuses the bit-perfect claim but not the playback
+  case api 33 or non-bit-perfect route: prefer unprocessed falls back on route
+  case strict unprocessed refuses a resample instead of resampling
+  case a route that claims bit-perfect must provide it for this format
+  case strict unprocessed is refused when the route offers another format
+  case bit-perfect profile is preferred over an equally exact plain profile
+  case relaxed policy may pick a different profile on the same route
+  case a route that reports nothing cannot be used for strict output
+  case an implausible source format is refused
+  case reason codes are stable identifiers for logs
+[suite] ring
+  case invalid channel count cannot exceed the ring allocation cap
+  case capacity and empty state
+  case write and read preserve bytes
+  case full ring refuses the remainder and counts the drop
+  case underrun is counted, not faked with silence
+  case partial read reports missing frames
+  case wraparound keeps frame order
+  case clear discards buffered frames without counting underrun
+  case 24-in-32 frames are byte exact
+  case invalid format yields a zero-capacity ring instead of a guess
+  case a faster writer loses frames instead of overwriting unread audio
+  case single writer and single reader stay consistent
+
+checks=6390 failures=0
+RESULT OK
