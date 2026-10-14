@@ -66,6 +66,7 @@ internal class PlayerRuntime(context: Context) {
     ))
     val preferences = _preferences.asStateFlow()
     val library = MediaLibraryRepository(context.applicationContext)
+    val collections = yy.daniel.yyplayerforandroid.playback.MusicCollectionRepository(context.applicationContext)
     val lyrics = MusicLyricsRepository(context.applicationContext)
     val online = OnlineRepository(appContext, { preferences.value.onlineMusic }, { preferences.value.onlineLyrics })
 
@@ -80,7 +81,7 @@ internal class PlayerRuntime(context: Context) {
         }
     }
     val libraryRevision = MutableStateFlow(0L)
-    init { scope.launch { online.load() } }
+    init { scope.launch { online.load() }; scope.launch { collections.load() } }
     private var engine: AndroidMedia3PlaybackBackend? = null
 
     /**

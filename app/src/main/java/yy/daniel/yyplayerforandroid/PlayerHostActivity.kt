@@ -47,6 +47,7 @@ abstract class PlayerHostActivity : ComponentActivity() {
     }
     internal fun openOrientation() = open(OrientationActivity::class.java)
     internal fun openLyricStyle() = open(LyricStyleActivity::class.java)
+    internal fun openMusicQueue() = open(MusicQueueActivity::class.java)
     internal fun openAudioOutput() = open(AudioOutputActivity::class.java)
     internal fun openSetup() {
         runtime.setup.restart()

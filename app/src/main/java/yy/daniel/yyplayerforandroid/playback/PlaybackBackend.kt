@@ -34,6 +34,7 @@ enum class DecoderMode(val title: String) {
 }
 
 enum class PlaybackPhase { IDLE, BUFFERING, READY, ENDED, ERROR }
+enum class PlayOrder(val label: String) { SEQUENTIAL("顺序播放"), SINGLE("单曲循环"), RANDOM("随机播放") }
 
 data class PlaybackSnapshot(
     val mediaGeneration: Long = 0,
@@ -63,6 +64,8 @@ data class PlaybackSnapshot(
     val videoPixelRatio: Float = 1f,
     val videoRotationDegrees: Int = 0,
     val error: String? = null,
+    val playOrder: PlayOrder = PlayOrder.SEQUENTIAL,
+    val outputFallback: String? = null,
 ) {
     val current: LocalMedia? get() = queue.getOrNull(queueIndex)
     val isVideo: Boolean get() = current?.kind == MediaKind.VIDEO
@@ -80,4 +83,10 @@ interface PlaybackBackend : AutoCloseable {
     fun setDecoderMode(mode: DecoderMode)
     fun next()
     fun previous()
+    fun setPlayOrder(order: PlayOrder)
+    fun jumpTo(index: Int) { play(state.value.queue, index) }
+    fun enqueue(items: List<LocalMedia>, next: Boolean = false)
+    fun removeQueueItem(index: Int)
+    fun moveQueueItem(from: Int, to: Int)
+    fun clearQueue()
 }

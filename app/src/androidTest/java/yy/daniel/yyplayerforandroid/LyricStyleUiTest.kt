@@ -11,6 +11,19 @@ import yy.daniel.yyplayerforandroid.ui.theme.YYPlayerTheme
 
 class LyricStyleUiTest {
     @get:Rule val compose = createComposeRule()
+    @Test fun bilingualSettingsSaveIndependentlyAndPreviewTranslation() {
+        val style = mutableStateOf(LyricStyle())
+        compose.setContent { YYPlayerTheme { LyricStyleScreen(style.value, { style.value = it }, {}) } }
+        compose.onNodeWithTag("lyric-style-list").performScrollToNode(hasContentDescription("当前译文字号"))
+        compose.onNodeWithContentDescription("当前译文字号").performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.SetProgress) { it(24f) }
+        compose.onNodeWithTag("lyric-style-list").performScrollToNode(hasContentDescription("原文与译文间距"))
+        compose.onNodeWithContentDescription("原文与译文间距").performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.SetProgress) { it(20f) }
+        assertEquals(24f, style.value.translationActiveSize)
+        assertEquals(20f, style.value.bilingualSpacing)
+        assertEquals(20f, style.value.translationSize)
+        assertEquals(28f, style.value.activeSize)
+        assertEquals(14f, style.value.lineSpacing)
+    }
     @Test fun accessibilitySizeChangeSavesAndRemainsIndependentOfInactiveLine() {
         val style = mutableStateOf(LyricStyle())
         compose.setContent { YYPlayerTheme { LyricStyleScreen(style.value, { style.value = it }, {}) } }

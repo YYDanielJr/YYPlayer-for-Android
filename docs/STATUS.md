@@ -1,5 +1,82 @@
 # 进度与交接记录
 
+## 2026-10-14：提交 U11–U14 到 dev
+
+用户明确授权提交。本次提交收录 U11 音乐库／歌单／队列／输出回退／双语歌词，以及 U12–U14 按钮、列表与封面动效修复，包含对应测试和实机验收记录。下方各轮“未提交”描述为当时状态，本条覆盖当前提交状态；不推送远端，不合入 master，不修改 Rust 参考工程。
+
+提交前检查：当前分支 `dev`，`git diff --check` exit 0；新增文件均为本批源码、测试素材或验收证据，没有加入 build、APK、设备参考原图或本地配置。沿用 U14 最终构建／34 项单测／lint 和真机录屏结果，本轮只提交及更新记录，不重复构建。后续按用户反馈继续开发，既有未验条件保持。
+
+## 2026-10-14：U14 保留收回弹簧，消除终点换图
+
+状态：**按用户纠正恢复收回回弹，已保留数据安装并录屏检查。** U13 的无回弹收回曲线被本轮覆盖，透明控件误触修复和 9° 无回弹按压保持。全部仍在 `dev` 未提交工作区，master／Rust 不变。
+
+- U14.1 `ui/YYPlayerApp.kt`：收回 spring 刚度 230／阻尼比 0.8／阈值 0.0001，几何使用带符号进度，允许轻微越过落点后复位；页面透明度与控件退出单独处理。共享封面层完成弹簧后继续显示底栏小图，消除结束瞬间切换另一绘制节点；静止位置跟随底栏实际测量，减少动画／视频走原路径。
+- U14.2 同文件：尾段快速重开时，以当前可见封面矩形重新起步并测量新页面目标，兼容歌词锚点转大封面。保留 U13 Initial pass 拦截、不可交互语义和透明详情移除，回弹不能让旧菜单恢复点击。
+- 构建 `:app:assembleDebug :app:assembleDebugAndroidTest :app:testDebugUnitTest :app:lintDebug --no-daemon --max-workers=4` → **exit 0／BUILD SUCCESSFUL 1m10s**；JVM **34 项、0 失败**；lint **0 error／2 既有 warning**。主 APK install -r Success，`git diff --check` exit 0。
+- 有线小米 13 Ultra `c9e352e3`／API36／`OS3.0.308.0.WMACNXM`，自制 QA Song 4 暂停。录屏确认末段宽度约 94→71→79px、顶部 y1466→1448（720px 宽录屏中的粉色边界），存在真实回弹，终点没有换图；大封面和歌词收起约 350ms 后点击底栏均正常重开，没有菜单闪现／意外播放。裁去系统栏的录屏和边界采样见 [U14 验收](validation/ui-u14/README.md)，此为视觉证据而非帧率基准。结束回到音乐库、4 首原顺序队列、QA Song 4 暂停，导入与偏好未清除。
+- APK SHA256 `31C6A63D0E3C69C71FF4B4582F4583B8F81950F7721B735BAC48B10F85E74F25`。README／音乐体验文档同步说明 U14 覆盖 U13 收回参数。
+
+未执行／下一步：本轮只有转场修改，未重跑 U13 已通过的播放 instrumentation 或 native CTest；Compose suite 已知挂起、release 帧率、横屏／大字体／TalkBack／API26–32 仍待验。由用户复核实际回弹幅度和收尾手感。
+
+## 2026-10-14：U13 按钮比例、封面返回与透明页面误触
+
+状态：**本轮四项修改已实现，最终 APK 已保留数据安装到有线小米 13 Ultra，旧版弹窗闪现已录到复现，新版相同操作对照通过。** 继续在 `dev`，保留 U11／U12 改动，未新提交／推送；master 为 `836a920`，Rust 参考仓库工作区干净。实机证据见 [U13 验收](validation/ui-u13/README.md)。
+
+- U13.1 `ui/HyperDesign.kt`、`PlayerScreens.kt`：分析用户企业模式／米家截图，按 density 560 换算高度约 52.3dp／50dp。公共页面操作由 56dp／SemiBold 调整为 52dp、18sp／Medium；弹窗通过局部令牌统一 50dp、17sp／Medium，选择弹窗取消也使用同一组件。圆角 16dp，并排等宽间隔 12dp，灰色次要／主题色确认，图标触控仍为 48dp。截图不能唯一确定第一方原始字号／字重，不宣称复制精确字体参数。实机新版量得页面 182px、弹窗 175px；队列、取消确认和引导前进／返回已检查。
+- U13.2 `ui/YYPlayerApp.kt`、`MusicMotion.kt`：收回从弹簧改为 360ms 单调贝塞尔曲线，避免在小目标处过冲和尾段迟迟不交接；展开保留低幅弹簧。共享封面层在详情静止时保留组合，更新稳定底栏测量，收回使用相同圆角／阴影插值；歌词页小封面连续回到左下角。角落最大倾角从 7° 增至 9°，临界阻尼 1／刚度 95 不变，保持无触底回弹。
+- U13.3 同上：旧版收起后约 350ms 点击 `(800,2970)`，录屏确认误触透明详情的“歌词与播放选项”，独立弹窗短暂显示再随详情销毁。新增 Initial pass 输入拦截、不可交互语义隐藏和尾段透明详情树移除，阻止消失中的按钮发命令；新版同操作正常重开封面，歌词页较早点击被拦截，无弹窗或意外播放。
+- U13.4 `ui/MusicLibraryBrowser.kt`：首页删除“全部音乐／收藏”卡片，直接显示歌曲组；原收藏数据保留，入口移至“歌单 → 我的收藏”，返回／分类／播放逻辑沿用。`LibraryTabsUiTest.kt` 改为断言“本地音乐”，适配卡片移除。
+
+验证／运行结果：
+
+- `:app:assembleDebug :app:assembleDebugAndroidTest :app:testDebugUnitTest :app:lintDebug --no-daemon --max-workers=4` → **exit 0／BUILD SUCCESSFUL 1m15s**；JVM **34 项、0 失败**，lint **0 error／2 既有 warning**。两 APK install -r 均 Success；直接 instrumentation `MusicUpgradeDeviceTest` → **exit 0／OK (5 tests)，3.148s**。`git diff --check` exit 0。
+- 设备 `c9e352e3`／小米 13 Ultra `2304FPN6DC`／API36／`OS3.0.308.0.WMACNXM`。沿用自制 4 首 30s 低幅 FLAC／纯色封面／双语 LRC；未卸载或清除数据，原导入、`QA-Playlist`、收藏和偏好保留；结束回到音乐库、4 首原顺序队列、QA Song 4 暂停。引导退出后完成标记保留。第一方参考原图只在忽略的 build 目录，公共证据只含自制素材。
+- 主 APK SHA256 `CD9250290E7FAE111F71678A9C317C425D261B715C38E49B9D9711C6BCAC0FEE`。修复前／后误触对照、歌词返回、截图和完整构建／测试日志见验收目录。没有把录屏观感当成 release 性能证明。
+
+未执行／下一动作：Compose Activity suite 在此 ROM 上既有挂起，本轮只完成编译；未改 native、未重跑 CTest。横屏／200% 字体／TalkBack／深色专项、API26–32、多指和 release 帧率仍待验；有线连接不具备 USB DAC 验证条件。下一步由用户复核此次按钮比例与收回手感，后续补齐设备专项。
+
+## 2026-10-13：U12 音乐动效衔接与 HyperOS 页面整理
+
+状态：**用户本轮四项修改已实现，最终 APK 已保留数据安装到有线小米 13 Ultra；实际页面、长按排序、多选移除和录屏已复核。** 继续在 `dev` 工作区，包含此前未提交 U11；没有新提交／推送，master／Rust 参考仓库不变。用户最新两张圈选截图仅在忽略的 build 目录作参考，没有进入公共证据。
+
+- U12.1 `YYPlayerApp.kt`、`MusicMotion.kt`、`MusicPlayerScreen.kt`：过渡封面与静态封面使用一致的圆角和阴影；阴影随尺寸连续插值，直到 Animatable 的完整弹簧尾段结束才交回静态层，避免仅按位置阈值在回弹经过终点时切层。降低回弹幅度；固定移动期间的目标位置，结束后继续测量布局。歌词页将 44dp／12dp 圆角小封面作为收回起点，平移到首页圆形封面；隐藏底栏重复封面至收回完成。关闭相邻 pager 页的过渡绘制，避免未选中歌词／标题漏入展开画面；保留快速反向、减少动画设置和无回弹倾斜。
+- U12.2 `MusicPlayerScreen.kt`：封面／歌词底部统一倍速、收藏、播放顺序、队列四项操作；播放顺序使用现有 Miuix ListView／Refresh／Replace 图标，不再单独占一行小胶囊。截图圈选的时间偏移小按钮改为整行“延后／提前／重置”操作。
+- U12.3 新增 `MusicQueueActivity.kt`、`ui/MusicQueueScreen.kt`，在 Manifest 和 PlayerHostActivity 注册导航；替换 U11 队列弹窗，共用 service 所有的播放器，使用系统 Activity 转场。提供单选／多选、全选、移除、清空确认、长按拖动排序、让位动画、靠边自动滚动和无障碍上移／下移动作。实机发现 LazyColumn 会先消费长按后的移动，已修正为长按成立后在 Initial pass 接管移动，普通滑动和点击仍走正常路径；临时日志已移除。
+- U12.4 `HyperDesign.kt` 新增统一 56dp 起的大操作按钮和分组列表行；`MusicLibraryBrowser.kt` 歌曲列表只有组首顶部／组尾底部圆角，中间行直连，继续按 lazy row 加载。`SetupScreen.kt`、`LyricStyleScreen.kt`、`LibraryScreens.kt`、`PlayerScreens.kt`、`OnlineSearchScreen.kt` 和歌单管理的相关小操作改为整行或大按钮；确认主题色，取消／次要操作灰色，既有弹窗全宽灰色取消保留。没有更换 UI 框架或引入第二播放器。
+
+验证／证据：
+
+- 最终 `:app:assembleDebug :app:assembleDebugAndroidTest :app:testDebugUnitTest :app:lintDebug --no-daemon --max-workers=4` → **exit 0／BUILD SUCCESSFUL 1m13s**；JVM **34 项、0 失败**，lint **0 error／2 warning**（原 ExportedService 与版本提示）。两 APK install -r 成功；实际完整输出见 [U12 验收](validation/ui-u12/README.md)。`git diff --check` exit 0。
+- 最终 APK 直接 instrumentation `MusicUpgradeDeviceTest` → **OK (5 tests)，2.934s，adb exit 0**，队列／播放／持久化／回退回归通过。本轮未再尝试已知挂起的 Compose Activity suite，不能将其计作通过；未改 native C++，未重跑 CTest。
+- 小米 13 Ultra `2304FPN6DC`，API36／`OS3.0.308.0.WMACNXM`，有线 `c9e352e3`。沿用自制 4 首低幅 FLAC／双语 LRC；最终版实机将第 4 首拖到首位，再拖回末位，当前歌曲仍为 QA Song 1、暂停位置未变；单／多选数量正确，移除第 3／4 首后仅剩 1／2，库和歌单不变。队列返回详情正常。向导前进／上一步／稍后设置正常，无导入或偏好清除。歌词偏移菜单已查看，未更改偏移。
+- 最终录屏包含大封面展开／收回、歌词小封面收回和快速反向；已抽帧复核阴影持续存在、圆角转圆形连续、相邻歌词不漏入展开。此为实机视觉检查，不是帧率／性能达标证明。截图／裁去系统栏的录屏见验收目录。
+- 最终主 APK SHA256 `BC128A9E1500488DB884015D451A334E2C3815AA6007410694985FADDD789C95`。结束在音乐库、4 首原顺序队列、QA Song 1 暂停；向导完成标记与原设置保持，用户素材未删除。
+
+未验／下一动作：最终动画手感由用户复核；队列长列表靠边滚动、重复 URI、多指取消、横屏／200% 字体／TalkBack／深色专项、API26–32尚未单独设备验证。本轮无 USB DAC，不新增独占／位准确资格。后续根据用户视觉反馈微调，并在可用设备补齐 Compose UI 自动化。
+
+## 2026-10-13：U11 音乐库／队列／输出回退／封面动画／双语歌词
+
+状态：**五项升级已实现，构建与专项真机测试通过；普通应用 UI 已在小米 13 Ultra 操作验证，动画观感待用户复核。** 先按用户授权将原 dev-hifi 升级提交为 `c75b34d`，再 fast-forward 合入 `dev`；本轮 U11 修改全部留在 `dev` 工作区，尚未提交／推送。`master` 保持 `836a920`；桌面 Rust `e6a8456` 仅只读参考，未修改。
+
+任务／主要文件：
+
+- U11.1 `playback/MusicCollections.kt`、`MusicCollectionRepository.kt`、`ui/MusicLibraryBrowser.kt`、`LibraryScreens.kt`、`PlayerApplication.kt`：歌曲／歌手／专辑／歌单分类；同名专辑按歌手区分；歌单增删改名、单曲／多选添加、移出与排序。后台版本化持久化、数量／体积限制和损坏备份，content URI 为成员身份；库、歌单和播放队列独立，失去授权的成员保留。搜索／收藏／分类／歌单从当前曲目建立队列。
+- U11.2 `PlaybackBackend.kt`、`AndroidMedia3PlaybackBackend.kt`、`MusicQueueDialog.kt`、`YYPlayerApp.kt`：顺序末尾停止、单曲自动循环、随机顺序和前后切歌；模式持久化，视频固定顺序。队列跳转、下一首播放、追加、移动、移除、清空；移动其他条目保留当前曲目和位置。`HyperDesign.kt` 移除底栏下一首，只留播放／暂停；详情页保留完整控制。
+- U11.3 `audio/OutputFallbackPolicy.kt`、`AndroidMedia3PlaybackBackend.kt`、`PlayerSessionService.kt`、`MusicPlayerScreen.kt`：当前 AudioTrack 后端无法证明独占，PreferExclusive 使用 SYSTEM；native sink 配置／初始化／写入异常在确认同一输出仍连接、非 strict 的前提下单次回退 SYSTEM，保留队列／位置／播放意图／音量。回调匹配引擎版本和媒体代次，旧输出先释放；失败原因与实际路径可见，可主动重试。StrictExclusive／StrictUnprocessed 仍拒绝静默降级；设备丢失不触发回退扬声器。决定补入 ADR0006。
+- U11.4 `ui/MusicMotion.kt`、`YYPlayerApp.kt`、`MusicPlayerScreen.kt`：实测底栏小封面与详情大封面位置，根层展开／收回至左下角，带轻微回弹；文字和控制区配套位移／渐变。角落倾斜改为临界阻尼、低刚度的连续跟随，按下不触底回弹；取消、滚动接管、第二指、换媒体复位。修正 clickable 消费初始按下导致倾斜提前复位的问题。
+- U11.5 `playback/Lyrics.kt`、`ui/BilingualLyricText.kt`、`LyricStyle.kt`、`LyricStyleScreen.kt`：同步 Rust 的非空 ` / ` 原译文拆分，避免误拆 AC/DC／日期／URL；定时和纯文本共用样式，译文显示开关、当前／其他译文字号、字重、原译文间距。v1→v2 保留原文设置。更新 README、UI_MUSIC_EXPERIENCE 和 [U11 验收记录](validation/music-u11/README.md)。
+
+命令／实际结果：
+
+- `:app:assembleDebug :app:assembleDebugAndroidTest :app:testDebugUnitTest :app:lintDebug --no-daemon --max-workers=4` → **exit 0 / BUILD SUCCESSFUL 1m22s**；JVM **34 项、0 失败**；lint **0 error／2 warning**（既有 ExportedService、Kotlin 新版本提示，未升级依赖）。最终源码构建见 [checks](validation/music-u11/checks.txt)。
+- 两 APK `adb -s c9e352e3 install -r ...` 成功，保留导入／偏好；没有运行会卸载数据的 connectedDebugAndroidTest。直接 `am instrument -w -r -e class yy.daniel.yyplayerforandroid.MusicUpgradeDeviceTest .../androidx.test.runner.AndroidJUnitRunner` → **exit 0 / OK (5 tests)，3.072s**，见 [device-tests](validation/music-u11/device-tests.txt)。覆盖真实 Media3 EOF／随机切歌／队列编辑、真实持久化／迁移、带 encoder delay 的 AAC 触发 native→SYSTEM 且播放时钟前进、strict 拒绝与 PreferExclusive 选择 SYSTEM。测试使用独立偏好和自制素材，不将模拟状态当播放证据。
+- 合并运行既有 Compose UI 测试时，新 5 项先通过，随后停在 LyricStyleUiTest；等待无进展后主动 force-stop，因此记录 `Process crashed`，**不计作 Compose UI 通过，也不能据此断言生产应用崩溃**。LibraryManagementUiTest／LibraryTabsUiTest 未完成。保存 [未完成输出](validation/music-u11/compose-ui-incomplete.txt)；普通应用 adb／uiautomator 操作正常。
+- 主 APK SHA256 `825F747F145C8475C170817906987BCA1A7F45B029C6B0B9CF9749E2AE9C3856`。`git diff --check` 最终 exit 0；本轮未改 native C++，未重跑主机 CTest。
+
+设备／UI 证据：小米 13 Ultra `2304FPN6DC`，API36／Android16／`OS3.0.308.0.WMACNXM`，有线 adb `c9e352e3`。只导入自制 4 首 30s 低幅 FLAC、内嵌纯色封面和双语 LRC，位于 `Music/YYPlayerQA-U11`，两个歌手各有同名专辑。实际验证分类、菜单创建 `QA-Playlist` 并添加歌曲、歌单播放／队列、底栏单按钮、封面展开／收回／快速反向和右上角按压。译文当前字号改至 24sp、原译间距 20dp 后返回立即生效；点句 seek 保持暂停。结束已恢复歌词默认值（原文 28sp、原行距 14dp、两种译文 20sp、原译间距 8dp），应用停留音乐库、播放暂停。截图仅自制素材，见验收目录。
+
+未验／下一动作：本轮有线占用 USB，没有 USB DAC，**不宣称 DAC、独占或端到端位准确通过**；API26–32、200% 字体／TalkBack、暗色专项、物理多指未重验。Compose Activity instrumentation 在此 ROM 上仍需单独排查或换模拟器重跑；新增 UI 测试已可编译但未完成设备执行。下一步由用户复核实机动画手感；有独立 DAC／设备条件后补做相应输出资格验证。既有 H05 native gapless 限制仍在，本轮提供可说明原因的系统回退，并未宣称原生 gapless 已修复。
+
 ## 2026-10-13：保存 dev-hifi 升级基线
 
 用户授权将既有 H02–H05／U09／U10 未提交升级提交到 `dev-hifi`，再合入 `dev` 继续新一轮音乐库、队列、输出回退、封面动画和双语歌词升级。接手时 `dev-hifi` 与新建 `dev` 均位于 `1daef67`，尚未开始新需求源码修改；保留全部既有实现与验收证据，`master` 不变，不推送。

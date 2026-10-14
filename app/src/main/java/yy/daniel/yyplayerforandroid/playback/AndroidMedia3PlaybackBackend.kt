@@ -1,6 +1,7 @@
 package yy.daniel.yyplayerforandroid.playback
 
 import android.content.Context
+import androidx.core.content.edit
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
@@ -42,6 +43,14 @@ class AndroidMedia3PlaybackBackend(
     // `appliedOutputPath` after `player` made the renderers factory read a null enum.
     private var speed = 1f
     private var appliedOutputPath = outputPath()
+    private val orderStorage = appContext.getSharedPreferences("playback_order_v1", Context.MODE_PRIVATE)
+    private var playOrder = PlayOrder.entries.firstOrNull { it.name == orderStorage.getString("music", null) } ?: PlayOrder.SEQUENTIAL
+    private var fallbackReason: String? = null
+    private var expectedRoute: Int? = null
+    private var fallbackRoute: Int? = null
+    private fun routeId(): Int? = selectedDeviceId() ?: yy.daniel.yyplayerforandroid.audio.AudioDeviceProbe.anticipatedDeviceId(
+        appContext.getSystemService(Context.AUDIO_SERVICE) as android.media.AudioManager,
+        android.media.AudioAttributes.Builder().setUsage(android.media.AudioAttributes.USAGE_MEDIA).setContentType(android.media.AudioAttributes.CONTENT_TYPE_MUSIC).build())
     private val mediaHeaderSnapshot = java.util.concurrent.atomic.AtomicReference<Map<String, Map<String, Map<String, String>>>>(emptyMap())
     private var queue: List<LocalMedia> = emptyList()
     private var index: Int = -1
@@ -77,13 +86,14 @@ class AndroidMedia3PlaybackBackend(
      * mode already performs, and it keeps the queue, position and play intent.
      */
     fun setOutputPath(path: yy.daniel.yyplayerforandroid.audio.OutputPath) {
-        if (path == appliedOutputPath) return
+        if (path == appliedOutputPath && fallbackReason == null) return
         appliedOutputPath = path
+        fallbackReason = null; fallbackRoute = null
         negotiated = null
         rebuildPlayer()
     }
     internal var onPlayerReplaced: ((ExoPlayer) -> Unit)? = null
-    internal fun reconfigureOutput() { negotiated = null; rebuildPlayer() }
+    internal fun reconfigureOutput() { negotiated = null; fallbackReason = null; fallbackRoute = null; rebuildPlayer() }
 
     private fun rebuildPlayer(positionOverride: Long? = null) {
         if (outputTestActive) return
@@ -125,12 +135,13 @@ class AndroidMedia3PlaybackBackend(
         videoDecoderName = null
         audioDecoderName = null
         videoSize = VideoSize.UNKNOWN
-        val desiredPath = if (queue[startIndex].kind == MediaKind.VIDEO)
+        val desiredPath = if (queue[startIndex].kind == MediaKind.VIDEO || fallbackReason != null)
             yy.daniel.yyplayerforandroid.audio.OutputPath.SYSTEM else appliedOutputPath
         if (desiredPath != playerOutputPath) {
             rebuildPlayer(0L)
         }
         player.setMediaItems(queue.map(::toMediaItem), startIndex, 0L)
+        applyOrder(player)
         player.prepare()
         player.playWhenReady = true
         publish()
@@ -210,12 +221,70 @@ class AndroidMedia3PlaybackBackend(
         publish()
     }
 
-    override fun next() {
-        if (index + 1 < queue.size) { play(queue, index + 1) }
-    }
+    override fun next() { if (!outputTestActive && selectedDevicePresent()) { player.seekToNextMediaItem(); publish() } }
 
     override fun previous() {
-        if (player.currentPosition > 3_000L) seekTo(0) else if (index > 0) play(queue, index - 1)
+        if (outputTestActive || !selectedDevicePresent()) return
+        if (player.currentPosition > 3_000L) seekTo(0) else { player.seekToPreviousMediaItem(); publish() }
+    }
+
+    override fun setPlayOrder(order: PlayOrder) {
+        playOrder = order
+        orderStorage.edit { putString("music", order.name) }
+        applyOrder(player); publish()
+    }
+    private fun applyOrder(target: ExoPlayer) {
+        val order = if (queue.getOrNull(index)?.kind == MediaKind.VIDEO) PlayOrder.SEQUENTIAL else playOrder
+        target.repeatMode = when (order) { PlayOrder.SEQUENTIAL -> Player.REPEAT_MODE_OFF; PlayOrder.SINGLE -> Player.REPEAT_MODE_ONE; PlayOrder.RANDOM -> Player.REPEAT_MODE_ALL }
+        target.shuffleModeEnabled = order == PlayOrder.RANDOM
+    }
+    override fun jumpTo(index: Int) {
+        if (outputTestActive || index !in queue.indices || !selectedDevicePresent()) return
+        if (queue[index].isOnline && !networkAllowed()) return
+        error = null
+        player.seekToDefaultPosition(index)
+        if (player.playbackState == Player.STATE_IDLE) player.prepare()
+        player.play(); publish()
+    }
+    override fun enqueue(items: List<LocalMedia>, next: Boolean) {
+        if (outputTestActive || items.isEmpty()) return
+        if (queue.isEmpty()) { play(items, 0); return }
+        val requested = items.filter { it.kind == queue.first().kind && (!it.isOnline || networkAllowed()) }.distinctBy { it.identity }
+        val additions = requested.filterNot { item -> queue.any { it.identity == item.identity } }.take((20_000 - queue.size).coerceAtLeast(0))
+        val at = if (next) (index + 1).coerceIn(0, queue.size) else queue.size
+        queue = queue.toMutableList().apply { addAll(at, additions) }
+        mediaHeaderSnapshot.set(queue.associate { it.uri.toString() to it.mediaHeaders })
+        player.addMediaItems(at, additions.map(::toMediaItem))
+        if (next) {
+            requested.asReversed().forEach { item ->
+                val from = queue.indexOfFirst { it.identity == item.identity }
+                if (from >= 0 && from != index) moveQueueItem(from, (index + if (from < index) 0 else 1).coerceAtMost(queue.lastIndex))
+            }
+            if (player.shuffleModeEnabled) {
+                val priority = requested.mapNotNull { item -> queue.indexOfFirst { it.identity == item.identity }.takeIf { it >= 0 && it != index } }
+                val order = listOf(index) + priority + queue.indices.filter { it != index && it !in priority }.shuffled()
+                player.setShuffleOrder(androidx.media3.exoplayer.source.ShuffleOrder.DefaultShuffleOrder(order.toIntArray(), System.nanoTime()))
+            }
+        }
+        publish()
+    }
+    override fun removeQueueItem(index: Int) {
+        if (outputTestActive || index !in queue.indices) return
+        queue = queue.toMutableList().apply { removeAt(index) }
+        mediaHeaderSnapshot.set(queue.associate { it.uri.toString() to it.mediaHeaders })
+        player.removeMediaItem(index)
+        this.index = if (queue.isEmpty()) -1 else player.currentMediaItemIndex
+        publish()
+    }
+    override fun moveQueueItem(from: Int, to: Int) {
+        if (outputTestActive || from !in queue.indices || to !in queue.indices || from == to) return
+        queue = queue.toMutableList().apply { add(to, removeAt(from)) }
+        player.moveMediaItem(from, to); index = player.currentMediaItemIndex; publish()
+    }
+    override fun clearQueue() {
+        if (outputTestActive) return
+        queue = emptyList(); index = -1
+        player.stop(); player.clearMediaItems(); mediaHeaderSnapshot.set(emptyMap()); error = null; publish()
     }
 
     fun refreshPosition() = publish()
@@ -266,7 +335,17 @@ class AndroidMedia3PlaybackBackend(
 
     private fun newPlayer(mode: DecoderMode): ExoPlayer {
         val configuringRevision = ++outputRevision
-        playerOutputPath = if (queue.getOrNull(index)?.kind == MediaKind.VIDEO)
+        expectedRoute = routeId()
+        // The current AudioTrack backend cannot prove exclusive sharing. Prefer mode uses the
+        // compatible system sink; strict mode continues to report refusal from the policy gate.
+        if (appliedOutputPath == yy.daniel.yyplayerforandroid.audio.OutputPath.NATIVE_EXACT &&
+            sharingRequest() == yy.daniel.yyplayerforandroid.audio.SharingRequest.PREFER_EXCLUSIVE &&
+            transparencyRequest() != yy.daniel.yyplayerforandroid.audio.TransparencyRequest.STRICT_UNPROCESSED &&
+            selectedDevicePresent()) {
+            fallbackReason = "当前输出不支持已验证独占，已使用系统输出"
+            fallbackRoute = expectedRoute
+        }
+        playerOutputPath = if (queue.getOrNull(index)?.kind == MediaKind.VIDEO || fallbackReason != null)
             yy.daniel.yyplayerforandroid.audio.OutputPath.SYSTEM else appliedOutputPath
         val rendererPath = playerOutputPath
         val selector = MediaCodecSelector { mimeType, secure, tunneling ->
@@ -304,10 +383,11 @@ class AndroidMedia3PlaybackBackend(
             .setAudioAttributes(androidx.media3.common.AudioAttributes.DEFAULT, true)
             .setHandleAudioBecomingNoisy(true)
             .build().also {
+                applyOrder(it)
                 it.playbackParameters = if (rendererPath == yy.daniel.yyplayerforandroid.audio.OutputPath.NATIVE_EXACT)
                     PlaybackParameters.DEFAULT else PlaybackParameters(speed)
                 if (rendererPath == yy.daniel.yyplayerforandroid.audio.OutputPath.SYSTEM) {
-                    val id = selectedDeviceId()
+                    val id = fallbackRoute ?: selectedDeviceId()
                     val manager = appContext.getSystemService(Context.AUDIO_SERVICE) as android.media.AudioManager
                     it.setPreferredAudioDevice(manager.getDevices(android.media.AudioManager.GET_DEVICES_OUTPUTS)
                         .firstOrNull { device -> device.id == id })
@@ -324,7 +404,14 @@ class AndroidMedia3PlaybackBackend(
                 publish()
             }
             override fun onEvents(player: Player, events: Player.Events) {
-                if (target === this@AndroidMedia3PlaybackBackend.player) publish()
+                if (target === this@AndroidMedia3PlaybackBackend.player) {
+                    if (queue.getOrNull(index)?.kind == MediaKind.AUDIO &&
+                        (events.contains(Player.EVENT_REPEAT_MODE_CHANGED) || events.contains(Player.EVENT_SHUFFLE_MODE_ENABLED_CHANGED))) {
+                        playOrder = when { player.shuffleModeEnabled -> PlayOrder.RANDOM; player.repeatMode == Player.REPEAT_MODE_ONE -> PlayOrder.SINGLE; else -> PlayOrder.SEQUENTIAL }
+                        orderStorage.edit { putString("music", playOrder.name) }
+                    }
+                    publish()
+                }
             }
             override fun onVideoSizeChanged(videoSize: VideoSize) {
                 if (target !== this@AndroidMedia3PlaybackBackend.player) return
@@ -334,6 +421,27 @@ class AndroidMedia3PlaybackBackend(
             override fun onPlayerError(error: androidx.media3.common.PlaybackException) {
                 if (target !== this@AndroidMedia3PlaybackBackend.player) return
                 negotiated = null
+                onNegotiated(null)
+                val causes = generateSequence<Throwable>(error) { it.cause }.take(12).toList()
+                val outputError = causes.any { it is androidx.media3.exoplayer.audio.AudioSink.ConfigurationException ||
+                    it is androidx.media3.exoplayer.audio.AudioSink.InitializationException || it is androidx.media3.exoplayer.audio.AudioSink.WriteException }
+                val routeFailure = causes.any { it.message.orEmpty().contains("disconnected", true) || it.message.orEmpty().contains("route", true) }
+                val manager = appContext.getSystemService(Context.AUDIO_SERVICE) as android.media.AudioManager
+                val present = manager.getDevices(android.media.AudioManager.GET_DEVICES_OUTPUTS).any { it.id == expectedRoute }
+                if (playerOutputPath == yy.daniel.yyplayerforandroid.audio.OutputPath.NATIVE_EXACT && fallbackReason == null && outputError && !routeFailure &&
+                    yy.daniel.yyplayerforandroid.audio.OutputFallbackPolicy.allowed(sharingRequest(), transparencyRequest(), expectedRoute, routeId(), present)) {
+                    val revision = outputRevision
+                    val generation = mediaGeneration
+                    val failedRoute = expectedRoute
+                    playerHandler.post {
+                        if (target === this@AndroidMedia3PlaybackBackend.player && revision == outputRevision && generation == mediaGeneration &&
+                            failedRoute == routeId() && selectedDevicePresent()) {
+                            fallbackReason = "自研输出不可用（${error.errorCodeName}），已回退系统输出"
+                            fallbackRoute = failedRoute
+                            rebuildPlayer()
+                        }
+                    }
+                }
                 this@AndroidMedia3PlaybackBackend.error = "播放失败（${error.errorCodeName}）"
                 publish()
             }
@@ -420,6 +528,8 @@ class AndroidMedia3PlaybackBackend(
             videoPixelRatio = videoSize.pixelWidthHeightRatio,
             videoRotationDegrees = videoSize.unappliedRotationDegrees,
             error = error,
+            playOrder = if (queue.getOrNull(index)?.kind == MediaKind.VIDEO) PlayOrder.SEQUENTIAL else playOrder,
+            outputFallback = fallbackReason.takeIf { queue.getOrNull(index)?.kind == MediaKind.AUDIO },
         )
     }
 }

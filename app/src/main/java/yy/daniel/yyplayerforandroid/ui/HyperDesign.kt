@@ -22,6 +22,9 @@ import androidx.compose.ui.semantics.progressBarRangeInfo
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.semantics.setProgress
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.disabled
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
@@ -49,6 +52,7 @@ internal val PageTextInset = PageGutter + PreferenceInset
 internal val DialogContentInset = 24.dp
 // Insets belong inside interactive rows so press feedback spans the container.
 private val LocalPreferenceInset = compositionLocalOf { PreferenceInset }
+private val LocalDialogAction = compositionLocalOf { false }
 internal val CardShape = RoundedCornerShape(24.dp)
 internal val Muted: Color @Composable get() = MiuixTheme.colorScheme.onSurfaceVariantSummary
 
@@ -85,6 +89,30 @@ internal fun HyperPage(title: String, onBack: (() -> Unit)? = null, headerAlpha:
 internal fun HyperCard(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
     Surface(modifier = modifier, shape = CardShape, color = MiuixTheme.colorScheme.surface) {
         Column(content = content)
+    }
+}
+
+/** One visual group across lazy rows; only the outer corners are rounded. */
+@Composable
+internal fun HyperListRow(first: Boolean, last: Boolean, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+    val top = if (first) 24.dp else 0.dp
+    val bottom = if (last) 24.dp else 0.dp
+    Surface(modifier, shape = RoundedCornerShape(top, top, bottom, bottom), color = MiuixTheme.colorScheme.surface, content = content)
+}
+
+/** Page actions use a full-width touch target. Neutral actions retain the gray surface. */
+@Composable
+internal fun HyperActionButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier,
+    primary: Boolean = true, enabled: Boolean = true, compact: Boolean = LocalDialogAction.current) {
+    val colors = MiuixTheme.colorScheme
+    Surface(onClick = { if (enabled) onClick() }, modifier = modifier.fillMaxWidth().heightIn(min = if (compact) 50.dp else 52.dp)
+        .semantics { role = Role.Button; if (!enabled) disabled() }
+        .graphicsLayer { alpha = if (enabled) 1f else .4f }, shape = RoundedCornerShape(16.dp),
+        color = if (primary) colors.primary else colors.surfaceContainerHigh) {
+        Box(Modifier.padding(horizontal = 20.dp, vertical = 12.dp), contentAlignment = Alignment.Center) {
+            Text(text, fontSize = if (compact) 17.sp else 18.sp, lineHeight = if (compact) 22.sp else 24.sp, fontWeight = FontWeight.Medium,
+                color = if (primary) colors.onPrimary else colors.onSurface)
+        }
     }
 }
 
@@ -146,12 +174,12 @@ internal fun HyperDialog(title: String, onDismiss: () -> Unit, show: Boolean = t
     WindowDialog(show = show, title = title, onDismissRequest = onDismiss, backgroundColor = MiuixTheme.colorScheme.surface,
         insideMargin = DpSize(0.dp, 24.dp)) {
         Column(Modifier.heightIn(max = maxHeight)) {
-            CompositionLocalProvider(LocalPreferenceInset provides DialogContentInset) {
+            CompositionLocalProvider(LocalPreferenceInset provides DialogContentInset, LocalDialogAction provides true) {
                 Column(Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState()), content = content)
             }
             Spacer(Modifier.height(16.dp))
-            TextButton(text = buttonText, onClick = onDismiss,
-                modifier = Modifier.padding(horizontal = DialogContentInset).fillMaxWidth())
+            HyperActionButton(text = buttonText, onClick = onDismiss, primary = false, compact = true,
+                modifier = Modifier.padding(horizontal = DialogContentInset))
         }
     }
 }
@@ -173,7 +201,8 @@ internal fun LibrarySidebar(selected: Int, onSelect: (Int) -> Unit, onSettings: 
 }
 
 @Composable
-internal fun LibraryMiniPlayer(snapshot: PlaybackSnapshot, backend: PlaybackBackend, backdrop: HyperBackdrop, onOpen: () -> Unit, modifier: Modifier = Modifier, reduced: Boolean = false) {
+internal fun LibraryMiniPlayer(snapshot: PlaybackSnapshot, backend: PlaybackBackend, backdrop: HyperBackdrop, onOpen: () -> Unit, modifier: Modifier = Modifier, reduced: Boolean = false,
+    artworkModifier: Modifier = Modifier) {
     val details = rememberMediaDetails(snapshot.current)
     val interactions = remember { MutableInteractionSource() }
     val sink = remember(reduced) { if (reduced) null else SinkFeedback() }
@@ -182,7 +211,7 @@ internal fun LibraryMiniPlayer(snapshot: PlaybackSnapshot, backend: PlaybackBack
         .hyperGlass(backdrop, shape, .6f, navigationStyle = true).border(1.dp, MiuixTheme.colorScheme.onSurface.copy(alpha = .06f), shape), shape = shape,
         color = if (backdrop.supported) Color.Transparent else MiuixTheme.colorScheme.surface) {
             Row(Modifier.padding(start = 12.dp, end = 8.dp, top = 8.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                MediaArtwork(snapshot.current, Modifier.size(46.dp), radius = 23.dp)
+                MediaArtwork(snapshot.current, Modifier.size(46.dp).then(artworkModifier), radius = 23.dp)
                 Column(Modifier.weight(1f).padding(horizontal = 12.dp)) {
                     Text(snapshot.current?.let { if (snapshot.isVideo) displayTitle(it.title) else details.title ?: it.musicTitle }.orEmpty(), maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 15.sp, fontWeight = FontWeight.Medium)
                     Text(if (!snapshot.isVideo) listOf(details.artist ?: snapshot.current?.artist ?: "未知歌手", details.album ?: snapshot.current?.album ?: "未知专辑").joinToString(" · ") else if (snapshot.isPlaying) "正在播放" else "已暂停", fontSize = 12.sp, color = Muted, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -204,7 +233,6 @@ internal fun LibraryMiniPlayer(snapshot: PlaybackSnapshot, backend: PlaybackBack
                     }
                     HyperIconButton(if (snapshot.isPlaying) PlayerIcons.Pause else PlayerIcons.Play, if (snapshot.isPlaying) "暂停" else "播放", backend::togglePlayPause)
                 }
-                HyperIconButton(PlayerIcons.Next, "下一首", backend::next)
             }
     }
 }
@@ -240,6 +268,11 @@ internal object PlayerIcons {
     val Previous = MiuixIcons.Regular.ChevronBackward
     val Heart = MiuixIcons.Regular.Favorites
     val Queue = MiuixIcons.Regular.Playlist
+    val Order = MiuixIcons.Regular.ListView
+    val Repeat = MiuixIcons.Regular.Refresh
+    val Shuffle = MiuixIcons.Regular.Replace
+    val Edit = MiuixIcons.Regular.Edit
+    val SelectAll = MiuixIcons.Regular.SelectAll
     val Rotate = MiuixIcons.Regular.RotateLeft
     val Check = MiuixIcons.Regular.Ok
 }

@@ -6,6 +6,17 @@ import kotlin.math.roundToLong
 
 data class LyricLine(val milliseconds: Long, val text: String)
 
+/** Desktop's spaced separator preserves bare slashes in URLs, dates and artist names. */
+fun bilingualParts(text: String): Pair<String, String> {
+    val separator = text.indexOf(" / ")
+    if (separator >= 0) {
+        val primary = text.substring(0, separator).trim()
+        val secondary = text.substring(separator + 3).trim()
+        if (primary.isNotEmpty() && secondary.isNotEmpty()) return primary to secondary
+    }
+    return text to ""
+}
+
 /** Equivalent time semantics to player-core/lyrics.rs (GPL-3.0-only desktop reference). */
 data class Lyrics(val lines: List<LyricLine> = emptyList(), val plain: String = "") {
     fun active(positionMs: Long, userOffsetMs: Long = 0): Int {

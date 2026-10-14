@@ -47,7 +47,7 @@ internal fun PlayerScreen(backend: AndroidMedia3PlaybackBackend, snapshot: Playb
     val current = snapshot.current
     if (current == null) {
         HyperPage("正在播放", onBack) { padding -> Column(Modifier.fillMaxSize().padding(padding), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-            Text("选择一首音乐或一个视频", fontSize = 20.sp); Spacer(Modifier.height(24.dp)); Button(onClick = onBack) { Text("返回媒体库") }
+            Text("选择一首音乐或一个视频", fontSize = 20.sp); Spacer(Modifier.height(24.dp)); HyperActionButton("返回媒体库", onClick = onBack, modifier = Modifier.padding(horizontal = 28.dp))
         } }
         return
     }
@@ -171,7 +171,7 @@ internal fun SelectionDialog(title: String, show: Boolean, items: List<DropdownI
                         })
                 }
             }
-            TextButton(text = "取消", minHeight = 50.dp,
+            HyperActionButton(text = "取消", primary = false, compact = true,
                 modifier = Modifier.padding(start = 24.dp, top = 12.dp, end = 24.dp).fillMaxWidth(),
                 onClick = { dismiss?.invoke() })
         }) { measurables, constraints ->

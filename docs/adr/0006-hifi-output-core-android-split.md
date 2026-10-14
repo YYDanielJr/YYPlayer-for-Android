@@ -69,3 +69,13 @@ BIT_PERFECT 只有匹配 USB 契约、API 格式、实际路由与无欠载等�
 JNI 使用 shared_ptr lease 与普通 worker 的 IO mutex，解决 release/Clear 并发与多生产者问题；这不是 realtime 回调锁。PCM remaining slice、可写目标、重叠区间、C++17 有符号位移、24-in-32 padding、profile 全量有界读取、异常边界均修正。普通播放仍由 renderer 投递；核心环只用于参考信号。自检先释放歌曲输出，保留音量并在结束恢复原位置为暂停状态；取消完成 IO finally 后才解锁。
 
 格式重配待旧尾部排空，flush 保留待生效格式；API31+ 在排空短尾部时降低 AudioTrack start threshold，解决暂停后的门槛停摆。API26–30 的短尾部仍未取证，不能将 API37 通过扩大到低版本。证据、构建与限制以 STATUS 顶部 H05 和 validation README 为准。
+
+## U11：不可独占与输出错误的兼容回退（2026-10-13）
+
+用户要求不能独占或独占报错的设备走系统输出。保留当前后端／默认输出选择，在单一 AndroidMedia3PlaybackBackend 内实现可恢复路径，不引入第二引擎或修改全局音频配置。
+
+当前 AudioTrack 后端没有经过证明的独占能力，PreferExclusive 且非 StrictUnprocessed 时直接选择 SYSTEM，并报告回退原因。自研路径的 AudioSink 配置／初始化／写入失败，仅在宽松策略、已知同一连接设备、非设备丢失／路由错误且尚未回退时重建到 SYSTEM；旧输出释放后新输出才 prepare，保存队列、位置、播放意图、模式和音量，MediaSession 随同改绑。实际路径与请求偏好分开，保留原因，避免逐曲无限重试；用户重选输出／设备可显式重试。
+
+StrictExclusive 与 StrictUnprocessed 继续拒绝静默降级。路由丢失继续暂停，不自动选择扬声器；不能确定原设备（例如低 API 跟随系统且无可用路由报告）的错误不做猜测回退，界面提供用户主动“使用系统输出”。系统路径不显示 Native 的旧协商证据，不宣称独占、无处理或端到端位准确。
+
+小米 13 Ultra 有线调试、内置扬声器：真实带编码延迟的自有 AAC 触发 native 配置拒绝，系统路径继续真实播放且保留队列与模式；PreferExclusive 进入系统路径；StrictExclusive 使用自有 WAV 明确拒绝。没有连接 USB DAC，不扩大到 DAC／蓝牙／物理拔插资格。

@@ -55,7 +55,6 @@ class PlayerSessionService : MediaSessionService() {
      * the engine rebuilds its player and keeps playing from the same position.
      */
     fun applyOutputPath(path: OutputPath) {
-        if (path == appliedPath) return
         appliedPath = path
         engine?.setOutputPath(path)
     }

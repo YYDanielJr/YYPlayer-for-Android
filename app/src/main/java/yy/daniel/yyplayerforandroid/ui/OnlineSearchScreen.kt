@@ -119,7 +119,7 @@ internal fun OnlineSearchScreen(repository: OnlineRepository, lyricMode: Boolean
                 item {
                     Row(Modifier.fillMaxWidth().padding(start = PageTextInset, end = PreferenceInset), verticalAlignment = Alignment.CenterVertically) {
                         Text("搜索历史", Modifier.weight(1f), fontSize = 14.sp, color = Muted)
-                        TextButton("管理", onClick = { historyVisible = true }, modifier = Modifier.heightIn(min = 48.dp))
+                        HyperIconButton(PlayerIcons.Edit, "管理搜索历史", { historyVisible = true })
                     }
                     if (history.queries.isEmpty()) Text(if (history.keep) "搜索过的歌名会显示在这里" else "已关闭搜索历史记录",
                         Modifier.padding(horizontal = PageTextInset, vertical = 8.dp), fontSize = 14.sp, color = Muted)
@@ -138,8 +138,8 @@ internal fun OnlineSearchScreen(repository: OnlineRepository, lyricMode: Boolean
             if (searched && songs.isEmpty() && !busy && message == null) item { Text("没有找到${if (lyricMode) "歌词候选" else "相关歌曲"}，试试其他歌名或来源", Modifier.padding(28.dp), color = Muted) }
             items(if (!lyricMode && query.isBlank()) emptyList() else songs, key = { "${it.providerId}:${it.source}:${it.id}" }) { song ->
                 HyperCard(Modifier.padding(horizontal = PageGutter, vertical = 4.dp).fillMaxWidth()) {
-                    Row(Modifier.fillMaxWidth().clickable(enabled = !busy && !lyricMode, onClickLabel = "播放 ${song.title}") {
-                        try { onSong(song, repository.defaultPlaybackQuality(song), false) }
+                    Row(Modifier.fillMaxWidth().clickable(enabled = !busy, onClickLabel = if (lyricMode) "获取 ${song.title} 歌词" else "播放 ${song.title}") {
+                        try { if (lyricMode) onLyric(song) else onSong(song, repository.defaultPlaybackQuality(song), false) }
                         catch (e: Exception) { searchMessage = e.message ?: "此歌曲暂无可播放音质" }
                     }.padding(start = PreferenceInset, end = 8.dp, top = 12.dp, bottom = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                         if (!lyricMode) {
@@ -152,14 +152,14 @@ internal fun OnlineSearchScreen(repository: OnlineRepository, lyricMode: Boolean
                             Text(listOf(song.artist.ifBlank { "未知歌手" }, song.album.ifBlank { "未知专辑" }).joinToString(" · "), color = Muted, fontSize = 13.sp, maxLines = 2)
                             if (lyricMode && song.title.trim().equals(initialQuery.trim(), true)) Text("同名优先", color = MiuixTheme.colorScheme.primary, fontSize = 12.sp)
                         }
-                        if (lyricMode) TextButton("获取", onClick = { if (!busy) onLyric(song) }, enabled = !busy)
+                        if (lyricMode) Icon(PlayerIcons.Chevron, null, Modifier.size(24.dp), tint = Muted)
                         else {
                             HyperIconButton(PlayerIcons.More, "${song.title} 的选项", { if (!busy) { selected = song; songActions = true } })
                         }
                     }
                 }
             }
-            if (more && !busy) item { TextButton("加载更多", onClick = { search(true) }, modifier = Modifier.padding(horizontal = PageGutter).fillMaxWidth()) }
+            if (more && !busy) item { HyperActionButton("加载更多", onClick = { search(true) }, modifier = Modifier.padding(horizontal = PageGutter), primary = false) }
             }
             if (busy) Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 InfiniteProgressIndicator(Modifier.semantics { contentDescription = if (searching) "正在搜索" else "正在处理" })

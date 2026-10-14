@@ -70,7 +70,7 @@ class LibraryTabsUiTest {
         val barBefore = boundsOf("hyper-top-bar")
         val tabsBefore = boundsOf("library-tabs")
         val headerBefore = headerBounds()
-        assertEquals(1, compose.onAllNodesWithText("全部音乐").fetchSemanticsNodes().size)
+        assertEquals(1, compose.onAllNodesWithText("本地音乐").fetchSemanticsNodes().size)
 
         compose.onNode(hasText("视频") and hasAnyAncestor(hasTestTag("library-tabs"))).performClick()
         compose.waitUntil(5_000) { pager.currentPage == 1 && !pager.isScrollInProgress }
@@ -79,7 +79,7 @@ class LibraryTabsUiTest {
         assertEquals(barBefore, boundsOf("hyper-top-bar"))
         assertEquals(tabsBefore, boundsOf("library-tabs"))
         assertEquals(headerBefore, headerBounds())
-        assertEquals(0, compose.onAllNodesWithText("全部音乐").fetchSemanticsNodes().size)
+        assertEquals(0, compose.onAllNodesWithText("本地音乐").fetchSemanticsNodes().size)
         assertEquals(1, compose.onAllNodesWithText("本地视频").fetchSemanticsNodes().size)
         compose.onNode(hasText("视频") and hasAnyAncestor(hasTestTag("library-tabs"))).assertIsSelected()
     }

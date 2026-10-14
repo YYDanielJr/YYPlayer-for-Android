@@ -111,6 +111,11 @@ class VideoSurfaceGestureTest {
         override fun setDecoderMode(mode: DecoderMode) = Unit
         override fun next() = Unit
         override fun previous() = Unit
+        override fun setPlayOrder(order: yy.daniel.yyplayerforandroid.playback.PlayOrder) = Unit
+        override fun enqueue(items: List<LocalMedia>, next: Boolean) = Unit
+        override fun removeQueueItem(index: Int) = Unit
+        override fun moveQueueItem(from: Int, to: Int) = Unit
+        override fun clearQueue() = Unit
         override fun close() = Unit
     }
 }
