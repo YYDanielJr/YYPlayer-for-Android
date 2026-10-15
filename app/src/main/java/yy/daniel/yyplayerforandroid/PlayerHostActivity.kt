@@ -80,7 +80,7 @@ abstract class PlayerHostActivity : ComponentActivity() {
     private fun suppressTransition() = overridePendingTransition(0, 0)
 
     @Composable
-    internal fun AppTheme(immersive: Boolean = false, content: @Composable () -> Unit) {
+    internal fun AppTheme(immersive: Boolean = false, playbackDock: Boolean = true, content: @Composable () -> Unit) {
         val preferences by runtime.preferences.collectAsStateWithLifecycle()
         val configuration = LocalConfiguration.current
         val view = LocalView.current
@@ -94,7 +94,7 @@ abstract class PlayerHostActivity : ComponentActivity() {
         YYPlayerTheme(preferences.theme.mode, preferences.accent.color) {
             // Full player destinations already own their controls and cover animation. All
             // other app pages inherit one dock outside their scrolling/animated content.
-            if (this is MainActivity || this is PlayerActivity) content()
+            if (!playbackDock || this is MainActivity || this is PlayerActivity) content()
             else {
                 PlaybackPageHost(this, content)
             }

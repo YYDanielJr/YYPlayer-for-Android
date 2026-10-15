@@ -1,0 +1,35 @@
+
+yy.daniel.yyplayerforandroid.MusicExperienceUiTest:
+Error in platformNotificationPublishesArtworkAndControlsBackgroundPlayer(yy.daniel.yyplayerforandroid.MusicExperienceUiTest):
+java.lang.IllegalStateException: No compose hierarchies found in the app. Possible reasons include: (1) the Activity that calls setContent did not launch; (2) setContent was not called; (3) setContent was called before the ComposeTestRule ran. If setContent is called by the Activity, make sure the Activity is launched after the ComposeTestRule runs
+	at androidx.compose.ui.test.TestOwnerKt.getAllSemanticsNodes(TestOwner.kt:117)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNodes$ui_test(SemanticsNodeInteraction.kt:64)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNodes$ui_test$default(SemanticsNodeInteraction.kt:59)
+	at androidx.compose.ui.test.AndroidAssertions_androidKt.checkIsDisplayed(AndroidAssertions.android.kt:29)
+	at androidx.compose.ui.test.AssertionsKt.isDisplayed(Assertions.kt:380)
+	at androidx.compose.ui.test.AssertionsKt.assertIsDisplayed(Assertions.kt:33)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest.platformNotificationPublishesArtworkAndControlsBackgroundPlayer$lambda$0(MusicExperienceUiTest.kt:144)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest$$ExternalSyntheticLambda46.invoke(D8$$SyntheticClass:0)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest.fixture(MusicExperienceUiTest.kt:54)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest.fixture$default(MusicExperienceUiTest.kt:24)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest.platformNotificationPublishesArtworkAndControlsBackgroundPlayer(MusicExperienceUiTest.kt:100)
+
+
+Time: 51.656
+There was 1 failure:
+1) platformNotificationPublishesArtworkAndControlsBackgroundPlayer(yy.daniel.yyplayerforandroid.MusicExperienceUiTest)
+java.lang.IllegalStateException: No compose hierarchies found in the app. Possible reasons include: (1) the Activity that calls setContent did not launch; (2) setContent was not called; (3) setContent was called before the ComposeTestRule ran. If setContent is called by the Activity, make sure the Activity is launched after the ComposeTestRule runs
+	at androidx.compose.ui.test.TestOwnerKt.getAllSemanticsNodes(TestOwner.kt:117)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNodes$ui_test(SemanticsNodeInteraction.kt:64)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNodes$ui_test$default(SemanticsNodeInteraction.kt:59)
+	at androidx.compose.ui.test.AndroidAssertions_androidKt.checkIsDisplayed(AndroidAssertions.android.kt:29)
+	at androidx.compose.ui.test.AssertionsKt.isDisplayed(Assertions.kt:380)
+	at androidx.compose.ui.test.AssertionsKt.assertIsDisplayed(Assertions.kt:33)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest.platformNotificationPublishesArtworkAndControlsBackgroundPlayer$lambda$0(MusicExperienceUiTest.kt:144)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest$$ExternalSyntheticLambda46.invoke(D8$$SyntheticClass:0)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest.fixture(MusicExperienceUiTest.kt:54)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest.fixture$default(MusicExperienceUiTest.kt:24)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest.platformNotificationPublishesArtworkAndControlsBackgroundPlayer(MusicExperienceUiTest.kt:100)
+
+FAILURES!!!
+Tests run: 1,  Failures: 1

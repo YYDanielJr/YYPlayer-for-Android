@@ -1,0 +1,39 @@
+
+yy.daniel.yyplayerforandroid.MusicExperienceUiTest:...
+Error in ringSeekPauseAndNextControlTheRealSharedPlayer(yy.daniel.yyplayerforandroid.MusicExperienceUiTest):
+java.lang.AssertionError: Failed to inject touch input.
+Reason: Expected exactly '1' node but could not find any node that satisfies: (ContentDescription = '下一首' (ignoreCase: false))
+
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+	at androidx.compose.ui.test.ActionsKt.performTouchInput(Actions.kt:403)
+	at androidx.compose.ui.test.AndroidActions.performClickImpl(Actions.android.kt:23)
+	at androidx.compose.ui.test.ActionsKt.performClick(Actions.kt:61)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest.ringSeekPauseAndNextControlTheRealSharedPlayer$lambda$0(MusicExperienceUiTest.kt:410)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest$$ExternalSyntheticLambda0.invoke(D8$$SyntheticClass:0)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest.fixture(MusicExperienceUiTest.kt:54)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest.fixture$default(MusicExperienceUiTest.kt:24)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest.ringSeekPauseAndNextControlTheRealSharedPlayer(MusicExperienceUiTest.kt:383)
+.
+
+Time: 32.876
+There was 1 failure:
+1) ringSeekPauseAndNextControlTheRealSharedPlayer(yy.daniel.yyplayerforandroid.MusicExperienceUiTest)
+java.lang.AssertionError: Failed to inject touch input.
+Reason: Expected exactly '1' node but could not find any node that satisfies: (ContentDescription = '下一首' (ignoreCase: false))
+
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+	at androidx.compose.ui.test.ActionsKt.performTouchInput(Actions.kt:403)
+	at androidx.compose.ui.test.AndroidActions.performClickImpl(Actions.android.kt:23)
+	at androidx.compose.ui.test.ActionsKt.performClick(Actions.kt:61)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest.ringSeekPauseAndNextControlTheRealSharedPlayer$lambda$0(MusicExperienceUiTest.kt:410)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest$$ExternalSyntheticLambda0.invoke(D8$$SyntheticClass:0)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest.fixture(MusicExperienceUiTest.kt:54)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest.fixture$default(MusicExperienceUiTest.kt:24)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest.ringSeekPauseAndNextControlTheRealSharedPlayer(MusicExperienceUiTest.kt:383)
+
+FAILURES!!!
+Tests run: 5,  Failures: 1

@@ -13,7 +13,7 @@ class MusicQueueActivity : PlayerHostActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val snapshot by runtime.playback.state.collectAsStateWithLifecycle()
-            AppTheme { MusicQueueScreen(snapshot, runtime.playback, ::closePage) }
+            AppTheme(playbackDock = false) { MusicQueueScreen(snapshot, runtime.playback, ::closePage) }
         }
     }
 }

@@ -64,6 +64,249 @@ class MusicExperienceUiTest {
         val bitmap = (node ?: compose.onRoot(useUnmergedTree = true)).captureToImage().asAndroidBitmap()
         File(directory, "$name.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
     }
+    @Test fun controlCenterSongOpensCoverAndBackReturnsHome() = fixture { songs ->
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        val automation = instrumentation.uiAutomation
+        val runtime = compose.activity.runtime
+        fun shell(command: String) = automation.executeShellCommand(command).use {
+            android.os.ParcelFileDescriptor.AutoCloseInputStream(it).use { input -> input.readBytes() }
+        }
+        fun songNode(node: android.view.accessibility.AccessibilityNodeInfo?): android.view.accessibility.AccessibilityNodeInfo? {
+            if (node == null) return null
+            if (node.isVisibleToUser && node.text?.toString() == songs[0].musicTitle) return node
+            for (index in 0 until node.childCount) songNode(node.getChild(index))?.let { return it }
+            return null
+        }
+        try {
+            compose.runOnIdle { runtime.playback.togglePlayPause() }
+            compose.waitUntil(5000) { runtime.playback.state.value.isPlaying }
+            shell("input keyevent KEYCODE_HOME")
+            Thread.sleep(1000)
+            val screen = automation.takeScreenshot()
+            val width = screen.width; val height = screen.height; screen.recycle()
+            shell("input swipe ${width * 9 / 10} 1 ${width * 9 / 10} ${height / 2} 400")
+            var title: android.view.accessibility.AccessibilityNodeInfo? = null
+            compose.waitUntil(5000) { title = songNode(automation.rootInActiveWindow); title != null }
+            val bounds = android.graphics.Rect()
+            title!!.getBoundsInScreen(bounds)
+            android.util.Log.i("YYPlayerU28", "control-center title bounds=$bounds")
+            shell("input tap ${bounds.centerX()} ${bounds.centerY()}")
+            Thread.sleep(1000)
+            if (automation.rootInActiveWindow?.packageName?.toString() == "com.android.systemui") {
+                val expandedTitle = songNode(automation.rootInActiveWindow)
+                assertNotNull("expanded system media card exposes the playing song", expandedTitle)
+                expandedTitle!!.getBoundsInScreen(bounds)
+                android.util.Log.i("YYPlayerU28", "expanded title bounds=$bounds")
+                shell("input tap ${bounds.centerX()} ${bounds.centerY()}")
+                Thread.sleep(1000)
+            }
+            compose.waitUntil(5000) {
+                runCatching { compose.onAllNodesWithContentDescription("收起音乐详情").fetchSemanticsNodes().isNotEmpty() }.getOrDefault(false)
+            }
+            compose.onNodeWithContentDescription("专辑封面，切换到歌词").assertIsDisplayed()
+            evidence("u28-control-center-cover")
+            instrumentation.sendKeyDownUpSync(android.view.KeyEvent.KEYCODE_BACK)
+            compose.onNodeWithTag("library-mini-player").assertIsDisplayed()
+            assertTrue(runtime.playback.state.value.isPlaying)
+            evidence("u28-control-center-home")
+        } finally {
+            shell("cmd statusbar collapse")
+            instrumentation.runOnMainSync { runtime.playback.exoPlayer().pause() }
+        }
+    }
+    @Test fun mediaEntryHandlesWarmIntentWithoutReplayingOnRecreationOrLauncher() = fixture {
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        fun resumed(): MainActivity? {
+            var result: MainActivity? = null
+            instrumentation.runOnMainSync {
+                result = androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry.getInstance()
+                    .getActivitiesInStage(androidx.test.runner.lifecycle.Stage.RESUMED).filterIsInstance<MainActivity>().singleOrNull()
+            }
+            return result
+        }
+        val home = compose.activity
+        val scenarioIntent = android.content.Intent(home.intent)
+        var scenarioActivity = home
+        try {
+            compose.runOnIdle {
+                home.startActivity(android.content.Intent(android.content.Intent.ACTION_MAIN)
+                    .addCategory(android.content.Intent.CATEGORY_LAUNCHER).setClass(home, MainActivity::class.java)
+                    .addFlags(android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                    .putExtra(android.content.Intent.EXTRA_REFERRER, Uri.parse("android-app://com.android.systemui")))
+            }
+            compose.onNodeWithContentDescription("专辑封面，切换到歌词").assertIsDisplayed()
+            assertSame(home, resumed())
+            instrumentation.sendKeyDownUpSync(android.view.KeyEvent.KEYCODE_BACK)
+            compose.onNodeWithTag("library-mini-player").assertIsDisplayed()
+            instrumentation.runOnMainSync { home.recreate() }
+            compose.waitUntil(5000) { resumed()?.let { it !== home } == true }
+            val restored = resumed()!!
+            scenarioActivity = restored
+            compose.onNodeWithTag("library-mini-player").assertIsDisplayed()
+            compose.onNodeWithContentDescription("收起音乐详情").assertDoesNotExist()
+            compose.runOnIdle {
+                restored.startActivity(android.content.Intent(android.content.Intent.ACTION_MAIN)
+                    .addCategory(android.content.Intent.CATEGORY_LAUNCHER).setClass(restored, MainActivity::class.java)
+                    .addFlags(android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                    .putExtra(android.content.Intent.EXTRA_REFERRER, Uri.parse("android-app://com.miui.home")))
+            }
+            compose.onNodeWithTag("library-mini-player").assertIsDisplayed()
+            compose.onNodeWithContentDescription("收起音乐详情").assertDoesNotExist()
+            // Reuse a legacy back-stack destination: a media entry must still collapse to home.
+            compose.runOnIdle {
+                restored.intent.putExtra(MainActivity.EXTRA_MUSIC_ON_BACK_STACK, true)
+                restored.startActivity(android.content.Intent(restored, MainActivity::class.java)
+                    .addFlags(android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP).putExtra("open_music", true))
+            }
+            compose.onNodeWithContentDescription("专辑封面，切换到歌词").assertIsDisplayed()
+            assertFalse(restored.musicOnBackStack)
+            instrumentation.sendKeyDownUpSync(android.view.KeyEvent.KEYCODE_BACK)
+            compose.onNodeWithTag("library-mini-player").assertIsDisplayed()
+            assertSame(restored, resumed())
+        } finally {
+            // ActivityScenario identifies lifecycle events by the original launch intent.
+            // Restore only after assertions, so a real onNewIntent/setIntent can be tested.
+            instrumentation.runOnMainSync { scenarioActivity.intent = scenarioIntent }
+        }
+    }
+    @Test fun earlySwipeWaitsForSharedCoverThenPagesAndReturns() = fixture(withLyrics = true) {
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        val original = compose.activity.runtime.preferences.value.reduceMotion
+        try {
+            compose.runOnIdle { compose.activity.runtime.setReduceMotion(false) }
+            for (elapsed in listOf(160L, 320L, 480L)) {
+                compose.mainClock.autoAdvance = false
+                compose.onNodeWithTag("library-mini-player").performClick()
+                repeat((elapsed / 32).toInt()) { compose.mainClock.advanceTimeBy(32); compose.waitForIdle() }
+                // Use the root: gated detail semantics must not be needed to inject a real drag.
+                compose.onRoot().performTouchInput {
+                    swipe(androidx.compose.ui.geometry.Offset(width * .85f, height * .35f),
+                        androidx.compose.ui.geometry.Offset(width * .15f, height * .35f), 80)
+                }
+                compose.mainClock.autoAdvance = true
+                compose.waitForIdle()
+                compose.onNodeWithContentDescription("专辑封面，切换到歌词").assertIsDisplayed()
+                compose.onNodeWithTag("music-pager").performTouchInput { swipeLeft(durationMillis = 300) }
+                compose.waitForIdle()
+                compose.onNodeWithTag("music-compact-identity").assertIsDisplayed()
+                evidence("u27-lyrics-after-early-$elapsed")
+                compose.onNodeWithTag("music-pager").performTouchInput { swipeRight(durationMillis = 300) }
+                compose.waitForIdle()
+                compose.onNodeWithContentDescription("专辑封面，切换到歌词").assertIsDisplayed()
+                instrumentation.sendKeyDownUpSync(android.view.KeyEvent.KEYCODE_BACK)
+                compose.onNodeWithTag("library-mini-player").assertIsDisplayed()
+            }
+        } finally {
+            compose.mainClock.autoAdvance = true
+            compose.runOnIdle { compose.activity.runtime.setReduceMotion(original) }
+        }
+    }
+
+    @Test fun platformNotificationPublishesArtworkAndControlsBackgroundPlayer() = fixture { songs ->
+        val context = compose.activity
+        val scenarioIntent = android.content.Intent(context.intent)
+        val runtime = context.runtime
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        val notifications = context.getSystemService(android.app.NotificationManager::class.java)
+        fun notification() = notifications.activeNotifications.firstOrNull {
+            it.notification.extras.containsKey(android.app.Notification.EXTRA_MEDIA_SESSION)
+        }?.notification
+        try {
+            compose.runOnIdle { runtime.playback.togglePlayPause() }
+            compose.waitUntil(10000) { notification()?.getLargeIcon() != null }
+            val n = notification()!!
+            @Suppress("DEPRECATION")
+            val token = n.extras.getParcelable<android.media.session.MediaSession.Token>(android.app.Notification.EXTRA_MEDIA_SESSION)!!
+            val controller = android.media.session.MediaController(context, token)
+            assertEquals("android.app.Notification\$MediaStyle", n.extras.getString(android.app.Notification.EXTRA_TEMPLATE))
+            assertTrue(n.flags and android.app.Notification.FLAG_FOREGROUND_SERVICE != 0)
+            compose.waitUntil(5000) { controller.metadata?.getBitmap(android.media.MediaMetadata.METADATA_KEY_ALBUM_ART) != null ||
+                controller.metadata?.getBitmap(android.media.MediaMetadata.METADATA_KEY_ART) != null }
+            assertEquals(songs[0].musicTitle, controller.metadata?.getString(android.media.MediaMetadata.METADATA_KEY_TITLE))
+            val before = controller.playbackState!!.position
+            instrumentation.uiAutomation.executeShellCommand("input keyevent KEYCODE_HOME").use {
+                android.os.ParcelFileDescriptor.AutoCloseInputStream(it).use { input -> input.readBytes() }
+            }
+            Thread.sleep(2200)
+            assertEquals(android.media.session.PlaybackState.STATE_PLAYING, controller.playbackState!!.state)
+            assertTrue(runtime.playback.state.value.positionMs > before + 1000)
+            // Only the status/island strip is retained, never launcher contents or personal media.
+            if (InstrumentationRegistry.getArguments().getString("u07Evidence") == "true") {
+                val shot = instrumentation.uiAutomation.takeScreenshot()
+                val strip = Bitmap.createBitmap(shot, 0, 0, shot.width, minOf(shot.height, 220))
+                val directory = File(context.cacheDir, "u07-evidence").apply { mkdirs() }
+                File(directory, "u27-system-island.png").outputStream().use { strip.compress(Bitmap.CompressFormat.PNG, 100, it) }
+                strip.recycle(); shot.recycle()
+            }
+            repeat(3) {
+                controller.transportControls.pause()
+                compose.waitUntil(5000) { !runtime.playback.state.value.isPlaying }
+                controller.transportControls.play()
+                compose.waitUntil(5000) { runtime.playback.state.value.isPlaying }
+                Thread.sleep(500)
+                assertNotNull(notification())
+            }
+            controller.transportControls.skipToNext()
+            compose.waitUntil(5000) { runtime.playback.state.value.current?.identity == songs[1].identity &&
+                controller.metadata?.getString(android.media.MediaMetadata.METADATA_KEY_TITLE) == songs[1].musicTitle }
+            compose.waitUntil(5000) { notification()?.getLargeIcon() != null }
+            // An ordinary background app cannot launch an Activity by sending another PI.
+            // Bring the test caller foreground first; SystemUI has its own BAL exemption.
+            instrumentation.uiAutomation.executeShellCommand("am start -W -n ${context.packageName}/yy.daniel.yyplayerforandroid.MainActivity").use {
+                android.os.ParcelFileDescriptor.AutoCloseInputStream(it).use { input -> input.readBytes() }
+            }
+            notification()!!.contentIntent.send()
+            compose.waitUntil(5000) {
+                compose.onAllNodesWithContentDescription("收起音乐详情").fetchSemanticsNodes().isNotEmpty()
+            }
+            compose.onNodeWithContentDescription("收起音乐详情").assertIsDisplayed()
+        } finally {
+            instrumentation.runOnMainSync { runtime.playback.exoPlayer().pause() }
+            context.startActivity(android.content.Intent(context, MainActivity::class.java).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK))
+            instrumentation.waitForIdleSync()
+            instrumentation.runOnMainSync { context.intent = scenarioIntent }
+        }
+    }
+
+    @Test fun lyricsFollowInOrderAndCoverStaysSquareDuringPaging() = fixture(withLyrics = true) {
+        compose.onNodeWithTag("library-mini-player").performClick()
+        val cover = compose.onNodeWithContentDescription("专辑封面，切换到歌词")
+        val first = compose.onNodeWithText("把右半边留给歌词")
+        val last = compose.onNodeWithText("轻轻收回，再次相遇")
+        cover.performClick()
+        val firstRest = first.getUnclippedBoundsInRoot().left.value
+        val lastRest = last.getUnclippedBoundsInRoot().left.value
+        compose.onNodeWithText("封面").performClick()
+        compose.waitForIdle()
+        compose.mainClock.autoAdvance = false
+        try {
+            cover.performClick()
+            repeat(8) { compose.mainClock.advanceTimeBy(32); compose.waitForIdle() }
+            val firstDelta = first.getUnclippedBoundsInRoot().left.value - firstRest
+            val lastDelta = last.getUnclippedBoundsInRoot().left.value - lastRest
+            assertTrue("click: top line leads lower lines ($firstDelta, $lastDelta)", lastDelta > firstDelta + 1f)
+            evidence("u27-click-stagger")
+            compose.mainClock.autoAdvance = true
+            compose.waitForIdle()
+            compose.onNodeWithText("封面").performClick()
+            compose.waitForIdle()
+            compose.mainClock.autoAdvance = false
+            val pager = compose.onNodeWithTag("music-pager")
+            pager.performTouchInput { down(androidx.compose.ui.geometry.Offset(width * .9f, height * .85f)) }
+            repeat(6) {
+                pager.performTouchInput { moveBy(androidx.compose.ui.geometry.Offset(-width * .1f, 0f), 32) }
+                compose.mainClock.advanceTimeBy(32); compose.waitForIdle()
+            }
+            val firstDrag = first.getUnclippedBoundsInRoot().left.value - firstRest
+            val lastDrag = last.getUnclippedBoundsInRoot().left.value - lastRest
+            assertTrue("drag near bottom: nearest line leads ($firstDrag, $lastDrag)", firstDrag > lastDrag + 1f)
+            val bounds = cover.getUnclippedBoundsInRoot()
+            assertEquals("horizontal paging must not tilt the cover", (bounds.right - bounds.left).value, (bounds.bottom - bounds.top).value, 1f)
+            evidence("u27-drag-stagger")
+            pager.performTouchInput { up() }
+        } finally { compose.mainClock.autoAdvance = true }
+    }
+
     @Test fun playbackDockPersistsAcrossSecondaryPagesAndReturnsToCaller() = fixture {
         val home = compose.activity
         val runtime = home.runtime
@@ -86,7 +329,6 @@ class MusicExperienceUiTest {
                 OrientationActivity::class.java to home::openOrientation,
                 LyricStyleActivity::class.java to home::openLyricStyle,
                 AudioOutputActivity::class.java to home::openAudioOutput,
-                MusicQueueActivity::class.java to home::openMusicQueue,
                 OnlineSearchActivity::class.java to home::openOnlineSearch,
                 OnlineLyricsActivity::class.java to home::openOnlineLyrics,
             )
@@ -146,6 +388,7 @@ class MusicExperienceUiTest {
             compose.runOnIdle { home.openMusicQueue() }
             compose.waitUntil(5000) { resumed() is MusicQueueActivity }
             val queue = resumed()
+            compose.onNodeWithTag("library-mini-player").assertDoesNotExist()
             compose.onNodeWithText("清空队列").performClick()
             compose.onNodeWithText("停止并清空").performClick()
             compose.waitUntil(5000) { runtime.playback.state.value.current == null }
@@ -184,13 +427,10 @@ class MusicExperienceUiTest {
             verifyTransition { compose.onAllNodesWithText("音乐").onLast().performClick() }
             compose.runOnIdle { runtime.setup.restart() }
             compose.onNodeWithText("开始设置").assertIsDisplayed()
-            verifyTransition { compose.onNodeWithText("开始设置").performClick() }
+            dock().assertDoesNotExist()
+            compose.onNodeWithText("开始设置").performClick()
             compose.onNodeWithText("让音乐来到身边").assertIsDisplayed()
-            dock().performClick()
-            compose.onNodeWithContentDescription("收起音乐详情").assertIsDisplayed()
-            compose.onNodeWithContentDescription("收起音乐详情").performClick()
-            compose.onNodeWithText("让音乐来到身边").assertIsDisplayed()
-            dock().assertIsDisplayed()
+            dock().assertDoesNotExist()
         } finally {
             instrumentation.runOnMainSync { runtime.setup.finish() }
         }
@@ -326,6 +566,7 @@ class MusicExperienceUiTest {
         mini.performTouchInput { cancel() }
         compose.mainClock.advanceTimeBy(500)
         compose.mainClock.autoAdvance = true
+        mini.performClick() // The dock intentionally only exposes play/pause; next lives in detail.
         compose.onNodeWithContentDescription("下一首").performClick()
         compose.waitUntil(5000) { backend.state.value.current?.uri == songs[1].uri }
     }

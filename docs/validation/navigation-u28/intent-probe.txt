@@ -1,0 +1,9 @@
+--------- beginning of main
+10-15 21:07:41.968 27665 27665 I YYPlayerU28: create action=null flags=268435456 music=false referrer=android-app://com.android.shell
+10-15 21:07:42.752 27665 27665 I YYPlayerU28: create action=android.intent.action.MAIN flags=268468224 music=false referrer=android-app://yy.daniel.yyplayerforandroid.qa
+10-15 21:07:45.673 27665 27742 I YYPlayerU28: control-center title bounds=Rect(175, 1343 - 655, 1417)
+10-15 21:09:20.061 28734 28734 I YYPlayerU28: create action=null flags=268435456 music=false referrer=android-app://com.android.shell
+10-15 21:09:20.852 28734 28734 I YYPlayerU28: create action=android.intent.action.MAIN flags=268468224 music=false referrer=android-app://yy.daniel.yyplayerforandroid.qa
+10-15 21:09:23.632 28734 28874 I YYPlayerU28: control-center title bounds=Rect(178, 1333 - 656, 1406)
+10-15 21:09:24.686 28734 28874 I YYPlayerU28: expanded title bounds=Rect(634, 1146 - 1262, 1234)
+10-15 21:09:25.186 28734 28734 I YYPlayerU28: create action=android.intent.action.MAIN flags=339738624 music=false referrer=android-app://com.android.systemui

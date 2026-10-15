@@ -1,5 +1,37 @@
 # 进度与交接记录
 
+## 2026-10-15：0.1.7 用户授权提交
+
+- 用户明确“请你帮我提交”，本次在 dev 提交 U27／U28 累计源码、测试、0.1.7／8 版本、README 与验证记录，包括新增 MediaArtworkRepository。app/release 原签名产物和用户原始 buglist.txt 保留本地，不纳入提交。
+- 沿用 U28 最终构建、39 项 JVM、3 项真机专项、lint 与 APK 对齐证据，以及 U27 的 buglist 专项。本次仅补充提交交接记录，未重跑应用构建。提交前 diff --check 通过；验证记录敏感配置模式检查无匹配。
+- 下方“未提交／未授权”保留为历史状态；实际提交身份以 git log 为准。用户只授权提交，不推送／合入 master；视觉与未验设备范围不扩大。
+
+## 2026-10-15：U28 控制中心歌曲入口／0.1.7
+
+**实现与小米 13 Ultra 专项完成，版本 0.1.7／versionCode 8，未提交／推送。** 在 dev 的 U27 工作区继续修复，保留 buglist.txt、app/release 与先前修改。
+
+- 任务／根因：用户要求右侧状态栏下拉控制中心打开当前歌曲直接进入封面，退出封面回到首页。真实两步操作（打开媒体卡片、点击歌曲）复现：HyperOS 发出 MAIN／LAUNCHER，referrer 为 android-app://com.android.systemui，没有 sessionActivity 的 open_music 参数，所以旧入口停留首页。
+- 实现／文件：MainActivity 兼容上述来源且已有当前音频的启动；仍接受通知显式命令。onNewIntent 先 setIntent 再读取来源，消费命令后移除 open_music；系统媒体入口清除旧压栈标记，Back／收起返回当前首页并继续播放。配置重建不重放初始命令，普通桌面入口不强制展开。MusicExperienceUiTest 新增实际控制中心与温启动／重建测试，并修正 Intent 改变后的 ActivityScenario 清理。版本、release 测试断言、README 原框架、AGENTS、构建说明、音乐体验、技术设计、实施计划与 ADR0004 同步。
+- 设备／素材：重新枚举小米 13 Ultra c9e352e3／2304FPN6DC／API36／HyperOS OS3.0.308.0.WMACNXM，1440×3200；自制 30 秒 WAV 与几何封面。QA install --no-incremental -r，无卸载／清数据／全局设置更改；仅保留原创应用截图，不留个人系统界面。
+- 命令／结果：QA assembleDebug assembleDebugAndroidTest -PdeviceQa=true exit 0；最终正式 assembleDebug assembleRelease testDebugUnitTest lintDebug exit 0。39 JVM 全过，lint 0 error／2 既有 warning。直接 instrumentation 共 **3 个不同用例通过**：真实 SystemUI 点击→封面→Back 首页／仍播放；温启动→收起→重建、普通桌面入口、旧返回标记复用；真实媒体通知封面／后台暂停继续／切歌／通知入口。4 个正式 APK 的 Verify-MpvArtifact.py 各 12 个 so ELF／未压缩 ZIP 16KB 检查 exit 0；git diff --check exit 0。
+- 过程问题：单击仅展开系统卡片，改为真实两步才复现入口问题；修复后控制中心用例通过。首轮组合测试另外两项在 ActivityScenario teardown 失败：setIntent 改变启动 Intent 后框架无法匹配生命周期；在断言全部完成后恢复测试初始 Intent，复测 OK (2 tests)。失败日志保留，不作为通过证据。
+- 证据／交付：[U28 验证](validation/navigation-u28/README.md) 含日志、入口探针、原创封面与首页截图、APK hash。手机已安装并冷启动 YYPlayer QA 0.1.7／8，Status ok；正式双 ABI debug／release 已生成，release 未用用户私钥签名，原 app/release 保留。
+- 未验／下一步：本轮只验证该 HyperOS 版本；其他 ROM、API26–32、进程死亡恢复、release 帧率及原生后端／USB 输出资格未重测。请用户复核实际歌曲入口与手感；不代表用户最终视觉验收，不自动提交／合并／发布。
+
+## 2026-10-15：U27 buglist 四项修复／0.1.6
+
+**实现与小米 13 Ultra 专项完成，版本 0.1.6／versionCode 7，未提交／推送。** dev 基于用户重写 README 的 `9392e2b`；保留未跟踪 `buglist.txt` 与 `app/release/` 原签名产物。
+
+- 任务／子步骤：修复封面展开／回弹期间横滑残留；让媒体通知真正注册并上岛；排除队列／设置向导的播放栏；封面与歌词改为逐元素水平跟随；更新版本并按原 README 功能／截图／构建／致谢框架简要完善内容。
+- 实现：MusicExpansionHost 输入门禁保持到共享层完成回弹交接，不改变 180／0.86 与 230／0.8 弹簧。分页不倾斜，封面／标题／副标题分层跟随，歌词以手指距离或点按时可见顶部顺序跟随。队列用 AppTheme(playbackDock = false)，向导直接绘制，其他二级页默认继承完整开合。播放器、返回栈、原磨砂与真实内容采样保持。
+- 媒体根因：原来只创建 MediaSession，没有主动 addSession；应用直接操作引擎时未必有外部 MediaController 绑定，导致系统会话为 PLAYING、控制中心可见，但服务 `startForegroundCount=0`，没有媒体通知。现显式注册并由 Media3 管理通知／前台生命周期；共用后台封面缓存，按媒体／generation／Player／封面 revision 更新元数据，通知入口直接打开详情。真机已见超级岛原创封面与波形。
+- 文件：MusicExpansionHost、MusicMotion、MusicPlayerScreen、PlayerHostActivity、MusicQueueActivity、YYPlayerApp、PlayerSessionService、新 MediaArtworkRepository／MediaArtwork；版本与 ReleasePackagingInstrumentation；MusicExperienceUiTest；README、AGENTS、构建说明、音乐体验、技术设计、实施计划、ADR0004、本记录及 [U27 证据](validation/music-u27/README.md)。
+- 设备／素材：枚举确认小米 13 Ultra `c9e352e3`／2304FPN6DC／API36／HyperOS `OS3.0.308.0.WMACNXM`，1440×3200。自制 30 秒 WAV、几何封面与双语 LRC；QA 共存 install --no-incremental -r，未卸载／清数据／修改全局设置，只保存必要原创画面与顶部岛区域。
+- 命令／结果：最终 QA `assembleDebug assembleDebugAndroidTest -PdeviceQa=true` exit 0；正式 `assembleDebug assembleRelease testDebugUnitTest lintDebug` exit 0，**39 JVM 全过，lint 0 error／2 既有 warning**。直接 instrumentation 不同用例合计 **8 项通过**，覆盖六类二级页、队列／向导排除、快速开合／重建／减少动画、真实播放／切歌、点击与手势逐行位移／封面无倾斜，以及无需 Media3 Controller 预先绑定的媒体通知、后台三轮暂停／继续／切歌。4 个 APK 的 `Verify-MpvArtifact.py` 均 exit 0，各 12 个 so ELF／未压缩 ZIP 16KB 对齐。git diff --check exit 0。
+- 初轮问题：测试编译缺失 UIAutomator／可空类型／DpRect API 均已修正；媒体通知超时复现上述生产根因。注册后通知和系统控制通过，后台测试直接发送 PendingIntent 的返回断言受 Android 后台启动限制，改为前台验证目标 Intent；旧环形测试寻找 U13 已删的底栏下一首，改为先展开详情。日志保留，不以失败结果充作通过。
+- 交付：正式双 ABI debug／release 位于 app/build/outputs/apk，SHA256／大小见 [artifacts.json](validation/music-u27/artifacts.json)；release 未用用户私钥签名。手机已核验 QA 0.1.6／7 并正常冷启动 Status ok；原签名产物保留。
+- 未验／下一步：未重测 API26–32、其他 ROM／平板横屏、200% 字体／完整 TalkBack／深色、release 帧率、长期进程回收恢复、USB DAC 独占／端到端位准确，也未重复无关 libmpv 解码专项。超级岛结果限本机当前 ROM 与通知配置。用户可在 QA 中复核四项体验；视觉手感仍待用户最终确认，无自动提交／合并／发布。
+
 ## 2026-10-15：0.1.5 用户验收与提交
 
 - 用户明确“我已验收，请提交”，本次在 dev 提交 U22–U26 累计实现、文档、验证记录及现有构建依赖的未跟踪 U21 源码／测试／native keep 规则；原 app/release APK、mapping 和 symbols 保留本地，不提交。下方未提交／待用户确认等文字保留为当轮历史。

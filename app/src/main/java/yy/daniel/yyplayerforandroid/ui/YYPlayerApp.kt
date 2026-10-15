@@ -52,7 +52,7 @@ fun YYPlayerApp(activity: MainActivity) {
     val preferences by runtime.preferences.collectAsStateWithLifecycle()
     val snapshot by playback.state.collectAsStateWithLifecycle()
     if (!setupComplete && !activity.musicOnBackStack) {
-        PlaybackPageHost(activity) { SetupScreen(activity) }
+        SetupScreen(activity)
         return
     }
     MusicExpansionHost(activity) { music ->

@@ -1,0 +1,27 @@
+
+yy.daniel.yyplayerforandroid.MusicExperienceUiTest:
+Error in controlCenterSongOpensCoverAndBackReturnsHome(yy.daniel.yyplayerforandroid.MusicExperienceUiTest):
+androidx.compose.ui.test.ComposeTimeoutException: Condition still not satisfied after 5000 ms
+	at androidx.compose.ui.test.AndroidComposeUiTestEnvironment$AndroidComposeUiTestImpl.waitUntil(ComposeUiTest.android.kt:901)
+	at androidx.compose.ui.test.junit4.AndroidComposeTestRule.waitUntil(AndroidComposeTestRule.android.kt:500)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest.controlCenterSongOpensCoverAndBackReturnsHome$lambda$0(MusicExperienceUiTest.kt:103)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest$$ExternalSyntheticLambda21.invoke(D8$$SyntheticClass:0)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest.fixture(MusicExperienceUiTest.kt:54)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest.fixture$default(MusicExperienceUiTest.kt:24)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest.controlCenterSongOpensCoverAndBackReturnsHome(MusicExperienceUiTest.kt:67)
+
+
+Time: 11.428
+There was 1 failure:
+1) controlCenterSongOpensCoverAndBackReturnsHome(yy.daniel.yyplayerforandroid.MusicExperienceUiTest)
+androidx.compose.ui.test.ComposeTimeoutException: Condition still not satisfied after 5000 ms
+	at androidx.compose.ui.test.AndroidComposeUiTestEnvironment$AndroidComposeUiTestImpl.waitUntil(ComposeUiTest.android.kt:901)
+	at androidx.compose.ui.test.junit4.AndroidComposeTestRule.waitUntil(AndroidComposeTestRule.android.kt:500)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest.controlCenterSongOpensCoverAndBackReturnsHome$lambda$0(MusicExperienceUiTest.kt:103)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest$$ExternalSyntheticLambda21.invoke(D8$$SyntheticClass:0)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest.fixture(MusicExperienceUiTest.kt:54)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest.fixture$default(MusicExperienceUiTest.kt:24)
+	at yy.daniel.yyplayerforandroid.MusicExperienceUiTest.controlCenterSongOpensCoverAndBackReturnsHome(MusicExperienceUiTest.kt:67)
+
+FAILURES!!!
+Tests run: 1,  Failures: 1

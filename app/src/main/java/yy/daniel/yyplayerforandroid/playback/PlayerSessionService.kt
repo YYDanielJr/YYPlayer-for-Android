@@ -2,17 +2,24 @@ package yy.daniel.yyplayerforandroid.playback
 
 import android.app.PendingIntent
 import android.content.Intent
+import androidx.core.graphics.scale
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
 import yy.daniel.yyplayerforandroid.MainActivity
 import yy.daniel.yyplayerforandroid.PlayerApplication
 import yy.daniel.yyplayerforandroid.audio.OutputPath
+import androidx.media3.common.MediaMetadata
+import androidx.media3.common.Player
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 /**
  * Owns the platform-visible MediaSession, which is what makes the system media controls work: the
- * control centre, the media notification, Bluetooth transport buttons and the dynamic island all
- * address a session rather than an app.
+ * control centre, media notification and Bluetooth transport buttons address this session. OEM
+ * surfaces such as HyperOS's island consume the same standard notification and metadata.
  *
  * One player per process: the session is built on the engine the app already uses
  * ([PlayerApplication]'s runtime) instead of constructing a second one. Two ExoPlayers would mean two
@@ -30,6 +37,7 @@ class PlayerSessionService : MediaSessionService() {
     private var session: MediaSession? = null
     private var engine: AndroidMedia3PlaybackBackend? = null
     private var appliedPath: OutputPath = OutputPath.SYSTEM
+    private val metadataScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
     override fun onCreate() {
         super.onCreate()
@@ -44,8 +52,49 @@ class PlayerSessionService : MediaSessionService() {
             // What the notification and the control centre open when the user taps the title or artwork.
             .setSessionActivity(openAppIntent())
             .build()
+        // In-app commands address the engine directly, so no MediaController necessarily binds
+        // and calls onGetSession. Explicit registration starts Media3's notification/FGS tracking.
+        addSession(checkNotNull(session))
         playback.onPlayerReplaced = { session?.setPlayer(it) }
         runtime.attachSession(this)
+        // UI artwork used to be invisible to the session. Publish bounded artwork bytes, so
+        // SystemUI never has to open our private files or the user's SAF URI itself.
+        metadataScope.launch {
+            playback.state.combine(androidx.compose.runtime.snapshotFlow { ArtworkCache.revision }) { state, revision ->
+                Triple(state.current, state.mediaGeneration, session?.player) to revision
+            }.distinctUntilChanged().collectLatest { (source, _) ->
+                    val (media, generation, player) = source
+                    if (media?.kind != MediaKind.AUDIO || player == null) return@collectLatest
+                    val item = player.currentMediaItem ?: return@collectLatest
+                    val details = try { ArtworkCache.load(applicationContext, media) }
+                    catch (cancelled: CancellationException) { throw cancelled }
+                    catch (_: Exception) { MediaDetails() } // Missing/revoked artwork must not stop playback.
+                    val art = withContext(Dispatchers.Default) {
+                        details.artwork?.let { bitmap ->
+                            val size = minOf(1f, 384f / maxOf(bitmap.width, bitmap.height))
+                            val scaled = bitmap.scale(
+                                (bitmap.width * size).toInt().coerceAtLeast(1), (bitmap.height * size).toInt().coerceAtLeast(1), true)
+                            try { java.io.ByteArrayOutputStream().use {
+                                scaled.compress(android.graphics.Bitmap.CompressFormat.JPEG, 85, it)
+                                it.toByteArray()
+                            } } finally { if (scaled !== bitmap) scaled.recycle() }
+                        }
+                    }
+                    ensureActive()
+                    if (session?.player !== player || playback.state.value.mediaGeneration != generation ||
+                        playback.state.value.current?.identity != media.identity || player.currentMediaItem !== item ||
+                        !player.isCommandAvailable(Player.COMMAND_CHANGE_MEDIA_ITEMS)) return@collectLatest
+                    val metadata = item.mediaMetadata.buildUpon()
+                        .setTitle(details.title ?: media.musicTitle)
+                        .setArtist(details.artist ?: media.artist).setAlbumTitle(details.album ?: media.album)
+                        .setMediaType(MediaMetadata.MEDIA_TYPE_MUSIC).setIsPlayable(true)
+                        .setArtworkData(art, MediaMetadata.PICTURE_TYPE_FRONT_COVER).build()
+                    if (metadata == item.mediaMetadata) return@collectLatest
+                    // Media3 updates metadata in-place, preserving the current decoder, position,
+                    // play intent and session token. No second Player or synthetic notification.
+                    player.replaceMediaItem(player.currentMediaItemIndex, item.buildUpon().setMediaMetadata(metadata).build())
+                }
+        }
     }
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? = session
@@ -69,6 +118,7 @@ class PlayerSessionService : MediaSessionService() {
     }
 
     override fun onDestroy() {
+        metadataScope.cancel()
         (application as? PlayerApplication)?.runtime?.detachSession(this)
         engine?.onPlayerReplaced = null
         session?.release()
@@ -80,6 +130,7 @@ class PlayerSessionService : MediaSessionService() {
     private fun openAppIntent(): PendingIntent {
         val intent = Intent(this, MainActivity::class.java)
             .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            .putExtra("open_music", true)
         return PendingIntent.getActivity(
             this,
             0,

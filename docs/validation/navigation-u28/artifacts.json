@@ -1,0 +1,40 @@
+[
+  {
+    "path": "app/build/outputs/apk/debug/YYPlayer_for_Android_0.1.7_x86_64_debug.apk",
+    "version": "0.1.7",
+    "versionCode": 8,
+    "bytes": 50254010,
+    "sha256": "153885b5e66ef1f7c0a81098326aff3d79a1c15693a9e91c0713821b7b5ad713"
+  },
+  {
+    "path": "app/build/outputs/apk/debug/YYPlayer_for_Android_0.1.7_arm64-v8a_debug.apk",
+    "version": "0.1.7",
+    "versionCode": 8,
+    "bytes": 45325078,
+    "sha256": "480712146a4f478e948e5b62f226780cc8af5127ed8a40f5a6314930e7b991c0"
+  },
+  {
+    "path": "app/build/outputs/apk/release/YYPlayer_for_Android_0.1.7_x86_64_release.apk",
+    "version": "0.1.7",
+    "versionCode": 8,
+    "bytes": 15356480,
+    "sha256": "53198996061c73b05b8e229c481784f96bbdff7ad3db865874f91e1d967d8ee7"
+  },
+  {
+    "path": "app/build/outputs/apk/release/YYPlayer_for_Android_0.1.7_arm64-v8a_release.apk",
+    "version": "0.1.7",
+    "versionCode": 8,
+    "bytes": 14299284,
+    "sha256": "8799c54e80edc1c32dd8b7d08b3f30802e9bad2162a8c65879d5d97011e5a1a0"
+  },
+  {
+    "path": "build/qa-u28/app-debug-androidTest.apk",
+    "bytes": 3601200,
+    "sha256": "97e80ff1ef0b6822a839a48b2288bae5377013beae3956b3ac12e33958d62d6c"
+  },
+  {
+    "path": "build/qa-u28/YYPlayer_for_Android_0.1.7_arm64-v8a_debug.apk",
+    "bytes": 46114871,
+    "sha256": "65bc191c13b21fb5f7252315f6e9456578ebe9420174e59fcb98e786babac579"
+  }
+]

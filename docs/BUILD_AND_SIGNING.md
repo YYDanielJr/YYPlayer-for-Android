@@ -1,6 +1,6 @@
 # 编译、分包与签名
 
-当前版本为 **0.1.5（versionCode 6）**。B01 起 debug／release 均只编译并分别打包 `arm64-v8a` 和 `x86_64`，不生成 universal APK。每个 APK 可独立安装，无需同时安装两个架构。
+当前版本为 **0.1.7（versionCode 8）**。B01 起 debug／release 均只编译并分别打包 `arm64-v8a` 和 `x86_64`，不生成 universal APK。每个 APK 可独立安装，无需同时安装两个架构。
 
 ## 构建与命名
 
@@ -14,10 +14,10 @@
 产物位于 `app/build/outputs/apk/debug/` 和 `app/build/outputs/apk/release/`：
 
 ```text
-YYPlayer_for_Android_0.1.5_arm64-v8a_debug.apk
-YYPlayer_for_Android_0.1.5_x86_64_debug.apk
-YYPlayer_for_Android_0.1.5_arm64-v8a_release.apk
-YYPlayer_for_Android_0.1.5_x86_64_release.apk
+YYPlayer_for_Android_0.1.7_arm64-v8a_debug.apk
+YYPlayer_for_Android_0.1.7_x86_64_debug.apk
+YYPlayer_for_Android_0.1.7_arm64-v8a_release.apk
+YYPlayer_for_Android_0.1.7_x86_64_release.apk
 ```
 
 规则为 `YYPlayer_for_Android_<version>_<arch>_<debug/release>.apk`。版本从 `app/build.gradle.kts` 的 `versionName` 读取；发布新版本时同时维护递增的 `versionCode`。arm64 手机选择 `arm64-v8a`，x86_64 模拟器选择 `x86_64`。自动化应读取各目录的 `output-metadata.json`，按设备 `ro.product.cpu.abilist` 顺序选择匹配 ABI，不再硬编码旧 `app-debug.apk`。

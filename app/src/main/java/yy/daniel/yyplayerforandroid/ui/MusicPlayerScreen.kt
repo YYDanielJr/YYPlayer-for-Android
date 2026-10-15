@@ -97,7 +97,7 @@ internal fun rememberMusicReduceMotion(preference: Boolean): Boolean {
     return preference || !enabled
 }
 
-/** Called inside MainActivity only; video continues to use the native Activity stack. */
+/** Rendered by the originating page's MusicExpansionHost. */
 @Composable
 internal fun MusicPlayerScreen(snapshot: PlaybackSnapshot, backend: PlaybackBackend, repository: MusicLyricsRepository,
     reduceMotion: Boolean, favorite: Boolean, onFavorite: () -> Unit, onBack: () -> Unit, onOnlineLyrics: (() -> Unit)? = null,
@@ -113,6 +113,8 @@ internal fun MusicPlayerScreen(snapshot: PlaybackSnapshot, backend: PlaybackBack
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val pager = rememberPagerState(pageCount = { 2 })
+    var swipeOriginY by remember { mutableStateOf<Float?>(null) }
+    var pagerTop by remember { mutableFloatStateOf(0f) }
     var pageJob by remember { mutableStateOf<Job?>(null) }
     var wideLyrics by rememberSaveable { mutableStateOf(false) }
     var menu by remember { mutableStateOf<String?>(null) }
@@ -153,7 +155,7 @@ internal fun MusicPlayerScreen(snapshot: PlaybackSnapshot, backend: PlaybackBack
         }
     }
     fun addLyrics() { menu = null; requested = current.uri.toString(); picker.launch(Unit) }
-    fun select(page: Int) { pageJob?.cancel(); pageJob = scope.launch { if (reduceMotion) pager.scrollToPage(page) else pager.animateScrollToPage(page, animationSpec = tween(500, easing = FastOutSlowInEasing)) } }
+    fun select(page: Int) { swipeOriginY = null; pageJob?.cancel(); pageJob = scope.launch { if (reduceMotion) pager.scrollToPage(page) else pager.animateScrollToPage(page, animationSpec = tween(500, easing = FastOutSlowInEasing)) } }
     val dark = MiuixTheme.colorScheme.background.luminance() < .5f
     val foreground = if (dark) Color(0xFFF7F5F1) else Color(0xFF242C35)
     var palette by remember { mutableStateOf(details.coverColor) }
@@ -230,13 +232,21 @@ internal fun MusicPlayerScreen(snapshot: PlaybackSnapshot, backend: PlaybackBack
                         }
                     }
                 } else {
-                    HorizontalPager(pager, Modifier.weight(1f).fillMaxWidth(), beyondViewportPageCount = 1,
+                    HorizontalPager(pager, Modifier.weight(1f).fillMaxWidth().testTag("music-pager")
+                        .onGloballyPositioned { pagerTop = it.positionInRoot().y }
+                        .pointerInput(Unit) {
+                            awaitEachGesture {
+                                val down = awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
+                                swipeOriginY = pagerTop + down.position.y
+                            }
+                        }, beyondViewportPageCount = 1,
                         flingBehavior = PagerDefaults.flingBehavior(pager, snapAnimationSpec = spring(stiffness = 322.2f, dampingRatio = .9f))) { page ->
                         val pageModifier = Modifier.fillMaxSize().graphicsLayer { alpha = if (hideCover && pager.currentPage != page) 0f else 1f }
                         if (page == 0) MusicCover(current, title, subtitle, pageModifier, foreground, reduceMotion, pager,
                             hideCover = hideCover, onCoverBounds = onCoverBounds, journeyProgress = journeyProgress, journeyOrigin = journeyOrigin, onLyrics = { select(1) })
                         else MusicLyricsPane(lyricState, snapshot, backend, loading, centered, offset, reduceMotion, foreground,
-                            onAdd = ::addLyrics, onAuthorize = { treePicker.launch(Unit) }, modifier = pageModifier.musicJourney(journeyProgress, journeyOrigin, reduceMotion).musicTrail(pager, 1, reduceMotion, 220f, .10f), onOnline = onOnlineLyrics, style = lyricStyle)
+                            onAdd = ::addLyrics, onAuthorize = { treePicker.launch(Unit) }, modifier = pageModifier.musicJourney(journeyProgress, journeyOrigin, reduceMotion), onOnline = onOnlineLyrics, style = lyricStyle,
+                            pager = pager, swipeOriginY = swipeOriginY)
                     }
                 }
                 if (!wide) {
@@ -349,7 +359,6 @@ private fun Modifier.musicTrail(pager: PagerState, page: Int, reduced: Boolean, 
     return graphicsLayer {
         val lag = if (reduced) 0f else (position - follower).coerceIn(-.28f, .28f)
         translationX = lag * size.width * travel
-        rotationZ = lag * 2.5f
     }
 }
 
@@ -370,7 +379,7 @@ private fun MusicCover(current: LocalMedia, title: String, subtitle: String, mod
                 onCoverBounds(MusicCoverAnchor(Rect(it.positionInRoot(), Size(it.size.width.toFloat(), it.size.height.toFloat())))) }
                 .graphicsLayer { alpha = if (hideCover) 0f else 1f }
                 .then(if (pager != null) Modifier.musicTrail(pager, 0, reduceMotion, 340f, .2f) else Modifier)
-                .gentleCoverTilt(reduceMotion, current.identity)
+                .gentleCoverTilt(reduceMotion, current.identity, pager?.isScrollInProgress == true)
                 .shadow(24.dp, shape, clip = false).clip(shape).background(MiuixTheme.colorScheme.surfaceContainerHigh)
                 .clickable(interactionSource = interactions, indication = null, role = Role.Button, onClick = onLyrics)
                 .semantics { contentDescription = "专辑封面，切换到歌词" }
@@ -382,10 +391,12 @@ private fun MusicCover(current: LocalMedia, title: String, subtitle: String, mod
                 }, label = "music cover") { media -> MediaArtwork(media, Modifier.fillMaxSize(), 24.dp) }
             }
             Spacer(Modifier.height(28.dp))
-            Column(Modifier.fillMaxWidth().musicJourney(journeyProgress, journeyOrigin, reduceMotion).then(if (pager != null) Modifier.musicTrail(pager, 0, reduceMotion, 210f, .30f) else Modifier)) {
-                Text(title, color = foreground, fontSize = 27.sp, lineHeight = 34.sp, fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            Column(Modifier.fillMaxWidth().musicJourney(journeyProgress, journeyOrigin, reduceMotion)) {
+                Text(title, modifier = if (pager != null) Modifier.musicTrail(pager, 0, reduceMotion, 230f, .5f) else Modifier,
+                    color = foreground, fontSize = 27.sp, lineHeight = 34.sp, fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis)
                 Spacer(Modifier.height(8.dp))
-                Text(subtitle, color = foreground.copy(alpha = .64f), fontSize = 15.sp, lineHeight = 22.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                Text(subtitle, modifier = if (pager != null) Modifier.musicTrail(pager, 0, reduceMotion, 150f, .7f) else Modifier,
+                    color = foreground.copy(alpha = .64f), fontSize = 15.sp, lineHeight = 22.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
             }
         }
     }
@@ -394,7 +405,8 @@ private fun MusicCover(current: LocalMedia, title: String, subtitle: String, mod
 @Composable
 private fun MusicLyricsPane(state: MusicLyrics, snapshot: PlaybackSnapshot, backend: PlaybackBackend, loading: Boolean, centered: Boolean,
     offset: Long, reduced: Boolean, foreground: Color, onAdd: () -> Unit, onAuthorize: () -> Unit, modifier: Modifier,
-    onOnline: (() -> Unit)? = null, style: LyricStyle = LyricStyle()) {
+    onOnline: (() -> Unit)? = null, style: LyricStyle = LyricStyle(),
+    pager: PagerState? = null, swipeOriginY: Float? = null) {
     val lyrics = state.lyrics
     val plainLines by produceState(emptyList<String>(), lyrics.plain) {
         value = withContext(Dispatchers.Default) { lyrics.plain.trim().lines() }
@@ -405,6 +417,15 @@ private fun MusicLyricsPane(state: MusicLyrics, snapshot: PlaybackSnapshot, back
     var browsing by remember(snapshot.current?.uri) { mutableStateOf(false) }
     LaunchedEffect(dragging) { if (dragging) browsing = true else if (browsing) { delay(4000); browsing = false } }
     BoxWithConstraints(modifier) {
+        var paneTop by remember { mutableFloatStateOf(0f) }
+        val paneHeight = with(LocalDensity.current) { maxHeight.toPx() }
+        @Composable fun lineMotion(): Modifier {
+            var centerY by remember { mutableFloatStateOf(paneTop) }
+            // A drag leads with rows nearest the finger; a click leads with the top visible row.
+            val distance = (abs(centerY - (swipeOriginY ?: paneTop)) / paneHeight.coerceAtLeast(1f)).coerceIn(0f, 1f)
+            return Modifier.onGloballyPositioned { centerY = it.positionInRoot().y + it.size.height / 2f }
+                .then(if (pager != null) Modifier.musicTrail(pager, 1, reduced, 340f - 220f * distance, .2f + .65f * distance) else Modifier)
+        }
         val padding = maxHeight * .36f
         val focusIndex = if (active >= 0) lyrics.lines.indexOfFirst { it.milliseconds == lyrics.lines[active].milliseconds } else -1
         LaunchedEffect(focusIndex, browsing, snapshot.current?.uri, snapshot.mediaGeneration, style) {
@@ -429,6 +450,7 @@ private fun MusicLyricsPane(state: MusicLyrics, snapshot: PlaybackSnapshot, back
             else -> {
                 LazyColumn(state = list, contentPadding = PaddingValues(start = 32.dp, end = 32.dp, top = padding, bottom = maxHeight - padding),
                     verticalArrangement = Arrangement.spacedBy(style.lineSpacing.dp), modifier = Modifier.fillMaxSize()
+                    .onGloballyPositioned { paneTop = it.positionInRoot().y }
                     .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
                     .drawWithContent {
                         drawContent()
@@ -442,7 +464,7 @@ private fun MusicLyricsPane(state: MusicLyrics, snapshot: PlaybackSnapshot, back
                             tween(if (reduced) 0 else 350), label = "lyric emphasis")
                         val fontSize by animateFloatAsState(if (selected) style.activeSize else style.inactiveSize, tween(if (reduced) 0 else 200), label = "lyric font size")
                         val scale by animateFloatAsState(if (selected) 1f else .96f, if (reduced) snap() else spring(stiffness = 240f, dampingRatio = .85f), label = "lyric line spring")
-                        BilingualLyricText(line.text, Modifier.fillMaxWidth().graphicsLayer {
+                        BilingualLyricText(line.text, Modifier.fillMaxWidth().then(lineMotion()).graphicsLayer {
                             scaleX = scale; scaleY = scale; transformOrigin = TransformOrigin(if (centered) .5f else 0f, .5f)
                         }.semantics { stateDescription = if (selected) "当前歌词，点按跳转" else "点按跳转到 ${formatTime(line.milliseconds)}" }
                             // clickable expands small touch targets without inflating the lyric layout.
@@ -450,7 +472,7 @@ private fun MusicLyricsPane(state: MusicLyrics, snapshot: PlaybackSnapshot, back
                             .clickable(role = Role.Button) { browsing = false; backend.seekTo((line.milliseconds - offset).coerceAtLeast(0)) },
                             style = style, active = selected, primarySize = fontSize, color = lineColor, centered = centered)
                     } else items(plainLines.size) { index ->
-                        BilingualLyricText(plainLines[index], Modifier.fillMaxWidth(), style = style, active = false, primarySize = style.inactiveSize,
+                        BilingualLyricText(plainLines[index], Modifier.fillMaxWidth().then(lineMotion()), style = style, active = false, primarySize = style.inactiveSize,
                             color = style.inactiveColor?.let(::Color) ?: foreground.copy(alpha = .82f), centered = centered)
                     }
                 }

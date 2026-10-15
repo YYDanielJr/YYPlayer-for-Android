@@ -1,0 +1,10 @@
+Starting: Intent { cmp=yy.daniel.yyplayerforandroid.qa/yy.daniel.yyplayerforandroid.MainActivity }
+Status: ok
+LaunchState: COLD
+Activity: yy.daniel.yyplayerforandroid.qa/yy.daniel.yyplayerforandroid.MainActivity
+TotalTime: 941
+WaitTime: 947
+Complete
+
+    versionCode=8 minSdk=26 targetSdk=37
+    versionName=0.1.7

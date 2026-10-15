@@ -30,7 +30,7 @@ internal class MusicExpansionScope(
     val artworkModifier: Modifier,
 )
 
-/** The same shared artwork and spring for home, search, settings, queue and setup. */
+/** The same shared artwork and spring for every page that opts into a playback dock. */
 @Composable
 @androidx.annotation.OptIn(markerClass = [androidx.media3.common.util.UnstableApi::class])
 internal fun MusicExpansionHost(activity: PlayerHostActivity, content: @Composable (MusicExpansionScope) -> Unit) {
@@ -60,7 +60,9 @@ internal fun MusicExpansionHost(activity: PlayerHostActivity, content: @Composab
     val showingMusic = musicExpanded || travelling
     val sharedMini = !reduceMotion && !snapshot.isVideo && snapshot.current != null && miniBounds != null
     val detailVisible = musicExpanded || expansion > .02f
-    val detailInteractive = musicExpanded && expansion >= .96f
+    // The shared layer owns a frozen destination until the spring (including rebound) ends.
+    // Letting the pager move at .96 detached the page from that still-visible cover.
+    val detailInteractive = musicExpanded && !travelling
     LaunchedEffect(target, reduceMotion) {
         if (target == 1f && expansion <= .02f) {
             val from = miniBounds

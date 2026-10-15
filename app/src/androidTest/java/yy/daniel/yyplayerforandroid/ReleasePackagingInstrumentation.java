@@ -26,7 +26,7 @@ public final class ReleasePackagingInstrumentation extends Instrumentation {
             Context context = getTargetContext();
             check((context.getApplicationInfo().flags & android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) == 0,
                     "Install the actual release APK before running this instrumentation");
-            check("0.1.5".equals(context.getPackageManager()
+            check("0.1.7".equals(context.getPackageManager()
                     .getPackageInfo(context.getPackageName(), 0).versionName), "versionName");
             Intent launch = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName());
             try (android.os.ParcelFileDescriptor command = getUiAutomation().executeShellCommand(

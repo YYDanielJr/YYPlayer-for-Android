@@ -1,5 +1,17 @@
 # ADR 0004：音乐详情采用主 Activity 内转场
 
+## 2026-10-15 U28：系统媒体入口返回首页
+
+小米 13 Ultra 控制中心实际发送 MAIN／LAUNCHER，来源 android-app://com.android.systemui，没有 sessionActivity 的 open_music 参数。仅依赖显式参数会落到首页。继续使用同一 MainActivity 共享封面宿主，增加 SystemUI 来源且存在当前音频的导航兼容；不增加 Activity 或播放器。referrer 可被构造，仅用于无权限副作用的显示决策。
+
+媒体入口清除旧 music_on_back_stack 标记，使收起／返回始终回到此 Activity 的首页。onNewIntent 先更新 Intent 再读取来源，消费后移除 open_music；配置重建沿用保存的展开状态，不重放初始启动命令。普通桌面启动无额外展开。真机系统卡片与通知、温启动和重建验证见 [U28](../validation/navigation-u28/README.md)。
+
+## 2026-10-15 U27：宿主默认能力与页面排除
+
+按 buglist.txt，队列和设置向导不再叠加播放栏。新二级 Activity 默认从 `AppTheme` 获得 `PlaybackPageHost` 的栏与 `MusicExpansionHost` 的完整展开／返回收回能力；已有完整控件的页面显式使用 `AppTheme(playbackDock = false)`。主页向导分支直接绘制 `SetupScreen`，不创建展开宿主。
+
+共享封面仍冻结展开终点并保留原回弹，所以详情输入必须等弹簧完成后再放行；过去进度达到 0.96 即放行，导致快速横滑时页面离开而共享封面仍滞留。分页本身使用逐元素水平弹簧跟随，去掉分页倾角；独立角落按压不变，拖动时立即禁用倾角。见 [U27 验证](../validation/music-u27/README.md)。
+
 ## 2026-10-15 U26：所有播放栏宿主内展开
 
 用户明确要求将主页共享封面展开／收回动画应用到所有控制条页面。现将主页动画提取为 MusicExpansionHost，主页、搜索、设置／方向／歌词样式／音频输出、队列、联网歌词、重新设置共用同一套状态与绘制层。每页从自己的实际小封面 bounds 展开，收回后仍由同一层绘制小封面，保持原弹簧参数和反向动作处理。控制条材质不变。

@@ -1,5 +1,17 @@
 # YYPlayer for Android 执行规则
 
+2026-10-15 提交交接：用户明确授权提交当前 0.1.7。提交包含 U27 buglist 修复、U28 控制中心入口、版本和文档及验证记录；app/release 签名产物与原始 buglist.txt 保留本地，不纳入本次提交。下方“未提交／未授权”是各轮历史，实际提交身份以 git log 为准。本次仅提交 dev，不推送或合入 master；提交授权不等同额外视觉或硬件验收。
+
+## 2026-10-15 U28／0.1.7 当前修复
+
+当前版本 0.1.7／versionCode 8。系统媒体入口进入歌曲封面，收起／返回回到首页。HyperOS 控制中心实测会发送 MAIN／LAUNCHER 而非带 open_music 的 sessionActivity；MainActivity 仅在来源 android-app://com.android.systemui 且已有当前音频时补展开。referrer 仅为导航提示，不用于授权。新 Intent 先 setIntent 再读取来源；媒体入口清除旧 music_on_back_stack 标记，重建时不重放启动命令；普通桌面启动不强制展开。保留 U27 修复。证据以 STATUS 和 docs/validation/navigation-u28 为准，未授权提交／推送。
+
+## 2026-10-15 U27／0.1.6 当前修复
+
+按根目录 buglist.txt 修复，版本 0.1.6／versionCode 7。队列 Activity 通过 AppTheme(playbackDock = false) 关闭播放栏，设置向导直接绘制；其他二级页默认继承 PlaybackPageHost + MusicExpansionHost 的完整开合能力。展开／回弹期间必须保持输入门禁至共享层交接，不能在 0.96 时提前放行 Pager。分页仅水平位移，封面／标题／副标题与逐行歌词分层跟随；拖动时歌词按距手指远近，点击时从可见顶部开始。角落 9° 按压保留，分页过程中不倾斜。
+
+PlayerSessionService 在创建唯一真实 session 后立即 addSession，不能依赖外部 MediaController 偶然绑定才发布通知。共享 ArtworkCache 后台读取／缩小封面，session 元数据按当前媒体／generation／Player／封面 revision 更新，过期结果拒绝。小米媒体通知与上岛按公开标准接入，不添加伪播放器或私有系统设置。真机与命令结果以 docs/STATUS.md 最新 U27 记录为准；本轮未授权提交／推送。
+
 2026-10-15 验收交接：用户已验收 0.1.5，并明确授权提交到 dev。本次提交包含 U22–U26 的累计实现、文档与验证记录，以及此前遗漏但现有构建依赖的 U21 源码／测试／构建规则；app/release 用户签名产物保留在本地、不纳入 Git。下方“未提交／未授权／待用户确认”为各轮历史状态，提交身份以 git log 为准。本次仅授权提交，不推送或合入 master。
 
 最新 U26／0.1.5（versionCode 6）：所有带播放栏的页面共用 MusicExpansionHost 的同 Activity 封面展开／收回，主页不保留另一套动画。180／0.86 展开、230／0.8 收回、带符号位移、终点持续共享封面层和输入门禁保留。普通音频 openPlayer 发当前宿主命令；在线搜索成功播放也同页展开，不再压新 MainActivity。仅旧 PlayerActivity 音频转向兼容入口保留原压栈。Back 优先收起详情，下一次才退页面；底层页面保持 Composition，搜索结果 ViewModel 保留配置重建（不承诺进程死亡恢复）。不得在启动 effect 清除刚测得的大封面锚点。所有控制条维持 U25 恢复的原主页磨砂，无附加阴影。以下 U23–U25 的压栈入口是历史，以本段和 STATUS 为准；不自动提交／推送。
@@ -22,7 +34,7 @@ U24（仍为 0.1.2／3）：二级 Activity 通过 PlayerHostActivity.AppTheme �
 2. 检查 git status、分支与证据。**所有修改在 `dev`；不存在时创建 `dev`。master 只接受经授权的合入，禁止直接开发。** dev-hifi 为 `c75b34d`；U11–U14 为 `607ceb3`；U15–U19 为 `d551f38`，U20 为 `f24008b`；用户最新提交为 dev `31fece7`，master 合入为 `18fcb28`。不清理用户文件；没有新授权不自动提交／推送／合并。
 3. 当前音乐能力：歌曲／歌手／专辑／歌单分类，收藏入口在“歌单 → 我的收藏”；库、歌单和播放队列独立。独立队列 Activity 支持单／多选移除、长按排序；顺序／单曲／随机播放由真实后端实现。主页底栏只留播放／暂停，不恢复下一首和“全部音乐／收藏”快捷卡片。双语歌词及自定义译文字号／字重／原译间距按 U11 保留。
 4. 音乐前端基线为 U14：封面展开和收回均保留轻微回弹，收回终点继续使用同一绘制层；不能以删除回弹规避闪现。透明详情退出后不可点击，快速重开不得误弹菜单。9° 角落按压是缓慢、无触底回弹的另一套效果。按钮／列表令牌见第 7 节。U08 固定页头与顶部 40dp TabRow、U04 弹窗反馈等已确认基线继续保留。
-5. 当前 U22 验收设备为**一加平板 Pro `bdba9db1`／OPD2404／API36／OPD2404_16.0.5.1201(CN01)**，横屏 3000×2120、density420；用户说明为 8 Gen3／ColorOS16。每次先枚举，不复用旧地址。13 Ultra `c9e352e3` 的 U21 证据保留，17 Pro Max 本轮未连接；无 USB DAC，不能套用历史输出资格。MuMu 可补专项，但不替代物理设备资格。
+5. 当前 U27 验收设备为**小米 13 Ultra `c9e352e3`／2304FPN6DC／API36／OS3.0.308.0.WMACNXM**，竖屏 1440×3200。每次先枚举，不复用旧地址。U22–U26 一加平板证据保留，17 Pro Max 本轮未连接；无 USB DAC，不能套用历史输出资格。MuMu 可补专项，但不替代物理设备资格。
 6. 视频基线为 U20 倍速＋U21 手势／输入＋U22 比例修复：可选 libmpv、字幕／章节／同步／逐帧，横屏半透明右侧抽屉、真实滚动与逐级返回；工具内倍速 0.1×–8×／步进 0.1×，外侧仍为 0.5／1／1.25／1.5／2／3。Media3 与 libmpv 统一最高 8×；不按倍速自动切换后端，不再为仅硬解提供单独倍速范围。见视频体验与 ADR0007／0008。
 7. 每轮写清任务／文件／命令与 exit 结果／设备素材／证据／未验条件和下一动作，更新 STATUS，最后中文说明实现、验证与限制。设备阻塞时继续不依赖设备的工作；没有用户最终确认时不写“视觉已满意”。
 
@@ -44,7 +56,7 @@ U24（仍为 0.1.2／3）：二级 Activity 通过 PlayerHostActivity.AppTheme �
 
 ## 3. 版本与构建
 
-- U26 当前版本 `0.1.5`／versionCode `6`（此前工作区 0.1.4／5，用户正式包 0.1.1／2）。debug／release 均只编译 `arm64-v8a`、`x86_64`，按 ABI 独立打包，不生成 universal。应用 APK 名称固定为 `YYPlayer_for_Android_<version>_<arch>_<debug/release>.apk`；version 取实际 variant versionName，arch 用上述 ABI 标识。测试 APK 保留 AGP 命名；脚本读取 output-metadata.json 按设备 ABI 选择，不硬编码旧 app-debug.apk。
+- U27 当前版本 `0.1.6`／versionCode `7`（此前 U26 为 0.1.5／6）。debug／release 均只编译 `arm64-v8a`、`x86_64`，按 ABI 独立打包，不生成 universal。应用 APK 名称固定为 `YYPlayer_for_Android_<version>_<arch>_<debug/release>.apk`；version 取实际 variant versionName，arch 用上述 ABI 标识。测试 APK 保留 AGP 命名；脚本读取 output-metadata.json 按设备 ABI 选择，不硬编码旧 app-debug.apk。
 - Release 对全应用启用 R8 代码／资源优化，保留 native.keep 与 MpvNative @Keep 的 JNI 契约；native 库在 release APK 内压缩并由系统安装时解压，debug 保留未压缩。所有 ELF 仍须 16KB 对齐，未压缩 ZIP 条目也须 16KB 对齐；压缩库须确认 extractNativeLibs=true 并真实装载。不得因测试运行器依赖混淆前的 Kotlin 类就关闭优化或全包 keep。
 - 正式签名由 Android Studio／受控构建注入；未提供签名配置的 assembleRelease 产物未签名，不把 release 文件名当签名证明，不给 release 默认配置 debug 证书。QA 副本可用 Gradle signingReport 确认的现有调试证书验证并 install -r，不卸载数据；正式发布归档 mapping.txt。详细命令和安装空间权衡见 [编译与签名](docs/BUILD_AND_SIGNING.md)。
 - S00已按官方 Android 坐标接入 Miuix0.9.4；Kotlin2.4.20、Compose BOM2026.09.00、Media3 1.11.1 已锁 catalog，实际完整构建与 lint 仍以 STATUS 为准。不能混旧miuix坐标与新miuix-ui API。

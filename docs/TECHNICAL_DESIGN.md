@@ -1,5 +1,9 @@
 # Android 技术设计与选型
 
+2026-10-15 U28／0.1.7：MainActivity 统一消费媒体导航。显式 open_music 或 SystemUI 来源的 MAIN／LAUNCHER（需当前已有音频）展开封面并清除旧压栈返回标记，返回收回主页。onNewIntent 更新 Intent 后读取 referrer；该字段仅为 UI 导航提示。仅首次创建消费入口，配置重建使用已保存展开状态。唯一播放引擎和服务不变，见 [U28](validation/navigation-u28/README.md)。
+
+2026-10-15 U27／0.1.6：MediaSession 创建后显式 addSession，确保没有外部 MediaController 绑定时也启动 Media3 通知／前台服务追踪。ArtworkCache 从 Composable 文件移到 playback 仓库供 UI 与服务共享；后台限量读取，服务压缩最长边 384px 封面字节，按媒体代次／Player 身份／revision 拒绝过期元数据。队列和向导排除悬浮栏，其他二级页默认复用完整宿主动效；详情待共享封面回弹结束再接受输入，分页按元素水平跟随。详见 [U27](validation/music-u27/README.md)。
+
 2026-10-15 U26／0.1.5：MusicExpansionHost 统一主页与各播放栏宿主的同页详情动画，常规音频入口使用当前 Activity 命令而非压入 MainActivity；唯一 runtime 不变。搜索 ViewModel 仅保留配置重建结果，展开状态 saveable，旧歌词请求按 generation 取消／拒绝。详见 [ADR0004](adr/0004-inline-music-player.md) 和 [U26](validation/music-u26/README.md)。
 
 2026-10-15 U25／0.1.4：PlaybackPageHost 改全尺寸内容捕获＋兄弟悬浮层，玻璃采样页面真实内容；LocalPlaybackBottomSpace 只供列表末尾和固定操作按钮避让，不缩小列表视口。取代 U24 的底部占位布局；继续唯一后端、原生 Activity 返回栈和 IME 避让。见 [U25](validation/playback-u25/README.md)。
