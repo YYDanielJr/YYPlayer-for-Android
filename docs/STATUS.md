@@ -157,7 +157,7 @@
 用户要求更新文档和 AGENTS.md。功能代码基线为 `dev` 提交 **`607ceb3`**；HiFi 基线 `c75b34d` 已合入，master 保持 `836a920`。本轮仅修改文档，尚未提交／推送。
 
 - `AGENTS.md`：替换旧 U08／MuMu 接手入口，明确 dev 开发与 master 仅接受授权合入、最新 U11–U14 功能、真实 service／唯一引擎、最终按钮与动效规则，以及有线小米 13 Ultra／无 DAC 的验收条件。保留架构、线程、音频真实性、数据和兼容性约束；不把待验内容写成已通过。
-- `README.md`、`IMPLEMENTATION_PLAN.md`、`TECHNICAL_DESIGN.md`：更新当前实现与提交状态、设备命令和验收入口，区分已有 Media3／C++ PCM／JNI／AudioTrack 与后续 FFmpeg／libmpv／Oboe、Room／DataStore 规划；版本表核对实际 catalog，清除过时坐标与“无需 ExoPlayer”描述。
+- `../README.md.old`、`IMPLEMENTATION_PLAN.md`、`TECHNICAL_DESIGN.md`：更新当前实现与提交状态、设备命令和验收入口，区分已有 Media3／C++ PCM／JNI／AudioTrack 与后续 FFmpeg／libmpv／Oboe、Room／DataStore 规划；版本表核对实际 catalog，清除过时坐标与“无需 ExoPlayer”描述。
 - `HANDOFF_HIFI.md`：修正 H02–H05 已提交状态和当前启动指令，标记旧设备／无线地址／测试命令为历史范围，修复相对链接。`UI_SETUP_AND_LIBRARY.md`、`UI_MUSIC_EXPERIENCE.md` 同步底栏单按钮、收藏入口、52dp／50dp 按钮、双语样式 v2 和 U14 保留回弹；移除未收录原图的失效链接。
 - 验证：核对 `git log`／分支、catalog 和 service／歌词源码；文档入口本地链接检查及 `git diff --check` 通过（exit 0）。只改 Markdown，没有新增功能或重跑构建／设备测试，继续引用 U14／U13 已记录证据。
 
