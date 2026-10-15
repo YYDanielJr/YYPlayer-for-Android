@@ -19,7 +19,7 @@ import top.yukonga.miuix.kmp.theme.MiuixTheme
 @Composable
 internal fun OrientationPage(orientation: OrientationChoice, onSelect: (OrientationChoice) -> Unit, onBack: () -> Unit) {
     HyperPage("屏幕方向", onBack) { padding ->
-        LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(top = padding.calculateTopPadding() + 12.dp, bottom = 32.dp)) {
+        LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(top = padding.calculateTopPadding() + 12.dp, bottom = 32.dp + padding.calculateBottomPadding() + LocalPlaybackBottomSpace.current)) {
             OrientationChoice.entries.forEach { choice -> item {
                 val selected = orientation == choice
                 Surface(onClick = { onSelect(choice) }, shape = CardShape, color = MiuixTheme.colorScheme.surface,

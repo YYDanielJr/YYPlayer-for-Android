@@ -167,7 +167,7 @@ struct Engine {
                 try {
                     if (request->args.size() == 1 && request->args[0] == "snapshot") {
                         std::string out = "{\"loaded\":" + std::string(loaded ? "true" : "false") + ",\"error\":" + quote(playbackError);
-                        for (auto key : {"time-pos", "duration", "pause", "eof-reached", "speed", "video-params",
+                        for (auto key : {"time-pos", "duration", "pause", "eof-reached", "speed", "video-params", "video-out-params",
                              "track-list", "chapter-list", "chapter", "seeking", "hwdec-current", "video-codec", "audio-codec-name",
                               "audio-params", "current-ao", "sub-delay", "audio-delay", "sub-text", "sub-font", "sub-ass-override", "deband", "mpv-version", "ffmpeg-version"}) {
                             mpv_node node{};

@@ -1,0 +1,12 @@
+landscape MEDIA3/AUTO screenshot=3000x2120 circle=657x657 ratio=1.0 source=640x360 decoder=c2.qti.avc.decoder
+MPV/AUTO screenshot=3000x2120 circle=658x657 ratio=1.0015221 source=640x360 decoder=H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10 · mediacodec-copy
+MPV/SOFTWARE screenshot=3000x2120 circle=657x657 ratio=1.0 source=640x360 decoder=H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10
+rotate90 MEDIA3/AUTO screenshot=3000x2120 circle=657x657 ratio=1.0 source=640x360 decoder=c2.qti.avc.decoder
+MPV/AUTO screenshot=3000x2120 circle=657x657 ratio=1.0 source=640x360 decoder=H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10 · mediacodec-copy
+MPV/SOFTWARE screenshot=3000x2120 circle=657x657 ratio=1.0 source=640x360 decoder=H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10
+rotate270 MEDIA3/AUTO screenshot=3000x2120 circle=657x657 ratio=1.0 source=640x360 decoder=c2.qti.avc.decoder
+MPV/AUTO screenshot=3000x2120 circle=657x657 ratio=1.0 source=640x360 decoder=H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10 · mediacodec-copy
+MPV/SOFTWARE screenshot=3000x2120 circle=657x657 ratio=1.0 source=640x360 decoder=H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10
+tablet-hevc90 MEDIA3/AUTO screenshot=3000x2120 circle=825x825 ratio=1.0 source=2038x1440 decoder=c2.qti.hevc.decoder
+MPV/AUTO screenshot=3000x2120 circle=825x824 ratio=1.0012136 source=2038x1440 decoder=H.265 / HEVC (High Efficiency Video Coding) · mediacodec-copy
+MPV/SOFTWARE screenshot=3000x2120 circle=825x824 ratio=1.0012136 source=2038x1440 decoder=H.265 / HEVC (High Efficiency Video Coding)

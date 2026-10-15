@@ -1,0 +1,38 @@
+[
+  {
+    "apk": "app\\build\\outputs\\apk\\debug\\YYPlayer_for_Android_0.1.0_arm64-v8a_debug.apk",
+    "bytes": 45292310,
+    "sha256": "faee83d75be682b25866911bb0d5b4284178bfd8df5a1fb1beec23f3bcfd99b7",
+    "package": "yy.daniel.yyplayerforandroid"
+  },
+  {
+    "apk": "app\\build\\outputs\\apk\\debug\\YYPlayer_for_Android_0.1.0_x86_64_debug.apk",
+    "bytes": 50221242,
+    "sha256": "40de3554be934f9133d467247ae5890c8e2be0053ca2683966ab531bce68bc9a",
+    "package": "yy.daniel.yyplayerforandroid"
+  },
+  {
+    "apk": "app\\build\\outputs\\apk\\release\\YYPlayer_for_Android_0.1.0_arm64-v8a_release.apk",
+    "bytes": 14285852,
+    "sha256": "a85274c3c0ca87d848bb877f55b66f1dceabb2fde2b09a4ca6d4eb270fc7be97",
+    "package": "yy.daniel.yyplayerforandroid"
+  },
+  {
+    "apk": "app\\build\\outputs\\apk\\release\\YYPlayer_for_Android_0.1.0_x86_64_release.apk",
+    "bytes": 15343060,
+    "sha256": "9ff9a18cb889826a0148f569c80aff196656708d7bdc5699af6a4575f08a0eac",
+    "package": "yy.daniel.yyplayerforandroid"
+  },
+  {
+    "apk": "build\\u21-qa\\YYPlayer_for_Android_0.1.0_arm64-v8a_debug.apk",
+    "bytes": 45634632,
+    "sha256": "81bac9c0e9ed51a2082e28cd1b2aa8d6103909aa6d8ac55f231592883170c0c4",
+    "package": "yy.daniel.yyplayerforandroid.qa"
+  },
+  {
+    "apk": "build\\u21-qa\\YYPlayer_for_Android_0.1.0_arm64-v8a_release.apk",
+    "bytes": 14308435,
+    "sha256": "65e78f861219b050cd1f2801e900edd2c8ad7f760e1100f49f85e0ff6ea0ee2d",
+    "package": "yy.daniel.yyplayerforandroid.qa"
+  }
+]

@@ -1,12 +1,24 @@
 # YYPlayer for Android
 
-U21 当前工作区修复了实体机 libmpv 文件权限导致的 loading failed，并精简视频控制器，加入可开关的双击／拖动预览／亮度／音量手势。两套后端的长按变速响应已在 13 Ultra 测量；详情见 [视频体验](docs/UI_VIDEO_EXPERIENCE.md)、[U21 验证](docs/validation/video-u21/README.md)。本轮与 B01 构建规则变更均未提交，原签名 release 和数据保留。
+2026-10-15：用户已验收 **0.1.5**，U22–U26 累计实现与必要源文件纳入本次 dev 提交；下方各阶段“未提交”为历史记录。正式签名产物仍仅保留本地，不纳入源码提交。
 
-当前功能基线为 **2026-10-14 `dev` U15–U20**，已提交至 `f24008b`。B01 更新版本为 **0.1.0（versionCode 2）**，debug／release 均按 arm64-v8a、x86_64 分包，release 启用全应用代码／资源优化与原生库压缩；B01 尚未提交。命名、签名和验证说明见 [编译与签名](docs/BUILD_AND_SIGNING.md)。
+U26／**0.1.5（versionCode 6）**：主页封面从控制条展开／收回的共享动画现用于所有带播放栏的页面。搜索、设置、队列、联网歌词和重新设置均在当前页展开，收回到当前控制条并保留页面；原磨砂视觉不变。见 [U26](docs/validation/music-u26/README.md)。
+
+U25／**0.1.4（versionCode 5）**：播放栏改为真正覆盖在页面内容上的悬浮层。列表可从磨砂播放栏下方滚过，仅末尾增加避让留白；保留键盘上移、暂停／恢复和返回原页面。U24 的底部占位布局已替换，验证见 [U25](docs/validation/playback-u25/README.md)。
+
+按后续反馈，所有页面播放栏统一恢复原主页磨砂视觉，已撤销新增阴影；真正悬浮的布局继续保留。
+
+U24 将播放栏接入在线搜索、联网歌词、设置／方向／歌词样式／音频输出、播放队列与重新设置页。有当前媒体时可直接播放／暂停、查看进度、打开详情并返回原页面；完整封面和视频使用自身控制器。同 Activity 页内切换不带动播放栏，跨 Activity 保留 ROM 转场。版本仍为 0.1.2，见 [U24 验证](docs/validation/playback-u24/README.md)。
+
+U23 追加在线搜索的返回栈：流式播放进入封面后，收起或系统返回会回到原搜索页，保留搜索词、结果和滚动位置，歌曲继续播放。主页打开的封面仍收回到主页。版本保持 0.1.2，详见 [U23 验证](docs/validation/navigation-u23/README.md)。
+
+U22／**0.1.2（versionCode 3）** 修复一加平板横屏音乐重复小封面：左列为封面、歌曲信息与控制栏，右列完整留给歌词；侧栏设置入口增加图标。libmpv 修正旋转元数据对应的显示尺寸，解决横屏录屏被压窄。已在一加平板 Pro 验证，见 [U22 记录](docs/validation/tablet-u22/README.md)。
+
+用户已将 0.1.1 提交至 `dev` 的 `31fece7`，并合入 `master` 的 `18fcb28`；本轮 U22 在 `dev` 修改，尚未提交。原有未跟踪 U21 文件与用户 release 归档保留。debug／release 继续按 arm64-v8a、x86_64 分包，release 启用全应用代码／资源优化与原生库压缩；命名、签名和验证说明见 [编译与签名](docs/BUILD_AND_SIGNING.md)。
 
 视频已有全窗口双指变换／还原、3× 触感、字幕与音轨、A–B、截图和可选 libmpv 的章节／逐帧／libass／音画同步。横屏设置使用半透明右侧抽屉，支持实际上下滑动和屏幕内逐级返回。新增「播放工具 → 播放倍速」0.1×–8×，每次 0.1×，外侧快捷档位不变。Media3 与 libmpv 统一最高 8×，调节倍速不切换后端。见 [视频体验](docs/UI_VIDEO_EXPERIENCE.md)、[U20 验证](docs/validation/video-u20/README.md)、[ADR0008](docs/adr/0008-video-speed-range.md)。
 
-基于 Kotlin、Jetpack Compose 和 Miuix 的 Android 本地音乐／视频播放器。HiFi 基线 `c75b34d` 已合入，`master` 保持 `836a920`；桌面 Rust 工程只读参考。U15–U18 文档的“未提交”描述当轮状态，已在 `d551f38` 集中收录。
+基于 Kotlin、Jetpack Compose 和 Miuix 的 Android 本地音乐／视频播放器。U21 的 FD 输入、精简视频控制器、可配置手势与双后端变速继续保留，13 Ultra 历史证据见 [U21 验证](docs/validation/video-u21/README.md)。桌面 Rust 工程只读参考；下文带日期的旧版本与“未提交”描述属于当轮状态。
 
 当前音乐体验包括歌曲／歌手／专辑／歌单浏览，顺序／单曲／随机播放，独立队列页面的单选／多选移除与长按排序，以及双语歌词字号、字重和原译间距。主页保留固定页头、顶部标签和仅有播放／暂停的底栏；“全部音乐／收藏”快捷卡片已移除，收藏从“歌单 → 我的收藏”进入。
 
@@ -14,7 +26,7 @@ U21 当前工作区修复了实体机 libmpv 文件权限导致的 loading faile
 
 播放仍使用 Media3／MediaCodec，已有真实 MediaSessionService、可移植 C++ PCM 核心、系统与自研 AudioTrack 输出路径。非严格自研输出故障可在同一设备仍连接时回退 SYSTEM；严格模式拒绝静默降级，断连不回退扬声器。视频可选 libmpv／FFmpeg／libass 按 ADR0007 实现；音乐 FFmpeg PCM／Oboe 和端到端位准确仍未完成，见 [HiFi 交接](docs/HANDOFF_HIFI.md) 与 [ADR0006](docs/adr/0006-hifi-output-core-android-split.md)。
 
-最近验收设备为**有线小米 13 Ultra `c9e352e3`／API36／OS3.0.308.0.WMACNXM**。U14 构建、34 项 JVM 和 lint 通过（0 error／2 既有 warning）；U13 的 5 项真实播放回归通过。Compose Activity suite 在此 ROM 上尚未完成；API26–32、无障碍／大字体等专项、release 帧率和音频硬件资格仍待验。本轮没有 USB DAC，历史 DAC 结果不代表此设备通过。最新进展和具体限制见 [STATUS](docs/STATUS.md)。
+最近验收设备为**一加平板 Pro `bdba9db1`／API36／ColorOS16／OPD2404_16.0.5.1201(CN01)**；使用 `.qa` 共存包，保留用户 0.1.1 release 与数据。13 Ultra 的 U21 结果不自动覆盖其他设备。API26–32、完整无障碍／大字体、release 帧率和音频硬件资格仍待验；最新命令、结果和限制见 [STATUS](docs/STATUS.md)。
 
 ## 文档入口
 
@@ -26,7 +38,7 @@ U21 当前工作区修复了实体机 libmpv 文件权限导致的 loading faile
 | [实施计划](docs/IMPLEMENTATION_PLAN.md) | 当前 U11–U14 基线、待验事项及长期 S00–S14 计划 |
 | [AGENTS.md](AGENTS.md) | 后续代码代理必须遵循的执行规则与禁区 |
 | [进度记录](docs/STATUS.md) | 实际完成情况、证据和下一任务；接手先读 |
-| [编译与签名](docs/BUILD_AND_SIGNING.md) | 0.1.0、双 ABI 独立 APK、release 体积优化与正式签名 |
+| [编译与签名](docs/BUILD_AND_SIGNING.md) | 0.1.5、双 ABI 独立 APK、release 体积优化与正式签名 |
 | [U07 引导／库／控件](docs/UI_SETUP_AND_LIBRARY.md) | 首次设置、顶部标签、播放玻璃胶囊、歌词样式与长按批量管理 |
 | [音乐体验 U05–U14](docs/UI_MUSIC_EXPERIENCE.md) | 当前歌单／队列／双语歌词／按钮与封面动效，以及历轮证据 |
 | [ADR 0004](docs/adr/0004-inline-music-player.md) | 音乐使用主页内动画覆盖层，视频保留 Activity |

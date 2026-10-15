@@ -1,5 +1,77 @@
 # 进度与交接记录
 
+## 2026-10-15：0.1.5 用户验收与提交
+
+- 用户明确“我已验收，请提交”，本次在 dev 提交 U22–U26 累计实现、文档、验证记录及现有构建依赖的未跟踪 U21 源码／测试／native keep 规则；原 app/release APK、mapping 和 symbols 保留本地，不提交。下方未提交／待用户确认等文字保留为当轮历史。
+- 验证沿用 U26 已通过的 8 项平板专项、39 项 JVM、双 ABI debug／release 构建和 lint（0 error／2 既有 warning），本次仅补验收交接文字，不重复构建或设备操作。提交前 git diff --check 与暂存检查通过；验证记录敏感配置模式扫描无匹配（rg exit 1 表示未发现匹配）。
+- 用户已验收当前平板体验；API26–32、其他设备、release 帧率等未验范围不因此扩大。提交身份以 git log 为准；未推送、未合入 master，下一步按用户后续指令处理。
+
+## 2026-10-15：U26 所有播放栏页面共享封面动画／0.1.5
+
+**实现与一加平板专项完成，版本 0.1.5／versionCode 6，未提交。** dev 基线仍为 `31fece7`；保留 U22–U25 和用户未跟踪文件。
+
+- 任务／实现：将主页共享封面绘制层、展开 180／0.86 与收回 230／0.8 弹簧、输入门禁、快速反向处理提取到 MusicExpansionHost。主页、搜索／联网歌词、设置／方向／歌词样式／输出、队列和引导页均在当前 Activity 内展开，收回回到本页播放栏，保留页面状态与原主页磨砂视觉。真正子 Activity 仍用 ROM 转场；旧 PlayerActivity 音频跳转兼容入口保留。
+- 配套：展开时隐藏键盘；展开状态跨配置重建恢复，搜索结果用 ViewModel 保留，不写大 Bundle；联网歌词详情内切歌刷新当前查询且不关闭宿主。修复逐帧验证发现的目标锚点被迟到 effect 清空问题，保证中间帧真实移动／缩放。没有更改视频或媒体输出路径。
+- 文件：MusicExpansionHost、PlaybackPageHost、YYPlayerApp、PlayerHostActivity、MainActivity、OnlineSearchActivity、OnlineSearchScreen、OnlineSearchPageState；版本／release 断言；OnlineUiTest、MusicExperienceUiTest；README、AGENTS、ADR0004、音乐体验、在线 API、技术设计、实施计划、构建说明与本记录。
+- 设备／素材：每次枚举确认一加平板 Pro bdba9db1／OPD2404／API36／ColorOS16／OPD2404_16.0.5.1201(CN01)，横屏 3000×2120。使用自有 WAV／几何封面／LRC 和受控 localhost HTTPS 结果，未保存个人媒体画面。
+- 命令／结果：onlineQa debug／androidTest／JVM exit 0；直接 instrumentation **OK (8 tests)**，包含七类二级页中间帧几何、展开／收回、三次途中返回、键盘、配置重建、子页返回、联网歌词切歌及主页回归。正式 `assembleDebug assembleRelease testDebugUnitTest lintDebug` 首轮 exit 1（新宿主缺 Media3 opt-in），补局部注解后重跑 exit 0，**39 JVM 全过，lint 0 error／2 既有 warning**。最终普通 QA debug／androidTest exit 0；注解不改变运行逻辑，未重复设备 suite。git diff --check exit 0。
+- 证据／交付：[U26 验证](validation/music-u26/README.md) 含日志、原创中间帧与收回截图、四个正式 ABI／类型 APK 和普通 QA 的 SHA256。已 install --no-incremental -r 更新并启动普通 YYPlayer QA 0.1.5，无 onlineQa 信任配置；原 release 0.1.1／2 与数据保留。测试偏好／API 已恢复，reverse 和本轮 HTTPS 服务已清理。正式 release 未用用户私钥签名；未提交／推送／合入。
+- 限制／下一步：手机竖屏、API26–32、200% 字体、完整 TalkBack／深色／分屏、release 帧率未重测；配置重建恢复不代表进程回收后完整搜索结果恢复。用户可在当前平板 QA 复核各页开合与原材质，视觉手感仍待用户确认。
+
+## 2026-10-15：U25 后续——全部播放栏恢复原主页视觉
+
+- 任务／实现：按用户要求删除 HyperDesign.LibraryMiniPlayer 新增的 6dp 阴影和 import，所有页面共用原主页磨砂／透明度／边框／按压反馈。脚本提取函数全文与 dev HEAD `31fece7` 比对一致，磨砂底层文件无 diff；保留 U25 真实内容悬浮、键盘避让和返回栈，版本保持 0.1.4／5。
+- 文件：HyperDesign.kt、README、AGENTS、音乐体验、本 STATUS 和 U25 验证补充。旧 U25 阴影描述／截图保留为历史，新增恢复后记录明确覆盖。
+- 命令／结果：普通 QA `assembleDebug assembleDebugAndroidTest -PdeviceQa=true` exit 0；正式 `assembleDebug assembleRelease` exit 0；平板直接 instrumentation 两项 `MusicExperienceUiTest` 回归通过（七类二级页真实播放／返回、空队列、主页平板封面多次开合）；git diff --check exit 0。仅删除视觉修饰，没有新增测试，未重复 JVM／完整 lint／后端专项。
+- 设备／素材／交付：枚举一加平板 Pro bdba9db1／API36／ColorOS16，使用原有自制 WAV／几何封面／LRC；QA install --no-incremental -r 成功，原 release 与数据保留。四个正式 APK 已刷新，release 未用用户私钥签名。[U25 最新恢复记录](validation/playback-u25/README.md)含日志、截图与 restore-artifacts.json；未提交／推送。
+- 限制／下一步：其他设备、深色、大字体、release 帧率未重测；用户可在当前 QA 0.1.4 复核原主页视觉恢复效果。
+
+## 2026-10-15：U25 真悬浮播放栏／0.1.4
+
+**实现与一加平板专项完成，版本 0.1.4／versionCode 5，未提交。** dev 基线仍为 `31fece7`，保留 U22–U24 和原有未跟踪文件。
+
+- 任务／实现：修正用户指出的 U24 底部占位布局。PlaybackPageHost 使用全尺寸真实内容捕获层＋上层播放栏，列表在磨砂下方滚动，加入 6dp 轻阴影；不压缩内容视口。实际栏高仅通过 LocalPlaybackBottomSpace 增加列表尾部 contentPadding，队列／引导固定操作按钮单独避让。保留键盘上移、原页返回栈、唯一后端、主页共享封面和页内动画分离。
+- 文件：PlaybackPageHost、HyperDesign、OnlineSearchScreen、SettingsScreen、AudioOutputScreen、LyricStyleScreen、OrientationPage、MusicQueueScreen、SetupScreen；app/build.gradle.kts 及 ReleasePackagingInstrumentation 版本；OnlineUiTest、MusicExperienceUiTest；README、AGENTS、构建说明、音乐体验、技术设计、实施计划、ADR0004、本记录和 U25 验证。
+- 设备／素材：枚举一加平板 Pro bdba9db1／OPD2404／API36／ColorOS16／OPD2404_16.0.5.1201(CN01)，横屏 3000×2120。自有 WAV／几何封面／LRC／localhost HTTPS 32 条结果，不保存个人媒体画面；QA 共存 install --no-incremental -r，原正式 release 0.1.1／2 和数据保留。
+- 命令／结果：onlineQa debug／androidTest／JVM、普通 QA debug／androidTest，以及正式 `assembleDebug assembleRelease testDebugUnitTest lintDebug` 均 exit 0。39 JVM 全通过；lint 0 error／2 既有 warning。直接 instrumentation **7 项通过**，覆盖真实结果行与栏重叠、实际 swipeUp 栏位置不动、最后一项滚出遮挡、点击不穿透、真实 IME、七类二级页和引导返回、原封面两项回归。git diff --check exit 0。
+- 证据／交付：[U25](validation/playback-u25/README.md) 含命令、结果、原创截图和 APK hash。四个正式 ABI／类型 APK metadata 均为 0.1.4／5；release 未用用户私钥签名。平板已安装普通 YYPlayer QA 0.1.4，无 onlineQa 信任配置；测试偏好／API 恢复，reverse 和本轮 HTTPS 服务已清理。文档和 AGENTS 同步，无提交／推送／合并。
+- 限制／下一步：API26–32、手机竖屏、分屏、200% 字体、TalkBack、深色和 release 帧率未重测；未改后端／native 库，不重复其硬件资格。跨 Activity 仍随 ROM 窗口过渡。用户可在自己的歌曲／在线服务上复核悬浮视觉与手感，不声称用户已满意。
+
+## 2026-10-15：U24 跨页面共享播放栏
+
+**实现与一加平板专项完成，保持 0.1.2／3，未提交。** dev 仍为用户提交的 `31fece7`；继续保留 U22／U23 与原有未跟踪文件。
+
+- 任务／子步骤：将播放栏提升到二级 Activity 的 AppTheme 宿主，覆盖在线搜索／联网歌词、设置／方向／歌词样式／输出、队列和重新设置；实际高度为内容留位，IME／导航边距统一消费，键盘弹出上移。页内滚动／分页／步骤动画不带动播放栏，完整音乐／视频使用自身控制器。非主页音频入口统一压栈，收起回同一调用者。磨砂背景覆盖完整窗口，修正初轮短捕获层导致灰块。
+- 文件：新增 PlaybackPageHost；PlayerHostActivity、YYPlayerApp；OnlineUiTest、MusicExperienceUiTest；README、AGENTS、技术设计、实施计划、音乐体验、ADR0004、本 STATUS、验证目录。
+- 设备／素材：先枚举有线一加平板 Pro bdba9db1／OPD2404／API36／ColorOS16／OPD2404_16.0.5.1201(CN01)。自有 WAV／几何封面／LRC，受控 localhost HTTPS 搜索流。共存 QA 全部 install --no-incremental -r，原 0.1.1 release 与数据保留。
+- 命令／结果：onlineQa `assembleDebug assembleDebugAndroidTest testDebugUnitTest` exit 0；普通 QA debug／androidTest exit 0；正式 `assembleDebug assembleRelease testDebugUnitTest lintDebug` exit 0，39 JVM 全过，lint 0 error／2 既有 warning。直接 instrumentation **7 项通过**：搜索真实暂停／恢复／返回与键盘、7 类二级页面的同一后端／相同底栏位置／逐页返回、清队列隐藏、页内动画逐帧稳定、重新设置往返、两项原封面回归。git diff --check exit 0。
+- 证据／交付：[U24 验证](validation/playback-u24/README.md) 含命令、初轮安装选择纠正、日志、原创截图和 APK 哈希；平板已恢复不含 onlineQa 信任配置的普通 YYPlayer QA 0.1.2，测试偏好／API 恢复，reverse 和本地测试服务已清理。正式双 ABI debug／release 已刷新，release 未用用户私钥签名；未提交／推送／合并。
+- 边界／下一步：跨 Activity 仍随 ROM 窗口转场运动，用户已接受；没有申请全局悬浮窗。测试时钟 bounds 不证明 release 帧率。本轮未重测 API26–32、手机竖屏、大字体／TalkBack／深色／分屏及视频 native 资格；未改后端或输出。下一步用户复核自己的音乐与在线服务，视觉手感仍待用户确认。
+
+## 2026-10-15：U23 在线流播放返回搜索栈
+
+**实现与一加平板专项完成，版本保持 0.1.2／3，未提交。** 基于同工作区 U22，dev 仍为用户提交的 `31fece7`；保留原有修改与未跟踪文件。
+
+- 任务／实现：去除搜索流播放后的清栈／关闭搜索页路径，压入带 `music_on_back_stack` 标记的 MainActivity 音乐入口。收起按钮与系统返回弹出该入口，恢复同一个搜索页及查询／结果／滚动位置，流播放继续。队列子页逐级返回，封面 Activity 重建后仍按原栈弹出。主页入口保留 U14／U22 覆盖层和共享封面回弹，不按 isOnline 误判返回位置。
+- 文件：MainActivity、PlayerHostActivity、OnlineSearchActivity、YYPlayerApp、OnlineSearchScreen 测试标记；OnlineUiTest、Serve-OnlineFixtures.py；README、AGENTS、ADR0004、音乐体验、在线 API、本 STATUS 和验证记录。
+- 环境／素材：一加平板 Pro bdba9db1／OPD2404／API36／OPD2404_16.0.5.1201(CN01)。受控 localhost HTTPS、32 条自制结果、自有 WAV 与几何封面。测试使用共存 QA，原正式包与数据保留。只在显式 onlineQa debug 构建信任本地测试证书，未改系统信任或关闭 TLS 校验。
+- 验证／命令：QA `assembleDebug assembleDebugAndroidTest testDebugUnitTest lintDebug`（onlineQa 及普通两种）均 exit 0；39 项 JVM 全过。真实 `OnlineUiTest` 3 项通过，覆盖直接播放／音质选择、3 次进出、系统返回、同一搜索 Activity 与结果 bounds、队列往返、重建、回主页后正常收起；`MusicExperienceUiTest` 两项通过。正式 `assembleDebug assembleRelease lintDebug` exit 0，lint 0 error／2 warning；四个 APK 的 ABI／ELF／ZIP 16KB 审计通过。git diff --check exit 0。
+- 交付／清理：已 install -r 更新普通 YYPlayer QA 0.1.2（不含 onlineQa 网络配置），测试在线开关与 API 配置恢复，移除 adb reverse 18443，停止本轮本地 HTTPS 服务。正式双 ABI debug／release 产物已刷新，release 未用用户私钥签名；没有自动提交、推送或合入。
+- 证据／边界：[U23 验证](validation/navigation-u23/README.md) 含命令、5 项真机测试、39 项 JVM、构建与 APK 哈希。未验证搜索进程完全被回收后的完整结果恢复、其他设备／API26–32、预测性返回帧率；U23 release 做构建与打包审计，未重复完整 release UI suite。下一步用户可在自身服务配置下复测。
+
+## 2026-10-15：U22 一加平板横屏修复／0.1.2
+
+**本轮实现与设备专项完成，未提交。** 用户已将 0.1.1 提交至 dev `31fece7` 并合入 master `18fcb28`；接手时两分支内容相同，先切回 dev 再修改。接手时仍有未跟踪的 U21 源码／测试／文档和 app/release 用户产物，保留不清理；本轮没有提交／推送／合入授权。下面 U21／B01 的“未提交／0.1.0”只描述历史当轮状态。
+
+- **音乐**：横屏左列按封面、歌名、歌手·专辑、进度与控制栏排列，右列完整用于歌词。去掉封面模式重复的 44dp 小封面；完整歌词页仍保留紧凑身份行。沿用 U14 展开／收回弹簧与共享封面层，淡出布局不覆盖当前锚点。
+- **视频**：用户指定的录屏为 HEVC／1440×2038／90°。libmpv 已转正画面，旧代码仍按竖屏 dw/dh 布局。改为读取输出参数并按 rotate 换算显示宽高，不重复旋转／像素比例校正。自制相同旋转片修复前圆为 258×817，修复后为 650×650。
+- **界面与版本**：侧栏“设置”前添加 Miuix Settings 图标；版本 0.1.2／versionCode 3。四个正式 ABI／构建类型 APK 按既有命名生成，正式 release 未签名；原用户包仍为 0.1.1／2，平板最终留有共存 YYPlayer QA 0.1.2／3 debug。
+- **文件**：MusicPlayerScreen、HyperDesign、MpvVideoBackend／MpvVideoGeometry、mpv_worker、app/build.gradle.kts；MusicExperienceUiTest、VideoPhoneDeviceTest、MpvVideoGeometryTest、ReleasePackagingInstrumentation；Test-TabletAspect.py；README、AGENTS、音乐／视频体验、技术设计／实施计划、编译说明与本记录。
+- **环境／素材**：一加平板 Pro bdba9db1／OPD2404／API36／OPD2404_16.0.5.1201(CN01)，横屏 3000×2120、density420。原创 WAV／几何封面／双语 LRC；H.264 0°／90°／270°及同规格 HEVC 旋转素材。用户视频仅流式读元数据，不保存个人画面；无全局系统设置改动、卸载或清数据。
+- **命令与结果**：`assembleDebug assembleRelease testDebugUnitTest lintDebug` exit 0；39 项 JVM 全通过，正式 lint 0 error／2 warning。QA debug／androidTest、QA R8 release 构建均 exit 0。`Test-TabletAspect.py` exit 0，4 次 instrumentation／12 组实际画面全部通过；音乐双栏与原封面换曲／按压回归各 1 项通过。release 专用 instrumentation 3 项 PASS；安装全部 install -r／exit 0。四个正式 APK 各 12 个 so 的 ELF／ZIP 16KB 审计通过。`git diff --check` exit 0。
+- **证据**：[U22 验证目录](validation/tablet-u22/README.md) 含根因、命令、初轮失败与修正、像素测量、原创截图、构建日志、APK 哈希与 native 审计。完整临时素材在忽略的 build 目录。
+- **未验／限制／下一步**：用户个人录屏未作帧保存或画面截图，采用同尺寸／编码／旋转的原创片做自动像素验证。Compose 时钟测试不等于 release 帧率证明；完整无障碍／大字体／分屏／API26–32 和其他设备未覆盖，音频硬件资格不变。用户可在平板 QA 复看，再用原签名生成正式 0.1.2；视觉满意度仍由用户确认。未经授权不自动提交／推送。
+
 ## 2026-10-14：U21 13 Ultra 视频加载、手势与响应修复
 
 - 任务／结果：修复 libmpv 在实体机重开 `/proc/self/fd` 被拒绝的问题，改授权 `fd://`；精简控制器并支持暂停时点击淡出；新增可开关双击／横拖目标时间与真实预览／左右侧亮度和播放器音量。保留双指旋转缩放、8×、字幕和抽屉等原功能。

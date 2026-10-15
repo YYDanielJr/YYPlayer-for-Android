@@ -1,0 +1,231 @@
+{
+  "apk_sha256": "e0bfbfc33e54122240a593538caa405d61b08ce6e4c4ea5aa9f2b43a6e7e1de4",
+  "libraries": [
+    {
+      "path": "lib/arm64-v8a/libandroidx.graphics.path.so",
+      "sha256": "41e9a793c43a0f4fddb19e33f346bace464f30f888ba7b9eaf96294ea115bfb6",
+      "soname": "libandroidx.graphics.path.so",
+      "needed": [
+        "libm.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_alignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "zip_offset": 2408719,
+      "compressed": true
+    },
+    {
+      "path": "lib/arm64-v8a/libavcodec.so",
+      "sha256": "2048ef964b3f7de520b0515db645923d9548fcd656b3d7b0732bbe5822ccb3a3",
+      "soname": "libavcodec.so",
+      "needed": [
+        "libswresample.so",
+        "libavutil.so",
+        "libm.so",
+        "libz.so",
+        "libandroid.so",
+        "libmediandk.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_alignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "zip_offset": 2413162,
+      "compressed": true
+    },
+    {
+      "path": "lib/arm64-v8a/libavdevice.so",
+      "sha256": "20f8d19d422b43e0a91b1dbe8f7b46558277aaab08e2971cc2a19238d2fc9a3d",
+      "soname": "libavdevice.so",
+      "needed": [
+        "libavformat.so",
+        "libavutil.so",
+        "libc.so"
+      ],
+      "load_alignments": [
+        16384,
+        16384
+      ],
+      "zip_offset": 8495910,
+      "compressed": true
+    },
+    {
+      "path": "lib/arm64-v8a/libavfilter.so",
+      "sha256": "1234199006dd10f73b92e7f7b10213530cf314dd3dd5bcdcf5f8527d4c27073a",
+      "soname": "libavfilter.so",
+      "needed": [
+        "libavutil.so",
+        "libc.so"
+      ],
+      "load_alignments": [
+        16384,
+        16384
+      ],
+      "zip_offset": 8499389,
+      "compressed": true
+    },
+    {
+      "path": "lib/arm64-v8a/libavformat.so",
+      "sha256": "4edf68d3a0008840e516992380466ff7ee2ec926a56aff07713fdea4025492a7",
+      "soname": "libavformat.so",
+      "needed": [
+        "libavcodec.so",
+        "libavutil.so",
+        "libm.so",
+        "libz.so",
+        "libc.so"
+      ],
+      "load_alignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "zip_offset": 8558824,
+      "compressed": true
+    },
+    {
+      "path": "lib/arm64-v8a/libavutil.so",
+      "sha256": "26a08d67f466edd3917280de7938fe373503ae94f59a86e377ce61de3ebb249b",
+      "soname": "libavutil.so",
+      "needed": [
+        "libm.so",
+        "libandroid.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_alignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "zip_offset": 9941977,
+      "compressed": true
+    },
+    {
+      "path": "lib/arm64-v8a/libc++_shared.so",
+      "sha256": "c4c2fe5cbcb1fba0003a31fc7ab29a9bb12df6cc187ec45a806462540e83d93b",
+      "soname": "libc++_shared.so",
+      "needed": [
+        "libc.so",
+        "libm.so",
+        "libdl.so"
+      ],
+      "load_alignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "zip_offset": 10261207,
+      "compressed": true
+    },
+    {
+      "path": "lib/arm64-v8a/libmpv.so",
+      "sha256": "0184efeba540fcb8ebfaa759462204d940c7cf7f8a589774389e4005bfa0a951",
+      "soname": "libmpv.so",
+      "needed": [
+        "libm.so",
+        "libz.so",
+        "libdl.so",
+        "libavcodec.so",
+        "libavfilter.so",
+        "libavformat.so",
+        "libavutil.so",
+        "libc++_shared.so",
+        "libswresample.so",
+        "libswscale.so",
+        "libandroid.so",
+        "libavdevice.so",
+        "libOpenSLES.so",
+        "libEGL.so",
+        "libc.so"
+      ],
+      "load_alignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "zip_offset": 10716110,
+      "compressed": true
+    },
+    {
+      "path": "lib/arm64-v8a/libswresample.so",
+      "sha256": "a18b0a5a556f74ba2fa61ee60cecccfcbd6b746f9cb0088b05534f3feb17678d",
+      "soname": "libswresample.so",
+      "needed": [
+        "libavutil.so",
+        "libm.so",
+        "libc.so"
+      ],
+      "load_alignments": [
+        16384,
+        16384
+      ],
+      "zip_offset": 13433004,
+      "compressed": true
+    },
+    {
+      "path": "lib/arm64-v8a/libswscale.so",
+      "sha256": "6707ce92803d331ce811cb65f752bb7441ba4396dbc71ecd284792fe7ec9ffe6",
+      "soname": "libswscale.so",
+      "needed": [
+        "libavutil.so",
+        "libm.so",
+        "libc.so"
+      ],
+      "load_alignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "zip_offset": 13476456,
+      "compressed": true
+    },
+    {
+      "path": "lib/arm64-v8a/libyy_mpv.so",
+      "sha256": "99c5f5f965db6c530300e321c545d46540e9be613cfb1b4042e452bd2cd017c7",
+      "soname": "libyy_mpv.so",
+      "needed": [
+        "libc++_shared.so",
+        "libdl.so",
+        "liblog.so",
+        "libm.so",
+        "libc.so"
+      ],
+      "load_alignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "zip_offset": 13964322,
+      "compressed": true
+    },
+    {
+      "path": "lib/arm64-v8a/libyyplayer_jni.so",
+      "sha256": "48cb5ff0e9fdc0fc18de9ff573672b04cc82bf01cdb7ae117b02626e84336974",
+      "soname": "libyyplayer_jni.so",
+      "needed": [
+        "libc++_shared.so",
+        "libm.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_alignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "zip_offset": 13998064,
+      "compressed": true
+    }
+  ],
+  "abis": [
+    "arm64-v8a"
+  ]
+}

@@ -313,7 +313,9 @@ internal class MpvVideoBackend(private val context: Context, generation: Long, i
         val error = data.optString("error").takeIf { it.isNotBlank() }
         val loaded = data.optBoolean("loaded")
         val ended = data.optBoolean("eof-reached")
-        val params = data.optJSONObject("video-params")
+        val params = data.optJSONObject("video-out-params") ?: data.optJSONObject("video-params")
+        val (displayWidth, displayHeight) = mpvDisplaySize(params?.optInt("dw") ?: 0,
+            params?.optInt("dh") ?: 0, params?.optInt("rotate") ?: 0)
         val tracks = data.optJSONArray("track-list")
         val chapters = data.optJSONArray("chapter-list")
         val paused = data.optBoolean("pause", true)
@@ -321,7 +323,7 @@ internal class MpvVideoBackend(private val context: Context, generation: Long, i
         emit(s.copy(phase = when { error != null -> PlaybackPhase.ERROR; ended -> PlaybackPhase.ENDED; loaded -> PlaybackPhase.READY; else -> PlaybackPhase.BUFFERING },
             isPlaying = loaded && !paused && !ended && error == null, positionMs = (data.optDouble("time-pos", 0.0) * 1000).toLong().coerceAtLeast(0),
             durationMs = (data.optDouble("duration", 0.0) * 1000).toLong().coerceAtLeast(0), speed = data.optDouble("speed", 1.0).toFloat(),
-            videoWidth = params?.optInt("dw") ?: 0, videoHeight = params?.optInt("dh") ?: 0,
+            videoWidth = displayWidth, videoHeight = displayHeight,
             videoDecoderName = listOfNotNull(data.optString("video-codec").takeUnless { it == "null" }, hw).joinToString(" · "),
             // hwdec-current is factual path evidence, not a MediaCodec hardware-acceleration certificate.
             videoDecoderHardwareFlag = null, videoDecoderSoftwareFlag = if (hw == null && loaded) true else null,

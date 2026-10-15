@@ -1,0 +1,22 @@
+[
+  {
+    "path": "app/build/outputs/apk/debug/YYPlayer_for_Android_0.1.4_x86_64_debug.apk",
+    "sha256": "2fa91ca0455d53cc9a344ccb9bb97c448c8be495b3be4f9c56ff303b96dd32a1"
+  },
+  {
+    "path": "app/build/outputs/apk/debug/YYPlayer_for_Android_0.1.4_arm64-v8a_debug.apk",
+    "sha256": "357f5d3e57868dd00d464546b01d4b264b74918fc9b473f14083e6321e460a16"
+  },
+  {
+    "path": "app/build/outputs/apk/release/YYPlayer_for_Android_0.1.4_x86_64_release.apk",
+    "sha256": "c57c9486036d185fc3930150281cc69656a73726d9817cb7fa58e828ad6c97fc"
+  },
+  {
+    "path": "app/build/outputs/apk/release/YYPlayer_for_Android_0.1.4_arm64-v8a_release.apk",
+    "sha256": "48c034d9e538cd11ce42aa0fe3dc9d1be56b3ae0d669e41c2e7bfb91de43ff10"
+  },
+  {
+    "path": "build/u25-restore-qa/YYPlayer_for_Android_0.1.4_arm64-v8a_debug.apk",
+    "sha256": "63673c622aa5cea466a3e2f62b17c4014789166f6bbc3da71a2e956bf7343518"
+  }
+]

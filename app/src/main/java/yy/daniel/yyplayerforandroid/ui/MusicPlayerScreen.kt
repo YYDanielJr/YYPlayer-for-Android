@@ -1,5 +1,7 @@
 package yy.daniel.yyplayerforandroid.ui
 
+import androidx.compose.ui.platform.testTag
+
 import android.animation.ValueAnimator
 import android.database.ContentObserver
 import android.os.Handler
@@ -159,6 +161,17 @@ internal fun MusicPlayerScreen(snapshot: PlaybackSnapshot, backend: PlaybackBack
     val theme by animateColorAsState(palette, tween(if (reduceMotion) 0 else 950), label = "music colour")
     val title = details.title ?: current.musicTitle
     val subtitle = listOf(details.artist ?: current.artist ?: "未知歌手", details.album ?: current.album ?: "未知专辑").joinToString(" · ")
+    val playbackStatus: @Composable () -> Unit = {
+        if (snapshot.error != null) Column(Modifier.fillMaxWidth().padding(horizontal = 28.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(snapshot.error, fontSize = 13.sp, maxLines = 2, color = foreground)
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                HyperActionButton("重试", { backend.play(snapshot.queue, snapshot.queueIndex) }, Modifier.weight(1f), primary = false)
+                if (snapshot.outputPath != yy.daniel.yyplayerforandroid.audio.OutputPath.SYSTEM)
+                    HyperActionButton("使用系统输出", { onOutputPath(yy.daniel.yyplayerforandroid.audio.OutputPath.SYSTEM) }, Modifier.weight(1f))
+            }
+        }
+        if (snapshot.outputFallback != null) Text(snapshot.outputFallback, Modifier.padding(horizontal = 28.dp), fontSize = 12.sp, color = foreground.copy(alpha = .65f))
+    }
 
     Box(Modifier.fillMaxSize().pointerInput(Unit) {
         // A full-window hit target keeps blank header/background taps out of the library below.
@@ -191,11 +204,29 @@ internal fun MusicPlayerScreen(snapshot: PlaybackSnapshot, backend: PlaybackBack
                     AnimatedContent(wideLyrics, Modifier.weight(1f).fillMaxWidth(), transitionSpec = {
                         fadeIn(tween(if (reduceMotion) 0 else 500)) togetherWith fadeOut(tween(if (reduceMotion) 0 else 350))
                     }, label = "wide cover to lyrics") { lyricsOnly ->
-                        Row(Modifier.fillMaxSize()) {
-                            if (!lyricsOnly) MusicCover(current, title, subtitle, Modifier.weight(1f).fillMaxHeight(), foreground, reduceMotion,
-                                hideCover = hideCover, onCoverBounds = onCoverBounds, journeyProgress = journeyProgress, journeyOrigin = journeyOrigin, onLyrics = { wideLyrics = true })
-                            MusicLyricsPane(lyricState, snapshot, backend, loading, centered, offset, reduceMotion, foreground,
-                                onAdd = ::addLyrics, onAuthorize = { treePicker.launch(Unit) }, modifier = Modifier.weight(1f).fillMaxHeight().musicJourney(journeyProgress, journeyOrigin, reduceMotion), onOnline = onOnlineLyrics, style = lyricStyle)
+                        // Keep the cover and its controls in one column. A second compact artwork
+                        // used to reappear below both columns when the shared-cover journey ended.
+                        val controls: @Composable () -> Unit = {
+                            Column(Modifier.musicJourney(journeyProgress, journeyOrigin, reduceMotion)) {
+                                playbackStatus()
+                                MusicControls(snapshot, backend, title, subtitle, foreground, reduceMotion, true, favorite, onFavorite,
+                                    onQueue = onQueue, onSpeed = { menu = "speed" }, hideCover = hideCover, showIdentity = lyricsOnly,
+                                    onCoverBounds = { if (lyricsOnly && wideLyrics) onCoverBounds(it) })
+                            }
+                        }
+                        Column(Modifier.fillMaxSize()) {
+                            Row(Modifier.weight(1f).fillMaxWidth()) {
+                                if (!lyricsOnly) Column(Modifier.weight(1f).fillMaxHeight().testTag("music-wide-cover-column")) {
+                                    MusicCover(current, title, subtitle, Modifier.weight(1f).fillMaxWidth(), foreground, reduceMotion,
+                                        hideCover = hideCover, onCoverBounds = { if (!wideLyrics) onCoverBounds(it) },
+                                        journeyProgress = journeyProgress, journeyOrigin = journeyOrigin, onLyrics = { wideLyrics = true })
+                                    controls()
+                                }
+                                MusicLyricsPane(lyricState, snapshot, backend, loading, centered, offset, reduceMotion, foreground,
+                                    onAdd = ::addLyrics, onAuthorize = { treePicker.launch(Unit) }, modifier = Modifier.weight(1f).fillMaxHeight()
+                                        .testTag("music-wide-lyrics").musicJourney(journeyProgress, journeyOrigin, reduceMotion), onOnline = onOnlineLyrics, style = lyricStyle)
+                            }
+                            if (lyricsOnly) controls()
                         }
                     }
                 } else {
@@ -208,22 +239,16 @@ internal fun MusicPlayerScreen(snapshot: PlaybackSnapshot, backend: PlaybackBack
                             onAdd = ::addLyrics, onAuthorize = { treePicker.launch(Unit) }, modifier = pageModifier.musicJourney(journeyProgress, journeyOrigin, reduceMotion).musicTrail(pager, 1, reduceMotion, 220f, .10f), onOnline = onOnlineLyrics, style = lyricStyle)
                     }
                 }
-                if (snapshot.error != null) Column(Modifier.fillMaxWidth().padding(horizontal = 28.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(snapshot.error, fontSize = 13.sp, maxLines = 2, color = foreground)
-                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        HyperActionButton("重试", { backend.play(snapshot.queue, snapshot.queueIndex) }, Modifier.weight(1f), primary = false)
-                        if (snapshot.outputPath != yy.daniel.yyplayerforandroid.audio.OutputPath.SYSTEM)
-                            HyperActionButton("使用系统输出", { onOutputPath(yy.daniel.yyplayerforandroid.audio.OutputPath.SYSTEM) }, Modifier.weight(1f))
-                    }
-                }
-                if (snapshot.outputFallback != null) Text(snapshot.outputFallback, Modifier.padding(horizontal = 28.dp), fontSize = 12.sp, color = foreground.copy(alpha = .65f))
-                AnimatedContent(targetState = wide || pager.settledPage == 1,
+                if (!wide) {
+                playbackStatus()
+                AnimatedContent(targetState = pager.settledPage == 1,
                     modifier = Modifier.musicJourney(journeyProgress, journeyOrigin, reduceMotion),
                     transitionSpec = { (fadeIn(tween(if (reduceMotion) 0 else 220)) togetherWith fadeOut(tween(if (reduceMotion) 0 else 120)))
                         .using(SizeTransform(sizeAnimationSpec = { _, _ -> if (reduceMotion) snap() else spring(stiffness = 320f, dampingRatio = .9f) })) }, label = "music controls") { compact ->
                     MusicControls(snapshot, backend, title, subtitle, foreground, reduceMotion, compact, favorite, onFavorite,
                         onQueue = onQueue, onSpeed = { menu = "speed" }, hideCover = hideCover,
-                        onCoverBounds = { if (if (wide) wideLyrics else pager.currentPage == 1) onCoverBounds(it) })
+                        onCoverBounds = { if (pager.currentPage == 1) onCoverBounds(it) })
+                }
                 }
             }
         }
@@ -440,12 +465,13 @@ private fun MusicLyricsPane(state: MusicLyrics, snapshot: PlaybackSnapshot, back
 @Composable
 private fun MusicControls(snapshot: PlaybackSnapshot, backend: PlaybackBackend, title: String, subtitle: String, foreground: Color,
     reduced: Boolean, compact: Boolean, favorite: Boolean, onFavorite: () -> Unit,
-    onQueue: () -> Unit, onSpeed: () -> Unit, hideCover: Boolean = false, onCoverBounds: (MusicCoverAnchor) -> Unit = {}) {
+    onQueue: () -> Unit, onSpeed: () -> Unit, hideCover: Boolean = false, showIdentity: Boolean = compact,
+    onCoverBounds: (MusicCoverAnchor) -> Unit = {}) {
     var dragging by remember(snapshot.current?.uri, snapshot.mediaGeneration) { mutableStateOf(false) }
     var value by remember(snapshot.current?.uri, snapshot.mediaGeneration) { mutableFloatStateOf(0f) }
     val progress = if (dragging) value else snapshot.progress
-    Column(Modifier.fillMaxWidth().padding(horizontal = if (compact) 24.dp else 32.dp).padding(top = 4.dp, bottom = if (compact) 12.dp else 8.dp)) {
-        if (compact) Row(Modifier.fillMaxWidth().padding(bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+    Column(Modifier.fillMaxWidth().testTag("music-controls").padding(horizontal = if (compact) 24.dp else 32.dp).padding(top = 4.dp, bottom = if (compact) 12.dp else 8.dp)) {
+        if (showIdentity) Row(Modifier.fillMaxWidth().testTag("music-compact-identity").padding(bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             MediaArtwork(snapshot.current, Modifier.size(44.dp).onGloballyPositioned {
                 onCoverBounds(MusicCoverAnchor(Rect(it.positionInRoot(), Size(it.size.width.toFloat(), it.size.height.toFloat())), 12.dp, 0.dp)) }
                 .graphicsLayer { alpha = if (hideCover) 0f else 1f }, 12.dp)

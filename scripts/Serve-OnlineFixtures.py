@@ -109,6 +109,8 @@ class Handler(BaseHTTPRequestHandler):
                 title = params.get('name', [''])[0]
                 songs = [{'id': 'qa1', 'name': title + ' (另一版本)', 'artist': ['QA Ensemble'], 'album': 'Original Fixtures', 'source': 'netease', 'lyric_id': 'qa1', 'duration': 12},
                          {'id': 'qa2', 'name': title, 'artist': ['YYPlayer QA'], 'album': 'Original Fixtures', 'source': 'netease', 'lyric_id': 'qa2', 'duration': 12}]
+                if title == '栈返回':
+                    songs = [dict(songs[1], id=f'stack{i}', name=f'栈返回 {i:02}') for i in range(1, 33)]
                 for song in songs: song['pic_id'] = 'qa-cover'
                 self.send(json.dumps(songs, ensure_ascii=False).encode())
             elif action == 'url':

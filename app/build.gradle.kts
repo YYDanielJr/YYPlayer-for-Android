@@ -34,8 +34,8 @@ android {
         manifestPlaceholders["appLabel"] = if (deviceQa) "YYPlayer QA" else "@string/app_name"
         minSdk = 26
         targetSdk = 37
-        versionCode = 2
-        versionName = "0.1.1"
+        versionCode = 6
+        versionName = "0.1.5"
 
         testInstrumentationRunner = if (providers.gradleProperty("releasePackagingQa").orNull == "true") {
             "yy.daniel.yyplayerforandroid.ReleasePackagingInstrumentation"

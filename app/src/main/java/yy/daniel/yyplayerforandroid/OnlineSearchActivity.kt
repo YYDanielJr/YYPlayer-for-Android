@@ -17,6 +17,7 @@ class OnlineSearchActivity : PlayerHostActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (!runtime.preferences.value.onlineMusic) { finish(); return }
+        val searchPage = androidx.lifecycle.ViewModelProvider(this)[OnlineSearchPageState::class.java]
         setContent {
             val preferences by runtime.preferences.collectAsStateWithLifecycle()
             val config by runtime.online.config.collectAsStateWithLifecycle()
@@ -70,13 +71,13 @@ class OnlineSearchActivity : PlayerHostActivity() {
                                     runtime.playback.play(listOf(media))
                                     runtime.fetchOnlineArtwork(song, media)
                                     runtime.fetchOnlineLyrics(song, media)
-                                    openPlayer(); closePage()
+                                    openPlayer()
                                 } catch (e: CancellationException) { throw e }
                                 catch (e: Exception) { message = e.message ?: "播放地址获取失败" }
                                 finally { busy = false }
                             }
                         }
-                    }, onLyric = {}, onBack = ::closePage)
+                    }, onLyric = {}, onBack = ::closePage, pageState = searchPage)
             }
         }
     }
@@ -86,11 +87,13 @@ class OnlineLyricsActivity : PlayerHostActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val media = runtime.playback.state.value.current
-        val generation = runtime.playback.state.value.mediaGeneration
         if (!runtime.preferences.value.onlineLyrics || media == null || media.kind != MediaKind.AUDIO) { finish(); return }
+        val searchPage = androidx.lifecycle.ViewModelProvider(this)[OnlineSearchPageState::class.java]
         setContent {
             val preferences by runtime.preferences.collectAsStateWithLifecycle()
             val snapshot by runtime.playback.state.collectAsStateWithLifecycle()
+            val current = snapshot.current
+            val generation = snapshot.mediaGeneration
             val config by runtime.online.config.collectAsStateWithLifecycle()
             var busy by remember { mutableStateOf(false) }
             var message by remember { mutableStateOf<String?>(null) }
@@ -98,24 +101,29 @@ class OnlineLyricsActivity : PlayerHostActivity() {
             val scope = rememberCoroutineScope()
             LaunchedEffect(preferences.onlineLyrics, snapshot.mediaGeneration, config) {
                 task?.cancel()
-                if (!preferences.onlineLyrics || snapshot.mediaGeneration != generation) closePage()
+                busy = false; message = null
+                if (!preferences.onlineLyrics || current == null || current.kind != MediaKind.AUDIO) closePage()
             }
             AppTheme {
-                OnlineSearchScreen(runtime.online, true, media.musicTitle, preferences.onlineLyrics, busy, message,
-                    onSong = { _, _, _ -> }, onLyric = { candidate ->
-                        task?.cancel()
-                        task = scope.launch {
-                            busy = true; message = null
-                            try {
-                                val text = runtime.online.lyric(candidate)
-                                check(runtime.preferences.value.onlineLyrics && runtime.playback.state.value.mediaGeneration == generation) { "歌曲已切换" }
-                                runtime.lyrics.saveOnline(media, text, selected = true)
-                                message = "歌词已保存，返回后自动显示"
-                            } catch (e: CancellationException) { throw e }
-                            catch (e: Exception) { message = e.message ?: "歌词获取失败" }
-                            finally { busy = false }
-                        }
-                    }, onBack = ::closePage)
+                // A next/previous action in the inline cover refreshes candidates for that song;
+                // it must not finish the Activity hosting the animation.
+                if (current != null && current.kind == MediaKind.AUDIO) key(current.identity) {
+                    OnlineSearchScreen(runtime.online, true, current.musicTitle, preferences.onlineLyrics, busy, message,
+                        onSong = { _, _, _ -> }, onLyric = { candidate ->
+                            task?.cancel()
+                            task = scope.launch {
+                                busy = true; message = null
+                                try {
+                                    val text = runtime.online.lyric(candidate)
+                                    check(runtime.preferences.value.onlineLyrics && runtime.playback.state.value.mediaGeneration == generation) { "歌曲已切换" }
+                                    runtime.lyrics.saveOnline(current, text, selected = true)
+                                    message = "歌词已保存，返回后自动显示"
+                                } catch (e: CancellationException) { throw e }
+                                catch (e: Exception) { message = e.message ?: "歌词获取失败" }
+                                finally { busy = false }
+                            }
+                        }, onBack = ::closePage, pageState = searchPage)
+                }
             }
         }
     }

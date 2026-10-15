@@ -1,0 +1,7 @@
+--------- beginning of main
+10-14 17:29:26.298 26219 26257 I YYPhoneQA: before release MEDIA3 advanced=1030 state=2668 playing=true
+10-14 17:29:26.740 26219 26257 I YYPhoneQA: speed MEDIA3 press=370ms releaseAck=32ms clock400ms=1030
+10-14 17:29:26.740 26219 26257 I YYPhoneQA: restored MEDIA3 clock400ms=601
+10-14 17:29:29.544 26219 26257 I YYPhoneQA: before release MPV advanced=1265 state=2933 playing=true
+10-14 17:29:30.026 26219 26257 I YYPhoneQA: speed MPV press=454ms releaseAck=79ms clock400ms=1265
+10-14 17:29:30.026 26219 26257 I YYPhoneQA: restored MPV clock400ms=451

@@ -1,0 +1,7 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <!-- Only the test APK publishes this fixed, self-generated fixture. It runs under its own UID. -->
+        <provider android:name="yy.daniel.yyplayerforandroid.ForeignVideoFixtureProvider"
+            android:authorities="${applicationId}.u21fixture" android:exported="true" />
+    </application>
+</manifest>

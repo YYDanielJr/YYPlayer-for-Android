@@ -1,5 +1,13 @@
 # Android 技术设计与选型
 
+2026-10-15 U26／0.1.5：MusicExpansionHost 统一主页与各播放栏宿主的同页详情动画，常规音频入口使用当前 Activity 命令而非压入 MainActivity；唯一 runtime 不变。搜索 ViewModel 仅保留配置重建结果，展开状态 saveable，旧歌词请求按 generation 取消／拒绝。详见 [ADR0004](adr/0004-inline-music-player.md) 和 [U26](validation/music-u26/README.md)。
+
+2026-10-15 U25／0.1.4：PlaybackPageHost 改全尺寸内容捕获＋兄弟悬浮层，玻璃采样页面真实内容；LocalPlaybackBottomSpace 只供列表末尾和固定操作按钮避让，不缩小列表视口。取代 U24 的底部占位布局；继续唯一后端、原生 Activity 返回栈和 IME 避让。见 [U25](validation/playback-u25/README.md)。
+
+2026-10-15 U23／U24：二级 Activity 由 AppTheme 接入 PlaybackPageHost，布局在滚动／页内动画之外，订阅唯一 runtime 的 PlaybackSnapshot 并发送原后端命令。MainActivity 保留共享封面动画；完整 PlayerActivity 不重复显示迷你栏。非主页音乐入口压入可弹出的 MainActivity，保留搜索及设置调用者；IME／导航 inset 在宿主消费一次。跨 Activity 保留 ROM 动画，无跨应用悬浮窗。见 [ADR0004](adr/0004-inline-music-player.md)、[U24](validation/playback-u24/README.md)。
+
+2026-10-15 U22／0.1.2：横屏音乐左列封面与控制、右列完整歌词，去除重复小封面并保留 U14 动效；侧栏设置增加 Miuix 图标。libmpv 输出参数按元数据旋转换算显示宽高，VO 内容不重复旋转。当前 dev 基线为用户提交的 `31fece7`，U22 尚未提交；一加平板 Pro 实测与边界见 [U22 验证](validation/tablet-u22/README.md)。以下带日期章节记录历史状态。
+
 2026-10-14 U21：实体机 libmpv 输入改为授权 `fd://` 租约；视频控制器精简，新增可配置单指手势与后台有限预览。Media3 视频短缓冲／低延迟模式、mpv AAudio 共享输出决定与限制见 [ADR0009](adr/0009-video-rate-response.md)，实测见 [U21](validation/video-u21/README.md)。音乐路径未变；本轮未提交，不能将下面早期计划覆盖当前工作区。
 
 2026-10-14 U20：工具内视频倍速统一 0.1×–8×／步进 0.1×，外侧快捷档位保留。Media3 与 libmpv 范围一致，移除 U19 的超过 8× 自动切换和仅硬解专用范围。用户授权提交到 dev；见 [ADR0008](adr/0008-video-speed-range.md) 和 [U20 验证](validation/video-u20/README.md)。

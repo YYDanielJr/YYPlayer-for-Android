@@ -147,7 +147,7 @@ internal fun MusicQueueScreen(snapshot: PlaybackSnapshot, backend: PlaybackBacke
                 }
                 if (snapshot.queue.isEmpty()) item { Text("队列为空，从音乐库选择歌曲开始播放。", Modifier.padding(24.dp), color = Muted) }
             }
-            Row(Modifier.fillMaxWidth().navigationBarsPadding().padding(24.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(Modifier.fillMaxWidth().navigationBarsPadding().padding(bottom = LocalPlaybackBottomSpace.current).padding(24.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 HyperActionButton(if (editing) "取消" else "清空队列", { if (editing) finishSelection() else clearing = true }, Modifier.weight(1f), primary = false, enabled = editing || keys.isNotEmpty())
                 HyperActionButton(if (editing) "移除所选 (${selected.size})" else "选择歌曲", {
                     if (!editing) editing = true else {
