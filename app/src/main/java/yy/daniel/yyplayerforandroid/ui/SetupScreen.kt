@@ -148,7 +148,7 @@ internal fun SetupScreen(activity: MainActivity) {
                     if (busy) Text("正在处理…", Modifier.padding(top = 20.dp), fontSize = 14.sp, color = Muted)
                 }
             }
-            Row(Modifier.fillMaxWidth().padding(horizontal = 28.dp, vertical = 20.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(Modifier.fillMaxWidth().padding(bottom = LocalPlaybackBottomSpace.current).padding(horizontal = 28.dp, vertical = 20.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 HyperActionButton(if (step > 0) "上一步" else "稍后设置", onClick = {
                     if (step > 0) { step--; message = null } else runtime.setup.finish()
                 }, modifier = Modifier.weight(1f), primary = false, enabled = !busy)

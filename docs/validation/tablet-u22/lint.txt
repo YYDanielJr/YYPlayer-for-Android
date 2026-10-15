@@ -1,0 +1,25 @@
+E:\SourceFiles\androidstudio\YYPlayerforAndroid\gradle\libs.versions.toml:9: Warning: A newer version of org.jetbrains.kotlin.plugin.compose than 2.4.20 is available: 2.4.21 [NewerVersionAvailable]
+kotlin = "2.4.20"
+         ~~~~~~~~
+
+   Explanation for issues of type "NewerVersionAvailable":
+   This detector checks with a central repository to see if there are newer
+   versions available for the dependencies used by this project. This is
+   similar to the GradleDependency check, which checks for newer versions
+   available in the Android SDK tools and libraries, but this works with any
+   MavenCentral dependency, and connects to the library every time, which
+   makes it more flexible but also much slower.
+
+E:\SourceFiles\androidstudio\YYPlayerforAndroid\app\src\main\AndroidManifest.xml:54: Warning: Exported service does not require permission [ExportedService]
+        <service
+         ~~~~~~~
+
+   Explanation for issues of type "ExportedService":
+   Exported services (services which either set exported=true or contain an
+   intent-filter and do not specify exported=false) should define a permission
+   that an entity must have in order to launch the service or bind to it.
+   Without this, any application can use this service.
+
+   https://goo.gle/ExportedService
+
+0 errors, 2 warnings

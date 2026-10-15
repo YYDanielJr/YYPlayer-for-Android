@@ -136,9 +136,10 @@ internal fun HyperSection(title: String, trailing: String? = null, onClick: (() 
 
 @Composable
 internal fun HyperSettingRow(title: String, summary: String? = null, value: String? = null,
-    onClick: (() -> Unit)? = null, trailing: @Composable (() -> Unit)? = null) {
+    onClick: (() -> Unit)? = null, leading: @Composable (() -> Unit)? = null, trailing: @Composable (() -> Unit)? = null) {
     Row(Modifier.fillMaxWidth().then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
         .padding(horizontal = LocalPreferenceInset.current, vertical = 18.dp), verticalAlignment = Alignment.CenterVertically) {
+        if (leading != null) { leading(); Spacer(Modifier.width(12.dp)) }
         Column(Modifier.weight(1f)) {
             Text(title, fontSize = 17.sp, fontWeight = FontWeight.Medium)
             if (!summary.isNullOrEmpty()) { Spacer(Modifier.height(5.dp)); Text(summary, fontSize = 14.sp, lineHeight = 20.sp, color = Muted) }
@@ -200,7 +201,7 @@ internal fun LibrarySidebar(selected: Int, onSelect: (Int) -> Unit, onSettings: 
             }
         }
         Spacer(Modifier.weight(1f))
-        HyperSettingRow("设置", onClick = onSettings)
+        HyperSettingRow("设置", onClick = onSettings, leading = { Icon(PlayerIcons.Tune, null, Modifier.size(24.dp)) })
     }
 }
 

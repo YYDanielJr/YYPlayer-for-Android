@@ -1,0 +1,6 @@
+
+yy.daniel.yyplayerforandroid.VideoPhoneDeviceTest:.
+
+Time: 10.796
+
+OK (1 test)

@@ -1,0 +1,6 @@
+
+yy.daniel.yyplayerforandroid.MusicExperienceUiTest:.
+
+Time: 4.186
+
+OK (1 test)

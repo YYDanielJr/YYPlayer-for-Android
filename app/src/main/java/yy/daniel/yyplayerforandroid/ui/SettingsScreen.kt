@@ -35,7 +35,7 @@ internal fun SettingsScreen(theme: ThemeChoice, onTheme: (ThemeChoice) -> Unit,
     var dialog by remember { mutableStateOf<String?>(null) }
     HyperPage("设置", onBack) { padding ->
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
-            LazyColumn(Modifier.widthIn(max = 700.dp).fillMaxWidth(), contentPadding = PaddingValues(top = padding.calculateTopPadding(), bottom = 36.dp + padding.calculateBottomPadding())) {
+            LazyColumn(Modifier.widthIn(max = 700.dp).fillMaxWidth(), contentPadding = PaddingValues(top = padding.calculateTopPadding(), bottom = 36.dp + padding.calculateBottomPadding() + LocalPlaybackBottomSpace.current)) {
                 item { HyperSection("外观") }
                 item { HyperCard(Modifier.padding(horizontal = PageGutter).fillMaxWidth()) {
                     Text("主题", Modifier.padding(start = PreferenceInset, top = 20.dp, bottom = 16.dp), fontSize = 17.sp, fontWeight = FontWeight.Medium)

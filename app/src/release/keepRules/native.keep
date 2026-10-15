@@ -1,0 +1,4 @@
+# JNI_OnLoad uses this exact nested class name and RegisterNatives signatures.
+# Keep just the small bridge, not the audio pipeline or the rest of the application.
+-keep class yy.daniel.yyplayerforandroid.audio.NativeAudioCore$Bridge { *; }
+# MpvNative already carries @Keep, consumed by the default Android rules.

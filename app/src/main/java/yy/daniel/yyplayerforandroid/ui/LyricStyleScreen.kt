@@ -38,7 +38,7 @@ internal fun LyricStyleScreen(style: LyricStyle, onStyle: (LyricStyle) -> Unit, 
         error = null
     }
     HyperPage("歌词显示", onBack) { padding ->
-        LazyColumn(Modifier.fillMaxSize().testTag("lyric-style-list"), contentPadding = PaddingValues(top = padding.calculateTopPadding(), bottom = padding.calculateBottomPadding() + 24.dp)) {
+        LazyColumn(Modifier.fillMaxSize().testTag("lyric-style-list"), contentPadding = PaddingValues(top = padding.calculateTopPadding(), bottom = padding.calculateBottomPadding() + 24.dp + LocalPlaybackBottomSpace.current)) {
             item { HyperSection("预览") }
             item { HyperCard(Modifier.padding(horizontal = PageGutter).fillMaxWidth()) {
                 Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(draft.lineSpacing.dp)) {

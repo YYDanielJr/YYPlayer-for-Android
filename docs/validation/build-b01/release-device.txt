@@ -1,0 +1,3 @@
+INSTRUMENTATION_RESULT: stream=PASS: 3 release checks (version/launcher, audio JNI, mpv decode)
+
+INSTRUMENTATION_CODE: -1

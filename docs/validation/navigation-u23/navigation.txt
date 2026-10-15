@@ -1,0 +1,6 @@
+
+yy.daniel.yyplayerforandroid.OnlineUiTest:...
+
+Time: 14.174
+
+OK (3 tests)

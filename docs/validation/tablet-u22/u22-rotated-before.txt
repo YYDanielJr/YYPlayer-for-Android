@@ -1,0 +1,21 @@
+
+yy.daniel.yyplayerforandroid.VideoPhoneDeviceTest:
+Error in tabletCircleAspectAcrossBackends(yy.daniel.yyplayerforandroid.VideoPhoneDeviceTest):
+java.lang.AssertionError: MPV must preserve a circle expected:<1.0> but was:<0.31578946>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:577)
+	at yy.daniel.yyplayerforandroid.VideoPhoneDeviceTest.tabletCircleAspectAcrossBackends(VideoPhoneDeviceTest.kt:168)
+
+
+Time: 9.91
+There was 1 failure:
+1) tabletCircleAspectAcrossBackends(yy.daniel.yyplayerforandroid.VideoPhoneDeviceTest)
+java.lang.AssertionError: MPV must preserve a circle expected:<1.0> but was:<0.31578946>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:577)
+	at yy.daniel.yyplayerforandroid.VideoPhoneDeviceTest.tabletCircleAspectAcrossBackends(VideoPhoneDeviceTest.kt:168)
+
+FAILURES!!!
+Tests run: 1,  Failures: 1

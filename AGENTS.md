@@ -1,17 +1,29 @@
 # YYPlayer for Android 执行规则
 
-当前工作区另含未提交 B01／U21：0.1.0 分架构构建、实体机 libmpv FD 输入修复、精简控制器与可配置手势、双后端变速响应。以 STATUS 顶部和 docs/validation/video-u21 为准；13 Ultra 已验证，17 Pro Max 未连接。原用户 release 保留，手机上的 YYPlayer QA 为共存调试入口。
+2026-10-15 验收交接：用户已验收 0.1.5，并明确授权提交到 dev。本次提交包含 U22–U26 的累计实现、文档与验证记录，以及此前遗漏但现有构建依赖的 U21 源码／测试／构建规则；app/release 用户签名产物保留在本地、不纳入 Git。下方“未提交／未授权／待用户确认”为各轮历史状态，提交身份以 git log 为准。本次仅授权提交，不推送或合入 master。
 
-本文件适用于整个 Android 工程，面向后续人类与代码代理。用户明确指令优先。当前为实现阶段；最新功能基线为 2026-10-14 的 `dev` U15–U20（在 `607ceb3` 的 U11–U14 上继续实现；提交身份以 git log 为准），不要将历史计划写成已实现能力。
+最新 U26／0.1.5（versionCode 6）：所有带播放栏的页面共用 MusicExpansionHost 的同 Activity 封面展开／收回，主页不保留另一套动画。180／0.86 展开、230／0.8 收回、带符号位移、终点持续共享封面层和输入门禁保留。普通音频 openPlayer 发当前宿主命令；在线搜索成功播放也同页展开，不再压新 MainActivity。仅旧 PlayerActivity 音频转向兼容入口保留原压栈。Back 优先收起详情，下一次才退页面；底层页面保持 Composition，搜索结果 ViewModel 保留配置重建（不承诺进程死亡恢复）。不得在启动 effect 清除刚测得的大封面锚点。所有控制条维持 U25 恢复的原主页磨砂，无附加阴影。以下 U23–U25 的压栈入口是历史，以本段和 STATUS 为准；不自动提交／推送。
+
+U25 视觉回调：用户要求所有悬浮播放栏恢复原主页视觉。LibraryMiniPlayer 已恢复 dev HEAD 原有实现，移除新增 6dp 阴影；所有入口统一原磨砂／透明度／边框／按压反馈，禁止为悬浮效果再次额外加阴影。保留 U25 覆盖真实内容的布局与末项避让，版本仍为 0.1.4／5。下方“轻阴影”仅描述此前方案，已被本指令覆盖。
+
+最新 U25／0.1.4（versionCode 5）：PlaybackPageHost 必须用全尺寸内容捕获层＋其上独立播放栏，不能恢复 U24 的 Column 底部占位。磨砂采样实际页面内容，列表 viewport 延伸到播放栏下方；LocalPlaybackBottomSpace 只加到列表 contentPadding 末尾或固定操作按钮的底部，不得用于缩小整个内容区。IME 上移、真实后端、原页返回栈、主页共享封面继续保留；轻阴影用于悬浮层次。U24 下述占位规则为历史，以本段和 STATUS／docs/validation/playback-u25 为准。未经新授权不提交／推送。
+
+U24（仍为 0.1.2／3）：二级 Activity 通过 PlayerHostActivity.AppTheme 的 PlaybackPageHost 共享播放栏，主库保留共享封面锚点，重新设置页也有播放栏；完整音乐／视频页不叠加第二份。播放栏在滚动／AnimatedContent／Pager 外，按实际高度为内容留位并消费一次 IME／导航栏 inset，弹窗保持模态优先。非主页打开音乐统一压栈并返回调用页，禁止 CLEAR_TOP 清搜索／设置。只投影唯一后端，不申请跨应用悬浮窗，不关闭 ROM Activity 转场；用户已接受 Activity 动画限制。证据见 STATUS／docs/validation/playback-u24，未经新授权不提交／推送。
+
+最新 U23 在同一 0.1.2 工作区补充搜索返回栈：在线搜索流播放后压入带 `music_on_back_stack` 标记的 MainActivity，搜索页保留；收起／系统返回弹出当前入口，继续播放并恢复原搜索状态。不得恢复 CLEAR_TOP＋关闭搜索页的旧路径，也不能仅凭 isOnline 判断返回位置。主页音乐覆盖层与回弹保持原样；同一 Application runtime 唯一引擎。见 STATUS 和 docs/validation/navigation-u23；本轮仍未授权提交／推送。
+
+当前为 U22／0.1.2（versionCode 3）：一加平板横屏音乐左列封面／标题／歌手·专辑／控制栏、右列完整歌词；移除重复小封面；libmpv 按输出参数的旋转后显示尺寸布局；主页侧栏设置图标。以 STATUS 顶部和 docs/validation/tablet-u22 为准。0.1.1 已由用户提交至 dev `31fece7`，master 为 `18fcb28`；接手时已回到 dev。U22 未获提交／推送／合入授权。接手时仍存在未跟踪的 U21 源码／文档和 app/release 用户产物，不能遗漏必要源文件，也不能整目录提交签名产物。原用户 release 保留，YYPlayer QA 为共存调试入口。
+
+本文件适用于整个 Android 工程，面向后续人类与代码代理。用户明确指令优先。当前为实现阶段；最新功能基线为 2026-10-15 的 `dev` U22 工作区（在已提交的 0.1.1 上继续实现；提交身份以 git log 为准），不要将历史计划写成已实现能力。
 
 ## 1. 接手顺序和当前任务
 
 1. 先读 README、docs/STATUS.md 顶部，再读 docs/UI_MUSIC_EXPERIENCE.md、docs/TECHNICAL_DESIGN.md 和 docs/IMPLEMENTATION_PLAN.md 的当前基线；音频工作另读 docs/HANDOFF_HIFI.md 与 ADR0006。带日期的早期记录为历史证据，不能覆盖最新用户要求。
-2. 检查 git status、分支与证据。**所有修改在 `dev`；不存在时创建 `dev`。master 只接受经授权的合入，禁止直接开发。** dev-hifi 的 H02–H05／U09–U10 已保存为 `c75b34d` 并合入 dev；U11–U14 已提交为 `607ceb3`；U15–U19 为 `d551f38`，U20 统一 8× 为 `f24008b`。B01 构建规则改动未获新的提交／推送／合入授权。master 当前基线 `836a920`。不清理用户文件；没有新授权不自动提交／推送／合并。
+2. 检查 git status、分支与证据。**所有修改在 `dev`；不存在时创建 `dev`。master 只接受经授权的合入，禁止直接开发。** dev-hifi 为 `c75b34d`；U11–U14 为 `607ceb3`；U15–U19 为 `d551f38`，U20 为 `f24008b`；用户最新提交为 dev `31fece7`，master 合入为 `18fcb28`。不清理用户文件；没有新授权不自动提交／推送／合并。
 3. 当前音乐能力：歌曲／歌手／专辑／歌单分类，收藏入口在“歌单 → 我的收藏”；库、歌单和播放队列独立。独立队列 Activity 支持单／多选移除、长按排序；顺序／单曲／随机播放由真实后端实现。主页底栏只留播放／暂停，不恢复下一首和“全部音乐／收藏”快捷卡片。双语歌词及自定义译文字号／字重／原译间距按 U11 保留。
 4. 音乐前端基线为 U14：封面展开和收回均保留轻微回弹，收回终点继续使用同一绘制层；不能以删除回弹规避闪现。透明详情退出后不可点击，快速重开不得误弹菜单。9° 角落按压是缓慢、无触底回弹的另一套效果。按钮／列表令牌见第 7 节。U08 固定页头与顶部 40dp TabRow、U04 弹窗反馈等已确认基线继续保留。
-5. 当前验收设备为**有线小米 13 Ultra `c9e352e3`／`2304FPN6DC`／API36／OS3.0.308.0.WMACNXM**；每次先枚举设备，不把旧无线地址当作当前连接。用户已说明有线占用 USB，本轮没有 USB DAC；历史 H05 DAC 证据不能套用到此设备。MuMu 可补专项，但不替代物理设备资格。
-6. 视频最新基线为 U20：可选 libmpv、字幕／章节／同步／逐帧，横屏半透明右侧抽屉、真实滚动与逐级返回；工具内倍速 0.1×–8×／步进 0.1×，外侧仍为 0.5／1／1.25／1.5／2／3。Media3 与 libmpv 统一最高 8×；不按倍速自动切换后端，不再为仅硬解提供单独倍速范围。见视频体验与 ADR0007／0008。
+5. 当前 U22 验收设备为**一加平板 Pro `bdba9db1`／OPD2404／API36／OPD2404_16.0.5.1201(CN01)**，横屏 3000×2120、density420；用户说明为 8 Gen3／ColorOS16。每次先枚举，不复用旧地址。13 Ultra `c9e352e3` 的 U21 证据保留，17 Pro Max 本轮未连接；无 USB DAC，不能套用历史输出资格。MuMu 可补专项，但不替代物理设备资格。
+6. 视频基线为 U20 倍速＋U21 手势／输入＋U22 比例修复：可选 libmpv、字幕／章节／同步／逐帧，横屏半透明右侧抽屉、真实滚动与逐级返回；工具内倍速 0.1×–8×／步进 0.1×，外侧仍为 0.5／1／1.25／1.5／2／3。Media3 与 libmpv 统一最高 8×；不按倍速自动切换后端，不再为仅硬解提供单独倍速范围。见视频体验与 ADR0007／0008。
 7. 每轮写清任务／文件／命令与 exit 结果／设备素材／证据／未验条件和下一动作，更新 STATUS，最后中文说明实现、验证与限制。设备阻塞时继续不依赖设备的工作；没有用户最终确认时不写“视觉已满意”。
 
 常规实现、可逆修改和检查不需要本文件额外批准；不要以“请确认是否继续”停止已授权工作。用户只要求规划时，不安装工具、不新增功能、不提交／发布。没有明确请求不创建其他用户聊天；本项目没有要求多代理委派。
@@ -32,7 +44,7 @@
 
 ## 3. 版本与构建
 
-- B01 当前版本 `0.1.0`／versionCode `2`。debug／release 均只编译 `arm64-v8a`、`x86_64`，按 ABI 独立打包，不生成 universal。应用 APK 名称固定为 `YYPlayer_for_Android_<version>_<arch>_<debug/release>.apk`；version 取实际 variant versionName，arch 用上述 ABI 标识。测试 APK 保留 AGP 命名；脚本读取 output-metadata.json 按设备 ABI 选择，不硬编码旧 app-debug.apk。
+- U26 当前版本 `0.1.5`／versionCode `6`（此前工作区 0.1.4／5，用户正式包 0.1.1／2）。debug／release 均只编译 `arm64-v8a`、`x86_64`，按 ABI 独立打包，不生成 universal。应用 APK 名称固定为 `YYPlayer_for_Android_<version>_<arch>_<debug/release>.apk`；version 取实际 variant versionName，arch 用上述 ABI 标识。测试 APK 保留 AGP 命名；脚本读取 output-metadata.json 按设备 ABI 选择，不硬编码旧 app-debug.apk。
 - Release 对全应用启用 R8 代码／资源优化，保留 native.keep 与 MpvNative @Keep 的 JNI 契约；native 库在 release APK 内压缩并由系统安装时解压，debug 保留未压缩。所有 ELF 仍须 16KB 对齐，未压缩 ZIP 条目也须 16KB 对齐；压缩库须确认 extractNativeLibs=true 并真实装载。不得因测试运行器依赖混淆前的 Kotlin 类就关闭优化或全包 keep。
 - 正式签名由 Android Studio／受控构建注入；未提供签名配置的 assembleRelease 产物未签名，不把 release 文件名当签名证明，不给 release 默认配置 debug 证书。QA 副本可用 Gradle signingReport 确认的现有调试证书验证并 install -r，不卸载数据；正式发布归档 mapping.txt。详细命令和安装空间权衡见 [编译与签名](docs/BUILD_AND_SIGNING.md)。
 - S00已按官方 Android 坐标接入 Miuix0.9.4；Kotlin2.4.20、Compose BOM2026.09.00、Media3 1.11.1 已锁 catalog，实际完整构建与 lint 仍以 STATUS 为准。不能混旧miuix坐标与新miuix-ui API。
@@ -77,6 +89,8 @@
 
 ## 6. 视频和手势
 
+- U22：libmpv 优先读取 `video-out-params`，没有时回退 `video-params`；`dw/dh` 已含像素比例修正，仍须按 `rotate` 的 90°／270° 交换显示宽高。mpv VO 已完成内容旋转，SessionPlayer 发布转正后的 VideoSize，不能再给 TextureView 重复旋转。同规格 HEVC 录屏与 0°／90°／270° 原创圆形素材有实际像素证据。
+
 - U21 实体机输入使用 `fd://N` 借用已授权 FD，禁止重新打开 `/proc/self/fd/N`；mpv 销毁后才释放租约。新预览独立打开 FD，后台有限抽帧与缓存，不共享播放 FD 的 offset，不作为主视频渲染。
 - U21 视频 Media3 使用 40ms PCM 目标缓冲与低延迟 AudioTrack，Sonic 负责完整 0.1×–8×，平台输出固定 1×；mpv 使用固定 AAR 内建 AAudio 共享低延迟输出、AudioTrack 初始化回退，实际 `current-ao` 才是驱动事实。音乐输出不随此改变，见 ADR0009；其他路由与 API26 未验证，不宣称所有组合零延迟。
 - U21 控制器保留顶部与底部单行操作＋进度条，其余进入工具；双击、左右拖动预览、左侧窗口亮度、右侧播放器音量、长按各有持久开关。保持单仲裁、暂停也能点击隐藏、退出动画与边缘返回保护。右侧手势不改系统音量。
@@ -95,6 +109,8 @@
 - 视频自定义倍速滑杆松手生效、加减 0.1×；快捷 1.25× 不被全局量化。真实后端限速必须查证，不能只改标签；绝对 3× 松手恢复基础速度，含 0.1×／8×。音乐原有快捷范围与精确输出拒绝变速规则保留。
 
 ## 7. 文件、数据与UI
+
+- U22 横屏音乐封面页：左列从上到下仅封面、歌名、歌手·专辑、紧凑控制栏；右列歌词占完整可用高度。紧凑按钮尺寸与小封面身份行独立，封面页禁止再次绘制 44dp 小封面；完整歌词页保留紧凑身份行。淡出分支不能覆盖当前共享封面锚点，原 U14 回弹／收回共享层继续保留。主页侧栏“设置”前使用 Miuix Settings 图标，整行仍可点击。
 
 - content URI是身份；DisplayName不是路径；SAF持久授权基于实际flags；禁止MANAGE_EXTERNAL_STORAGE默认全盘访问。
 - native源用明确FD/streamlease；dup共享offset，不能并行lseek；非seekable处理取消/顺序播放/显式缓存导入，禁止静默复制整库。
@@ -124,7 +140,7 @@
 
 每次STATUS至少写：任务/子步骤、文件、运行命令与exit结果、设备/素材/证据、未执行检查、已知问题、下一动作。只有代码+要求证据齐备才Done，硬件不足记Partial/待验；不把Luna不能完成当验收标准变宽。
 
-当前视频基线为 U15–U20，音乐保留 U11–U14；具体下一任务由最新用户指令决定，不因旧计划“下一步 S02”自行扩展到完整 native 替换。已通过：U14 最终 assembleDebug／assembleDebugAndroidTest／34 项 JVM／lint（0 error、2 既有 warning）；U13 MusicUpgradeDeviceTest 5 项真实播放回归；小米普通 UI 与录屏复核。细节与 APK hash 见 docs/validation/ui-u14 和 ui-u13。U19 构建／37 项 JVM／lint 和 MuMu 视频、libmpv、手势、音乐回归结果以 docs/validation/video-u19 为准；U20 上限及不切换后端的专项见 docs/validation/video-u20。实体视频高速解码／听感、API26–32 与原生发布资格仍待验。
+当前视频基线为 U22，音乐保留 U11–U14 并加入 U22 横屏双栏；U22 平板专项证据见 docs/validation/tablet-u22。历史验收：具体下一任务由最新用户指令决定，不因旧计划“下一步 S02”自行扩展到完整 native 替换。已通过：U14 最终 assembleDebug／assembleDebugAndroidTest／34 项 JVM／lint（0 error、2 既有 warning）；U13 MusicUpgradeDeviceTest 5 项真实播放回归；小米普通 UI 与录屏复核。细节与 APK hash 见 docs/validation/ui-u14 和 ui-u13。U19 构建／37 项 JVM／lint 和 MuMu 视频、libmpv、手势、音乐回归结果以 docs/validation/video-u19 为准；U20 上限及不切换后端的专项见 docs/validation/video-u20。实体视频高速解码／听感、API26–32 与原生发布资格仍待验。
 
 仍待验：该 ROM 上 Compose Activity suite 挂起／崩溃或无输出（LibraryTabsUiTest、LibraryManagementUiTest 等不能计作通过）；API26–32、横屏／大字体／TalkBack／深色专项、物理多指、release 帧率，以及独占／位准确硬件资格。U14 录屏能证明回弹和无可见换图，不证明帧率达标；用户手感反馈仍是后续依据。
 

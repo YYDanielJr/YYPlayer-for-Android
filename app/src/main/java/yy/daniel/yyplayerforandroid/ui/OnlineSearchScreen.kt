@@ -21,6 +21,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -39,7 +40,8 @@ import yy.daniel.yyplayerforandroid.online.*
 @Composable
 internal fun OnlineSearchScreen(repository: OnlineRepository, lyricMode: Boolean, initialQuery: String,
     allowed: Boolean, busyExternal: Boolean, externalMessage: String?,
-    onSong: (OnlineSong, ApiQuality, Boolean) -> Unit, onLyric: (OnlineSong) -> Unit, onBack: () -> Unit) {
+    onSong: (OnlineSong, ApiQuality, Boolean) -> Unit, onLyric: (OnlineSong) -> Unit, onBack: () -> Unit,
+    pageState: OnlineSearchPageState) {
     val config by repository.config.collectAsStateWithLifecycle()
     val history by repository.searchHistory.state.collectAsStateWithLifecycle()
     val providers = config?.providers.orEmpty().filter { if (lyricMode) it.lyricSearch != null && it.lyric != null else it.search != null && it.stream != null }
@@ -48,13 +50,13 @@ internal fun OnlineSearchScreen(repository: OnlineRepository, lyricMode: Boolean
     var source by rememberSaveable { mutableStateOf("") }
     val actualSource = source.takeIf { it in provider?.sources.orEmpty() } ?: provider?.sources?.keys?.firstOrNull().orEmpty()
     var query by rememberSaveable { mutableStateOf(initialQuery) }
-    var songs by remember { mutableStateOf(emptyList<OnlineSong>()) }
+    var songs by pageState.songs
     var searching by remember { mutableStateOf(false) }
-    var searched by remember { mutableStateOf(false) }
+    var searched by pageState.searched
     var searchMessage by remember { mutableStateOf<String?>(null) }
-    var page by remember { mutableIntStateOf(1) }
-    var lastQuery by remember { mutableStateOf("") }
-    var more by remember { mutableStateOf(false) }
+    var page by pageState.page
+    var lastQuery by pageState.lastQuery
+    var more by pageState.more
     var menu by remember { mutableStateOf(false) }
     var historyVisible by remember { mutableStateOf(false) }
     var songActions by remember { mutableStateOf(false) }
@@ -92,7 +94,10 @@ internal fun OnlineSearchScreen(repository: OnlineRepository, lyricMode: Boolean
         }
     }
     LaunchedEffect(allowed) { if (!allowed) { ++searchRevision; task?.cancel(); searching = false; songs = emptyList(); qualityVisible = false; menu = false; songActions = false } }
-    LaunchedEffect(config, provider?.id, actualSource) {
+    LaunchedEffect(config, provider?.id, actualSource, if (lyricMode) initialQuery else null) {
+        val key = listOf(config, provider?.id, actualSource, if (lyricMode) initialQuery else null)
+        if (pageState.sourceKey == key) return@LaunchedEffect
+        pageState.sourceKey = key
         ++searchRevision; task?.cancel(); searching = false; songs = emptyList(); searched = false; more = false; qualityVisible = false; songActions = false
         if (lyricMode && query.isNotBlank() && allowed) search()
     }
@@ -113,7 +118,7 @@ internal fun OnlineSearchScreen(repository: OnlineRepository, lyricMode: Boolean
                     if (lyricMode) "输入歌名，搜索歌词" else "搜索在线歌曲", { menu = true })
                 if (provider != null) Text("${provider.name} · ${provider.sources[actualSource].orEmpty()}", Modifier.padding(start = PageTextInset, bottom = 12.dp), color = Muted, fontSize = 12.sp)
             Box(Modifier.weight(1f).fillMaxWidth()) {
-            LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 24.dp)) {
+            LazyColumn(Modifier.fillMaxSize().testTag("online-search-results"), contentPadding = PaddingValues(bottom = 24.dp + LocalPlaybackBottomSpace.current)) {
             if (providers.isEmpty()) item { Text("请先在设置中导入支持${if (lyricMode) "歌词" else "音乐"}搜索的 API 配置", Modifier.padding(28.dp), color = Muted) }
             if (!lyricMode && !busy && (!searched || query.isBlank())) {
                 item {

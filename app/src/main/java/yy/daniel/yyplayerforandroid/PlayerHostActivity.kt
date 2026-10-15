@@ -24,6 +24,15 @@ import kotlinx.coroutines.launch
 /** Leave normal Activity transitions to the ROM. No custom windowAnimationStyle or slide override. */
 abstract class PlayerHostActivity : ComponentActivity() {
     internal val runtime get() = (application as PlayerApplication).runtime
+    internal var musicRequest by mutableIntStateOf(0)
+        private set
+    private var handledMusicRequest = 0
+    internal fun showMusic() { musicRequest++ }
+    internal fun consumeMusicRequest(): Boolean {
+        if (handledMusicRequest == musicRequest) return false
+        handledMusicRequest = musicRequest
+        return true
+    }
     internal val debugPortrait get() = applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE != 0 && intent.getBooleanExtra("qa_portrait", false)
     @android.annotation.SuppressLint("SourceLockedOrientationActivity") // Guarded debug-only MuMu screenshot aid.
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,8 +50,7 @@ abstract class PlayerHostActivity : ComponentActivity() {
     internal fun openSettings() = open(SettingsActivity::class.java)
     internal fun openPlayer() {
         if (runtime.playback.state.value.current?.kind == yy.daniel.yyplayerforandroid.playback.MediaKind.AUDIO) {
-            if (this is MainActivity) showMusic()
-            else startActivity(Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP).putExtra("open_music", true))
+            if (this is PlayerActivity) openMusicOnBackStack() else showMusic()
         } else open(PlayerActivity::class.java)
     }
     internal fun openOrientation() = open(OrientationActivity::class.java)
@@ -56,8 +64,12 @@ abstract class PlayerHostActivity : ComponentActivity() {
     }
     internal fun openOnlineSearch() { if (runtime.preferences.value.onlineMusic) open(OnlineSearchActivity::class.java) }
     internal fun openOnlineLyrics() { if (runtime.preferences.value.onlineLyrics) open(OnlineLyricsActivity::class.java) }
-    private fun open(type: Class<out PlayerHostActivity>) {
-        val target = Intent(this, type)
+    /** Push a music destination without clearing or finishing its caller (e.g. online search). */
+    internal fun openMusicOnBackStack() = open(MainActivity::class.java) {
+        putExtra(MainActivity.EXTRA_MUSIC_ON_BACK_STACK, true)
+    }
+    private fun open(type: Class<out PlayerHostActivity>, configure: Intent.() -> Unit = {}) {
+        val target = Intent(this, type).apply(configure)
         if (debugPortrait) target.putExtra("qa_portrait", true)
         startActivity(target) // The platform/HyperOS chooses the transition.
         if (runtime.preferences.value.reduceMotion) suppressTransition()
@@ -79,7 +91,14 @@ abstract class PlayerHostActivity : ComponentActivity() {
                 isAppearanceLightNavigationBars = !dark && !immersive
             }
         }
-        YYPlayerTheme(preferences.theme.mode, preferences.accent.color, content)
+        YYPlayerTheme(preferences.theme.mode, preferences.accent.color) {
+            // Full player destinations already own their controls and cover animation. All
+            // other app pages inherit one dock outside their scrolling/animated content.
+            if (this is MainActivity || this is PlayerActivity) content()
+            else {
+                PlaybackPageHost(this, content)
+            }
+        }
     }
 }
 

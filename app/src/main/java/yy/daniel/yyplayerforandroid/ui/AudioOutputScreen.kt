@@ -61,7 +61,7 @@ internal fun AudioOutputScreen(
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
             LazyColumn(
                 Modifier.widthIn(max = 700.dp).fillMaxWidth(),
-                contentPadding = PaddingValues(top = padding.calculateTopPadding(), bottom = 36.dp + padding.calculateBottomPadding()),
+                contentPadding = PaddingValues(top = padding.calculateTopPadding(), bottom = 36.dp + padding.calculateBottomPadding() + LocalPlaybackBottomSpace.current),
             ) {
                 item { HyperSection("输出策略") }
                 item {

@@ -1,0 +1,54 @@
+[
+  {
+    "file": "YYPlayer_for_Android_0.1.0_arm64-v8a_debug.apk",
+    "bytes": 45259494,
+    "sha256": "09412f8a0fe2796ce8a9cf173b0b33f940a267a1d1095f3af053990176f769a1",
+    "abi": "arm64-v8a",
+    "versionName": "0.1.0",
+    "versionCode": 2,
+    "native_libraries": 12,
+    "compressed_native": false,
+    "elf_16kb_pass": true,
+    "stored_zip_16kb_pass": true,
+    "dex_uncompressed_bytes": 49967888
+  },
+  {
+    "file": "YYPlayer_for_Android_0.1.0_x86_64_debug.apk",
+    "bytes": 50188426,
+    "sha256": "5aa16903b1d9cea9242908f542d8c13931d0cde25eb3b8f4ba0cd9d8bcac32dd",
+    "abi": "x86_64",
+    "versionName": "0.1.0",
+    "versionCode": 2,
+    "native_libraries": 12,
+    "compressed_native": false,
+    "elf_16kb_pass": true,
+    "stored_zip_16kb_pass": true,
+    "dex_uncompressed_bytes": 49967888
+  },
+  {
+    "file": "YYPlayer_for_Android_0.1.0_arm64-v8a_release.apk",
+    "bytes": 14276660,
+    "sha256": "6a156433cbfbe8d462cd6700c7d54314df0a6e70084dc86a5934dc3620b6746a",
+    "abi": "arm64-v8a",
+    "versionName": "0.1.0",
+    "versionCode": 2,
+    "native_libraries": 12,
+    "compressed_native": true,
+    "elf_16kb_pass": true,
+    "stored_zip_16kb_pass": null,
+    "dex_uncompressed_bytes": 4851900
+  },
+  {
+    "file": "YYPlayer_for_Android_0.1.0_x86_64_release.apk",
+    "bytes": 15333852,
+    "sha256": "ee047f889a41e610fd8ed5b96a535cdc63c92d428f0c1dae280705029d9c298a",
+    "abi": "x86_64",
+    "versionName": "0.1.0",
+    "versionCode": 2,
+    "native_libraries": 12,
+    "compressed_native": true,
+    "elf_16kb_pass": true,
+    "stored_zip_16kb_pass": null,
+    "dex_uncompressed_bytes": 4851900
+  }
+]

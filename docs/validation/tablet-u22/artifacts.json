@@ -1,0 +1,58 @@
+[
+  {
+    "file": "YYPlayer_for_Android_0.1.2_x86_64_debug.apk",
+    "variant": "debug",
+    "package": "yy.daniel.yyplayerforandroid",
+    "versionName": "0.1.2",
+    "versionCode": 3,
+    "bytes": 50237626,
+    "sha256": "6280015bead19c0b272db889cd32c7860003f48c4ed0fbf7fda3f9197b97e831",
+    "signed": true
+  },
+  {
+    "file": "YYPlayer_for_Android_0.1.2_arm64-v8a_debug.apk",
+    "variant": "debug",
+    "package": "yy.daniel.yyplayerforandroid",
+    "versionName": "0.1.2",
+    "versionCode": 3,
+    "bytes": 45308694,
+    "sha256": "7a45d24553a2af27357e7342bb1f98a0b8de2cb22bb1cd4d783cbf8f16c0bc37",
+    "signed": true
+  },
+  {
+    "file": "YYPlayer_for_Android_0.1.2_x86_64_release.apk",
+    "variant": "release",
+    "package": "yy.daniel.yyplayerforandroid",
+    "versionName": "0.1.2",
+    "versionCode": 3,
+    "bytes": 15344732,
+    "sha256": "270c90e8e548ed44e00755fc024323e38363c6255678fa78d4b6d060a237324c",
+    "signed": false
+  },
+  {
+    "file": "YYPlayer_for_Android_0.1.2_arm64-v8a_release.apk",
+    "variant": "release",
+    "package": "yy.daniel.yyplayerforandroid",
+    "versionName": "0.1.2",
+    "versionCode": 3,
+    "bytes": 14287536,
+    "sha256": "e0bfbfc33e54122240a593538caa405d61b08ce6e4c4ea5aa9f2b43a6e7e1de4",
+    "signed": false
+  },
+  {
+    "file": "YYPlayer_for_Android_0.1.2_arm64-v8a_debug.apk",
+    "package": "yy.daniel.yyplayerforandroid.qa",
+    "bytes": 45308710,
+    "sha256": "2d62c6f038eaaebee642628be997ffc7e1ccd5774b9004b30cc6424bd67e1572",
+    "signed": true,
+    "certificate": "existing debug certificate; QA only"
+  },
+  {
+    "file": "YYPlayer_for_Android_0.1.2_arm64-v8a_release.apk",
+    "package": "yy.daniel.yyplayerforandroid.qa",
+    "bytes": 14308435,
+    "sha256": "0286e9928440bf7a449437760ce099612ec1f67d77580a55b7395a6bc50ef561",
+    "signed": true,
+    "certificate": "existing debug certificate; QA only"
+  }
+]
